@@ -1,0 +1,39 @@
+---
+title: "clean_BurnDay_data"
+author: "Jack Goldman"
+date: "2023-02-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Users/jandr/Documents/PhD/Thesis/SnowVariability_BurnSeverity")
+
+```
+
+load required packages
+```{r}
+library(tidyverse)
+
+```
+
+Load required data
+```{r}
+df_burnday <- read.csv("Data/01_2020/boreal_fires_start.csv")
+```
+
+Get julian burn date for each fire
+```{r}
+df_burnday2 <- df_burnday %>% 
+  mutate(BurnDay = ymd(StartBurnDay),
+         BurnDay = yday(BurnDay),
+         StartBurnDay = as.numeric(StartBurnDay),
+         BurnDay_v1 = coalesce(StartBurnDay, BurnDay)) %>% 
+  select(-c(BurnDay, StartBurnDay)) %>% 
+  rename(BurnDay = BurnDay_v1) %>% 
+  select(c(Fire_ID, BurnDay))
+
+# save it
+write.csv(df_burnday2, "Data/BurnDay_01_2020.csv")
+```
+

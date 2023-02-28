@@ -1,0 +1,245 @@
+---
+title: "moisture_indices_interpolation"
+author: "Jack Goldman"
+date: "2023-02-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Users/jandr/Documents/PhD/Thesis/")
+
+```
+
+
+
+
+
+**FINAL DATA CONSISTS OF:**
+      **-Years 2001 to 2019**
+      **-Boreal Shield of Ontario**
+      **-Months May to September**
+
+
+Load required packages
+```{r}
+library(lubridate)
+library(sf)
+library(gstat)
+library(dplyr)
+library(fields)
+library(sp)
+
+```
+
+
+Load required data - we need both the Fire Perimeter data with Start Date and the FWI Data for 1980 to 2019
+```{r}
+df_wx <- read.csv("Data/DailyFWI_80to2019/daily_wx_1980_2019.csv")
+shp_fire <- st_read("OntBSdb/Fire_Perimeters/01_2020/OnShield_FirePerim_01to2020.shp") # has all reuiqred infor
+df_fire <- read.csv("OntBSdb/Topography/On_Fire_Elevation.csv") # as all centroids
+df_burnday <- read.csv("Data/01_2020/boreal_fires_start.csv")
+
+```
+
+
+Join all the required info from the shp_fires to data with the fire centroids (elevation data)
+```{r}
+shp_fire %>% glimpse()
+
+#select required columns
+shp_fire <- shp_fire %>% 
+  select(Fire_ID, FIRE_START, Fire_Year)
+
+# rename id columns to match both dfs and join shpfire to df_fire
+df_fire <- df_fire %>% 
+  rename(Fire_ID = ID1) %>% 
+  mutate(Fire_ID = str_remove(Fire_ID, "_rbr")) %>% 
+  left_join(shp_fire, by = "Fire_ID") 
+
+
+
+```
+
+Get fire start day and join to df_fire
+
+```{r}
+df_burnday %>% 
+  glimpse()
+
+# convert julday in StartBurnDay column to ymd, need to specify year 
+
+create_y <- function(origin, StartBurnDay){
+  datee = as.Date(as.numeric(StartBurnDay), origin = origin) 
+  return(datee) 
+  }
+  
+df_burnday2 <- df_burnday %>% 
+  mutate(filter_burned = yday(ymd(StartBurnDay)),
+         origin = as.Date(ISOdate(Fire_Year, 1, 1))) %>% 
+  filter(is.na(filter_burned)) %>%  
+  mutate(burned = map2(origin, StartBurnDay , create_y)) %>% 
+  unnest(burned) %>% 
+  select(-c(StartBurnDay, origin, filter_burned)) %>% 
+  rename(StartBurnDay = burned) 
+
+# attach df_burnday2 back to df_burnday
+df_burnday <- df_burnday %>% 
+  mutate(filter_burned = yday(ymd(StartBurnDay)),
+         origin = as.Date(ISOdate(Fire_Year, 1, 1)),
+         StartBurnDay = ymd(StartBurnDay)) %>% 
+  filter(!is.na(filter_burned)) %>% 
+  select(-c(filter_burned, origin)) 
+
+  
+df_burnday <-  df_burnday %>% bind_rows(df_burnday2)
+
+#join fire start day to df_fire
+df_burnday <- df_burnday %>% select(Fire_ID, StartBurnDay)
+df_fire <- df_fire %>% left_join(df_burnday, by = "Fire_ID")  
+
+
+# remove 
+df_fire  <- df_fire %>% select(-c(ID2, geometry))
+#remove uneeded dfs
+rm(df_burnday2, df_burnday, shp_fire)
+```
+
+
+I want to get 
+```{r}
+##Format weather date
+df_wx$WX_DATE <- ymd(df_wx$WX_DATE)
+#create interpolation date
+df_fire$interp_date <- as.Date(df_fire$StartBurnDay)
+
+```
+
+remove fires that burned in 2020 and that burned in may or september
+```{r}
+df_fire <-  df_fire %>% 
+  filter(Fire_Year <= "2019") 
+
+## Only keep fires from May to September 
+df_fire$month <- month(df_fire$interp_date)
+## 756 to 748
+df_fire <- subset(df_fire, df_fire$month > 4 & df_fire$month < 10)
+```
+
+
+
+TPS interpolation
+```{r}
+## Convert fire data to a SPDF based on lat/long locations 
+coordinates(df_fire) <- ~ long + lat
+
+##Get unique fire date 
+x <- unique(df_fire$interp_date)
+
+##Create empty dataframe to dump results in 
+final_df <- NULL
+
+
+for (j in (x)){
+  #subset fire id
+  k <- as.Date(j, origin = "1970-01-01")
+  
+  f <- df_fire[df_fire$interp_date == k,]
+  
+  w <- df_wx[df_wx$WX_DATE == k,]
+  
+  xx <- coordinates(f)
+  
+  inner_df <- NULL
+  
+
+  ##For every day, interpolate ISI, FWI, BUI
+  for (i in list("DC", "FFMC", "DMC")){
+    
+    df_sub <- w[,c("LONGITUDE", "LATITUDE", "WX_DATE",i)]
+    
+    
+    ##Create spline that takes long/lat and weather variable 
+    spln <- Tps(df_sub[,1:2], df_sub[,i])
+    
+    ## Predict ISI, FWI, and BUI based on fire coordinates 
+    pred <- predict(spln, x=as.matrix(xx) )
+    
+    
+    df2 <- data.frame(cbind(xx, pred))
+    
+    
+    if (i == "DC"){
+      inner_df <-df2
+      colnames(inner_df[3]) <- c("DC_pred")
+    } else if (i == "DMC"){
+      inner_df$DMC_pred <- df2$V3
+    } else if (i == "FFMC"){
+      inner_df$FFMC_pred <- df2$V3
+    } 
+    inner_df$DATE <- paste0(k)
+  }
+  final_df <- rbind(final_df, inner_df)
+}
+
+write.csv(final_df, "SnowVariability_BurnSeverity/Data/wx_interp_daily.csv")
+
+
+
+## Rename ISI (did not work)
+names(final_df)[names(final_df) == "v3"] <- "DC_pred"
+
+## Change date in final_df to date format
+final_df$DATE <- ymd(final_df$DATE)
+
+```
+
+Interpolation Cleaning - because FFMC and DMC values are bounded (e.g., 1-93 for FFMC), TPS splines do not know this and 
+as a consequence the data could has value above or below these values, we need to control for this setting all values that fall outside of the possible range as the avg value for that day across all sites.
+```{r}
+##Completed observation dataset
+ffmc <- df_wx %>% group_by(WX_DATE) %>% summarise(min.ffmc=min(FFMC), max.ffmc=max(FFMC))
+##Join min/max BUI of completed data with interpolated dataset
+final_df <- left_join(final_df, ffmc, by = c("DATE" = "WX_DATE"))
+##Change the values so they are not outside the min and max. 
+final_df$ffmc2 = case_when(final_df$FFMC_pred < final_df$min.ffmc ~ final_df$min.ffmc,
+                           final_df$FFMC_pred > final_df$max.ffmc ~ final_df$max.ffmc,
+                           TRUE ~ final_df$FFMC_pred)
+
+############ DMC #############
+
+##Completed observation dataset
+dmc <- df_wx %>% group_by(WX_DATE) %>% summarise(min.dmc=min(DMC), max.dmc=max(DMC))
+##Join min/max BUI of completed data with interpolated dataset
+final_df <- left_join(final_df, dmc, by = c("DATE" = "WX_DATE"))
+##Change the values so they are not outside the min and max. 
+final_df$dmc2 = case_when(final_df$DMC_pred < final_df$min.dmc ~ final_df$min.dmc,
+                           final_df$DMC_pred > final_df$max.dmc ~ final_df$max.dmc,
+                           TRUE ~ final_df$DMC_pred)
+```
+
+
+
+Clean up the final dataset, remove predicted values for FFMC and DMC and keep corrected values.
+```{r}
+
+final_df2 <- final_df %>% 
+  select(c("dmc2", "ffmc2", "DC_pred", "DATE", "lat", "long")) %>% 
+  rename(dmc = "dmc2", ffmc = "ffmc2", dc = "DC_pred") %>% 
+  rename_all(tolower)
+
+
+```
+
+Merge fire and weather data 
+```{r}
+## Convert fire data back to data frame
+df<- df_fire %>% 
+  as.data.frame() %>% 
+  left_join(final_df2, by = c("interp_date" = "date", "long" = "long", 
+                                           "lat" = "lat"))
+
+write.csv(df, "SnowVariability_BurnSeverity/Data/FWI_moisture_codes_01_19.csv")
+
+```
+
