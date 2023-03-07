@@ -145,6 +145,8 @@ df_snow <- df_snow %>%
 
 ```
 
+
+Add RBR to the dataframe
 ```{r}
 
 df_rbr <- read.csv("C:/Users/jandr/Documents/PhD/Thesis/OntBSdb/Clean_Tables/OnShield_Fire_BS_v2.csv")
@@ -162,6 +164,21 @@ df_snow <- df_snow %>%
 
 write.csv(df_snow, "SnowVariability_BurnSeverity/Data/snow_fire_dynamics_final.csv")
 
+
+```
+
+
+Add ppt and tmax to the dataframe
+```{r}
+df_ppttmax <- read.csv("SnowVariability_BurnSeverity/Data/ppt_tmax_timesincemelt_01_2020.csv")
+
+df_snow <- df_snow %>% 
+  left_join(df_ppttmax, by = "Fire_ID")
+
+df_snow <- df_snow %>% 
+  dplyr::select(-c(X.y, avg_vpd, avg_cmi, X.x))
+
+write.csv(df_snow, "SnowVariability_BurnSeverity/Data/snow_fire_dynamics_final.csv")
 
 ```
 
