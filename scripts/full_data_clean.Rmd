@@ -127,8 +127,41 @@ df_snow <- df_snow %>%
   dplyr::select(-c(X))
 ```
 
+
+
+
 save it
 ```{r}
 write.csv(df_snow, "SnowVariability_BurnSeverity/Data/snow_fire_dynamics.csv")
+```
+
+join topography - after joining topography we save a new separate file because of we dont want Tri that equalled NA
+```{r}
+
+
+df_snow <- df_snow %>% 
+  left_join(df_tri2, by = "Fire_ID") 
+
+
+```
+
+```{r}
+
+df_rbr <- read.csv("C:/Users/jandr/Documents/PhD/Thesis/OntBSdb/Clean_Tables/OnShield_Fire_BS_v2.csv")
+
+df_rbr <- df_rbr %>% 
+  dplyr::select(raster_id, RBR_median, RBR_quant, RBR_coefvar) 
+
+df_rbr$raster_id <- str_remove(df_rbr$raster_id, "_rbr")
+
+df_rbr <- df_rbr %>% 
+  rename(Fire_ID = raster_id)
+
+df_snow <- df_snow %>% 
+  left_join(df_rbr, by = "Fire_ID")
+
+write.csv(df_snow, "SnowVariability_BurnSeverity/Data/snow_fire_dynamics_final.csv")
+
+
 ```
 
