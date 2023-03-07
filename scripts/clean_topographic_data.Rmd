@@ -1,0 +1,110 @@
+---
+title: "clean_topography"
+author: "Jack Goldman"
+date: "2023-03-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Users/jandr/Documents/PhD/Thesis/")
+
+```
+
+Load required packages 
+```{r}
+library(sf)
+library(tidyverse)
+library(exactextractr)
+library(raster)
+library(spatialEco)
+```
+
+
+Read in DEM using raster package
+```{r}
+shpFires= st_read ("C:/Users/jandr/Documents/PhD/Thesis/OntBSdb/Fire_Perimeters/01_2020/OnShield_FirePerim_01to2020.shp")
+elev <- raster("C:/Users/jandr/Documents/PhD/Thesis/shield_elev-0000000000-0000000000.tif")
+
+```
+
+
+create a dem for each fire
+```{r}
+
+pathOut <- "C:/Users/jandr/Documents/PhD/Thesis/Data/Fire_perim_dems_01_2020"
+
+
+#loop
+
+shpFires <- st_as_sf(shpFires)
+shpFires = vect(shpFires)
+setwd(pathOut)
+
+for (i in 1:nrow(shpFires)){
+  
+
+  shpFires1 <- shpFires[i,]
+  FireID <- shpFires1 %>% pull(Fire_ID) # get the specific fire id 
+  crop1 = raster::crop(elev, shpFires1)
+  mask1 = raster::mask(crop1, shpFires1)
+  outFile <- paste0(FireID, '_DEM.tif')
+  raster::writeRaster(mask1, outFile,)
+  rm(FireID,shpFires1,crop1,outFile)
+  i + 1
+}
+
+```
+
+
+
+Extract for each fire perimeter
+```{r}
+
+path.In <- "C:/Users/jandr/Documents/PhD/Thesis/Data/Fire_perim_dems_01_2020/"
+dem.list <- list.files(path.In, pattern = glob2rx("*DEM.tif"))
+
+datalist = list()
+for (i in 1:length(dem.list)){
+  
+  #read in your raster
+  ras <- terra::rast(paste0(path.In,dem.list[i]))
+  fireID <- unlist(strsplit(dem.list[i],"[.tif]"))[1]
+  fireID <- str_remove(fireID, "_DEM")
+  fire <- shpFires[shpFires$Fire_ID == fireID,]
+  tri_ras <- tri(ras)
+  extract1  <- exact_extract(tri_ras, fire, 'mean', full_colnames = TRUE) # extract the mean
+  extract1$Fire_ID <- fireID # get the specific fire id and make it a column
+  datalist[[i]] <- extract1  
+} 
+
+df_tri <-  as.data.frame(data.table::rbindlist(datalist))
+
+df_tri <- df_tri %>% 
+  rename(tri = V1)
+
+```
+
+# how many nan ID's
+```{r}
+#10 id's
+nan_ids <- df_tri %>% filter(tri == "NaN") %>% pull(Fire_ID)
+```
+
+how many 0 IDs
+```{r}
+zero_ids <- df_tri %>% filter(tri < 0.5) 
+```
+
+remove nans
+```{r}
+df_tri2<- df_tri %>% 
+  filter(tri != "NaN")
+```
+
+
+Save the file
+```{r}
+write.csv(df_tri2, "SnowVariability_BurnSeverity/Data/terrain_ruggedness_index_01_2020.csv")
+```
+
