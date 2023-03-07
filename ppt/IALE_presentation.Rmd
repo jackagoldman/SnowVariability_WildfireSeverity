@@ -1,0 +1,14 @@
+---
+title: "The effects of snow cover on wildfire burn severity in the boreal forest "
+author: "Jack Goldman"
+date: "2023-03-07"
+output: powerpoint_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_knit$set(root.dir = "C:/Users/jandr/Documents/PhD/Thesis/")
+```
+
+---
+
