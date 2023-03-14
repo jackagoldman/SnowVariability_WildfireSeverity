@@ -1,0 +1,395 @@
+---
+title: "sem"
+author: "Jack Goldman"
+date: "2023-03-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Users/jandr/Documents/PhD/Thesis/SnowVariability_BurnSeverity/")
+
+```
+
+## Data analysis for structural equation Model
+
+Load packages
+```{r}
+library(piecewiseSEM)
+library(nlme)
+library(tidyverse)
+
+```
+
+
+read in data
+```{r}
+df_snow <- read.csv("Data/snow_fire_dynamics_final3.csv") %>% 
+  filter(Fire_Year < 2020 | Fire_Year <=2001) 
+
+#where are nas
+nas <-  df_snow %>% 
+  select_if(function(x) any(is.na(x))) #ecoregion na's
+
+#omit na's
+new_data <- df_snow %>% select(-c(ecoregion)) %>% na.omit(.)
+
+#make sure DC is greater than 0
+new_data <- new_data %>% filter( dc > 0) 
+
+
+#sqrt transform rbr quant
+new_data <- new_data %>% mutate(rbr_qs = sqrt((max(RBR_quant+1)-RBR_quant)))
+hist(new_data$rbr_qs)
+
+
+```
+
+
+
+
+Fit structural equation model - all fires:
+- I removed climate data because DC takes into consideration ppt and temperature from the first day of the fire season.
+- Should snow Accumulation day be included because of Chelene's past work? Chelene found that Overwintering DC has an effect, therefore the day that snow fell would determine overwintering DC.
+-DC is correlated with time since snow melt because DC is cumulative and would differ based on the amount of days between the start of the fire season and fire burn, should theoretically increase as TSSM increases
+- TSSM includes burn day, therefore ignition probabilities are likely influenced by canopy closure, bioamass and age. As biomass increases, ignition probability is higher, and as canopy closure increases, ignition and spread is more ikely and as age increases, more flammable fuel.  
+
+
+
+Get month/season of fire of fire 
+```{r}
+#create season
+new_data <- new_data %>% 
+  mutate(fmonth = lubridate::month(Fire_Start),
+         season = case_when(fmonth <= 6 ~ 1,
+                            fmonth > 6 & fmonth <=8 ~ 2,
+                            fmonth > 8 ~ 3))
+
+#east vs. west
+new_data_w <- new_data %>% filter(pyroregion == 1)
+new_data_e <- new_data %>% filter(pyroregion == 0)
+
+west_sp <- new_data_w %>% filter(season == 1)
+east_sp <- new_data_e %>% filter(season == 1)
+
+
+
+
+```
+
+```{r}
+vif.lme <- function (mod) #taken from github/gmonette/spida15
+{
+    if (any(is.na(fixef(mod)))) 
+        stop("there are aliased coefficients in the model")
+    v <- vcov(mod)
+    mm <- model.matrix(formula(mod), mod$data)
+    assign <- attributes(mm)$assign
+    if (names(fixef(mod)[1]) == "(Intercept)") {
+        v <- v[-1, -1]
+        assign <- assign[-1]
+    }
+    else warning("No intercept: vifs may not be sensible.")
+    terms <- labels(terms(mod))
+    n.terms <- length(terms)
+    if (n.terms < 2) 
+        stop("model contains fewer than 2 terms")
+    R <- cov2cor(v)
+    detR <- det(R)
+    result <- matrix(0, n.terms, 3)
+    rownames(result) <- terms
+    colnames(result) <- c("GVIF", "Df", "GVIF^(1/2Df)")
+    for (term in 1:n.terms) {
+        subs <- which(assign == term)
+        result[term, 1] <- det(as.matrix(R[subs, subs])) * det(as.matrix(R[-subs, 
+            -subs]))/detR
+        result[term, 2] <- length(subs)
+    }
+    if (all(result[, 2] == 1)) 
+        result <- result[, 1]
+    else result[, 3] <- result[, 1]^(1/(2 * result[, 2]))
+    result
+  }
+```
+
+test individual model paths for multicollinearity
+```{r, Extreme burn severity}
+
+#cc and avg biomass are highly correlated
+vif.lme(lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+    avgBio + cc, random = list(size_class =~1, Fire_Year =~1), data = new_data))
+
+vif.lme(lme(tssm ~ sdd + tri , random = list(size_class =~1, Fire_Year =~1), data = new_data))
+
+#cc and avg biomass are highly correlated
+vif.lme(lme(sdd ~ cc + avgBio + age + tri , random = list(size_class =~1, Fire_Year =~1), data = new_data))
+
+#compare models with cc or avgbio AIC 
+rbr_bio <- lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+    avgBio,random = list(size_class =~1, Fire_Year =~1), data = new_data)
+
+rbr_cc <- lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+    cc   , random = list(size_class =~1, Fire_Year =~1), data = new_data)
+AIC(rbr_bio, rbr_cc) # CC is greater by .400 , I chose to use bio because it better predicts sdd
+
+sdd_bio <- lme(sdd ~  avgBio + age + tri , random = list(size_class =~1, Fire_Year =~1), data = new_data)
+
+sdd_cc <- lme(sdd ~  cc+ age + tri , random = list(size_class =~1, Fire_Year =~1), data = new_data)
+
+AIC(sdd_bio, sdd_cc)# biomass has lower AIC
+
+
+
+
+```
+```{r, Median Burn Severity}
+#cc and avg biomass are highly correlated
+vif.lme(lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+    avgBio + cc, random = list(size_class =~1, Fire_Year =~1), data = new_data))
+
+#compare models with cc or avgbio AIC 
+mean_bio <- lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+    avgBio,random = list(size_class =~1, Fire_Year =~1), data = new_data)
+
+mean_cc <- lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+    cc   , random = list(size_class =~1, Fire_Year =~1), data = new_data)
+AIC(mean_bio, mean_cc) # CC is greater by 1.300 , I chose to use bio because it better predicts sdd
+
+```
+
+
+#Extreme
+
+### all of ontario
+```{r}
+sem_ext <- psem(
+  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+         avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ sdd + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML")
+)
+
+
+#summary
+summary(sem_ext)
+```
+
+When running the model on the entire dataset, there was an signficant independence claim which was that drought code has a significant impact on 
+time since snowmelt. We refit the model:
+
+
+```{r}
+sem_ext_2 <- psem(
+  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ sdd + tri + dc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML")
+)
+
+#summary
+summary(sem_ext_2)
+
+```
+SDD did not have an impact on extreme burn severity - this suggests that snowmelt timing does not influence burn severity, a possbile explanation for this is that snowmelt timing is heterogenous across a landscape and by averaging snowmelt timing and rbr across the perimeter we are homogeneizng both SDD and RBR, therefore we are unable to pick up variations in both sdd/rbr. Further investigations that consider variation in both.
+TSSM had a signfiicant impact on extreme burn severity - As time sine snowmelt increased, burn severity increased. 
+DC had a significant impact on extreme burn severity - As DC increased, burn severity decreased.
+Forest structural diversity was a strong predictor of extreme burn severity:
+- as age increased, burn severity decreased - older stands decreased burn severity.
+- as biomass increased, burn severity increased - overall biomass increased burn severity.
+- as canopy closure increased burn severity decreased - suggesting that live foliar biomass significantly reduces burn severity, this may be a result of reduced flammability of live foliage.
+SDD had a signficant impact on time since snowmelt - as snowmelt got later in the year, ignition date decreased.
+As DC increased, time since snowmelt increased - this suggests that decreases in fuel moisture significantly are a strong predictor of ignition and that ignitions were more likely later in the year when drought code increased.
+SDD was significantly influence by Biomass, age and topography;
+- as biomass increased, SDD was earlier
+- as age increased, SDD was later
+- as topography increased, sdd was earlier
+
+
+
+
+Lets make path coefficients easy and write to csv
+```{r}
+modsum <- summary(sem_ext_2)$coefficients
+modsum$Estimate <- round(modsum$Estimate, 3)
+modsum$Std.Error <- round(modsum$Std.Error, 3)
+modsum$Crit.Value <- round(modsum$Crit.Value, 3)
+modsum$P.Value <- round(modsum$P.Value, 3)
+modsum$P.Value <- ifelse(modsum$P.Value<0.001, "<0.001", modsum$P.Value)
+modsum$Std.Estimate <- round(modsum$Std.Estimate, 3)
+modsum$Response <- gsub("_", " ", modsum$Response)
+modsum$Predictor <- gsub("_", " ", modsum$Predictor)
+colnames(modsum)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum
+
+write.csv(modsum, "results/results-summary-tables/Table_S1.csv")
+```
+
+
+# Median burn severity for all of Ontario
+
+
+```{r}
+sem_med <- psem(
+  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+        avgBio, random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ sdd + tri, random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
+  lme(sdd ~ avgBio + age + tri,random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML")
+)
+
+
+#summary
+summary(sem_med)
+```
+Independence claim suggest significant impact of drought code on time since snowmelt
+
+```{r}
+sem_med_2 <- psem(
+  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+        avgBio, random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ sdd + tri +dc + age,random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
+  lme(sdd ~ avgBio + age + tri, random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML")
+)
+
+
+#summary
+summary(sem_med_2)
+```
+SDD has an effect on median burn severity , as snowmelt increased median burn severity decreased.
+ - the difference between this and extreme is consistent with the literature that suggests that more extreme fire events are caused by extreme fire weather and when fire weather is extreme it minimizes or negates the impact of other drivers. I.e. extreme fire weather is more powerful and overcomes in the importance of other drivers. Therefore it is expected that extreme severity events occur under extreme fire conditions making snowmelt timing impact negligible.
+
+
+
+
+
+```{r}
+modsum <- summary(sem_med_2)$coefficients
+modsum$Estimate <- round(modsum$Estimate, 3)
+modsum$Std.Error <- round(modsum$Std.Error, 3)
+modsum$Crit.Value <- round(modsum$Crit.Value, 3)
+modsum$P.Value <- round(modsum$P.Value, 3)
+modsum$P.Value <- ifelse(modsum$P.Value<0.001, "<0.001", modsum$P.Value)
+modsum$Std.Estimate <- round(modsum$Std.Estimate, 3)
+modsum$Response <- gsub("_", " ", modsum$Response)
+modsum$Predictor <- gsub("_", " ", modsum$Predictor)
+colnames(modsum)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum
+
+write.csv(modsum, "results/results-summary-tables/Table_S2.csv")
+```
+
+
+
+
+
+
+
+
+
+
+
+**What happens when we look at ecoregion patterns?**
+
+### west 
+```{r}
+
+west_sem_ext <- psem(
+  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+  lme(tssm ~ sdd + tri + dc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+)
+
+#summary
+summary(west_sem_ext)
+
+#examine plots
+lapply(west_sem_ext, function(i) hist(resid(i))) # looks generally normal
+
+```
+
+
+### east- extreme
+```{r}
+east_sem_ext <- psem(
+  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+        avgBio + cc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(tssm ~ sdd + tri + dc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(sdd ~ cc + avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+)
+
+#summary
+summary(east_sem_ext)
+
+###### looks like we have  5 independence claims
+#tssm ~ age - this is different from the west model and the full model
+
+
+
+#examine plots
+plot(east_sem_ext)
+lapply(east_sem_ext, function(i) hist(resid(i))) # looks generally norma
+```
+
+
+
+Add age to the model predicting time since snowmelt
+```{r}
+east_sem_ext_2 <- psem(
+  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+        avgBio + cc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(sdd ~ cc + avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+)
+#summary
+summary(east_sem_ext_2)
+
+
+
+
+
+#examine plots
+plot(east_sem_ext)
+lapply(east_sem_ext, function(i) hist(resid(i))) # looks generally norma
+```
+No effects of dc or sdd but a near effect of tssm 
+tssm.
+cc*
+
+
+TSSm effects
+sdd*
+
+SDD effects
+age***
+tri.
+
+
+
+
+######## Notes
+When looking at the results from the updated sem, we find that:
+1. DC has a significant positive effect on extreme burn severity, we find a 
+2. time since snow melt had a significant negative effect on extreme burn severity , for every 1 day that the fire burned closer to the snow melt date, we save decrease in burn severity.
+3. sdd had a significant negative effect on extreme burn severity, -1.8 coeff
+4. age, avgBio and cc all has significant effects, age was most significant with every 1.9 year increase in age, burn severity increased. 
+5. as biomass decreased burn severity descreased, for everty 2% decrease in burn severity we saw a decrease in burn severity
+6.  as CC increased burn severity increased, for every 2 % increase in canopy cover we observed an increase in burn severity
+
+Our model also showed that time since snow melt is -
+1. significantly affect by snow disturbance date, for every day that snowmelt timing day becomes earlier, we observed a derease in tssm. suggesting that burn day, or ignition became earlier based on snowmelt. Therefore snowmelt might lead to earlier fires. This relationship is represented in the literature
+2. time since snowmelt was significantly effect by terrain ruggedness index - 
+
+SDD is significantly effect by:
+cc*
+avgbio***
+age***
+tri**
+
+
+Our hypothesized relationship structure only explained 11% (17%) of the variance in extreme burn severity. However,  SDD had a stronger relationship with ext severity than DC. 
+
+Our hypothesized relationship structure only explained 28% (67%) of the variance in tssm. This suggests that tssm which could be thought of as a proxy for ignition, can be moderately explained by our relationship structure.
+
+
+
+
