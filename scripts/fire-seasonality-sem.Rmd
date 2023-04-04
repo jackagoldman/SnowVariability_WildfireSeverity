@@ -1,0 +1,108 @@
+---
+title: "fire-seasonality-sem"
+author: "Jack A Goldman"
+date: "2023-04-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/")
+
+```
+
+
+## Data analysis for structural equation Model
+
+Load packages
+
+```{r}
+library(piecewiseSEM)
+library(nlme)
+library(tidyverse)
+
+```
+
+
+Read in data
+
+```{r}
+df_snow <- read.csv("Data/0-forest-snow-fire-data.csv") %>% 
+  filter(Fire_Year < 2020 | Fire_Year <=2001) 
+
+#where are nas
+nas <-  df_snow %>% 
+  select_if(function(x) any(is.na(x))) #ecoregion na's
+
+#omit na's
+new_data <- df_snow %>% select(-c(ecoregion)) %>% na.omit(.)
+
+#make sure DC is greater than 0
+new_data <- new_data %>% filter( dc > 0) 
+
+
+
+```
+
+RBR quant is negatively skewed. Fix this using square root
+transformation for negatively skewed data
+
+```{r}
+#sqrt transform rbr quant
+new_data <- new_data %>% mutate(rbr_qs = sqrt((max(RBR_quant+1)-RBR_quant)))
+hist(new_data$rbr_qs)
+```
+
+```{r}
+# fire seasonality
+
+#create season
+new_data <- new_data %>% 
+  mutate(fmonth = lubridate::month(Fire_Start),
+         season = case_when(fmonth <= 6 ~ 1,
+                            fmonth > 6 & fmonth <=8 ~ 2,
+                          fmonth > 8 ~ 3))
+
+#east vs. west
+new_data_w <- new_data %>% filter(pyroregion == 1)
+new_data_e <- new_data %>% filter(pyroregion == 0)
+
+#spring fires
+new_data_sp <- new_data %>% filter(season == 1) # 195 observations
+west_sp <- new_data_w %>% filter(season == 1) # 126 observations
+east_sp <- new_data_e %>% filter(season == 1) # 69 observations 
+
+#summer fires
+new_data_sm <- new_data %>% filter(season == 2) # 412 observations
+west_sm <- new_data_w %>% filter(season == 2)# 297 observations
+east_sm <- new_data_e  %>%  filter(season ==2)# 115 observations
+
+#fall fires
+new_data_fl <- new_data %>% filter(season == 3) # 82 observations
+west_fl <- new_data_w %>% filter(season == 3)# 71 observations
+east_fl <- new_data_e  %>%  filter(season ==3)# 11 observations
+
+```
+
+
+
+
+### West - spring
+
+```{r}
+```{r, median burn severity }
+west_sem_med <- psem(
+  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+)
+
+#summary
+summary(west_sem_med)
+
+#examine plots
+lapply(west_sem_med, function(i) hist(resid(i))) # looks generally normal
+```
+
+
