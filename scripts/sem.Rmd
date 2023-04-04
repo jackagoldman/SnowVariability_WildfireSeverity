@@ -11,7 +11,7 @@ bibliography: references.bib
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "C:/Users/jandr/Documents/PhD/Thesis/SnowVariability_BurnSeverity/")
+knitr::opts_knit$set(root.dir = "/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/")
 
 ```
 
@@ -29,7 +29,7 @@ library(tidyverse)
 Read in data
 
 ```{r}
-df_snow <- read.csv("Data/snow_fire_dynamics_final3.csv") %>% 
+df_snow <- read.csv("Data/0-forest-snow-fire-data.csv") %>% 
   filter(Fire_Year < 2020 | Fire_Year <=2001) 
 
 #where are nas
@@ -73,10 +73,6 @@ Get month/season of fire of fire
 
 ```{r}
 
-#east vs. west
-new_data_w <- new_data %>% filter(pyroregion == 1)
-new_data_e <- new_data %>% filter(pyroregion == 0)
-
 
 # fire seasonality
 
@@ -85,7 +81,11 @@ new_data <- new_data %>%
   mutate(fmonth = lubridate::month(Fire_Start),
          season = case_when(fmonth <= 6 ~ 1,
                             fmonth > 6 & fmonth <=8 ~ 2,
-                            fmonth > 8 ~ 3))
+                          fmonth > 8 ~ 3))
+
+#east vs. west
+new_data_w <- new_data %>% filter(pyroregion == 1)
+new_data_e <- new_data %>% filter(pyroregion == 0)
 
 #spring fires
 new_data_sp <- new_data %>% filter(season == 1) # 195 observations
@@ -357,15 +357,16 @@ lapply(west_sem_ext, function(i) hist(resid(i))) # looks generally normal
 ```{r}
 east_sem_ext <- psem(
   lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-        avgBio + cc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(tssm ~ sdd + tri + dc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(sdd ~ cc + avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+        avgBio + cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
 )
 
+#cc may be better than avgBio here
 #summary
 summary(east_sem_ext)
 
-###### looks like we have  5 independence claims
+###### looks like we have  an independence claim
 #tssm ~ age - this is different from the west model and the full model
 
 
@@ -375,32 +376,57 @@ plot(east_sem_ext)
 lapply(east_sem_ext, function(i) hist(resid(i))) # looks generally norma
 ```
 
-Add age to the model predicting time since snowmelt
+### West - median
 
-```{r}
-east_sem_ext_2 <- psem(
-  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-        avgBio + cc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + age, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(sdd ~ cc + avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+```{r, median burn severity }
+west_sem_med <- psem(
+  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
 )
+
 #summary
-summary(east_sem_ext_2)
-
-
-
-
+summary(west_sem_med)
 
 #examine plots
-plot(east_sem_ext)
-lapply(east_sem_ext, function(i) hist(resid(i))) # looks generally norma
+lapply(west_sem_med, function(i) hist(resid(i))) # looks generally normal
+```
+### East SEM - med
+
+```{r}
+east_sem_med <- psem(
+  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+)
+
+#summary
+summary(east_sem_med)
+
+#examine plots
+lapply(east_sem_med, function(i) hist(resid(i))) # looks generally normal
 ```
 
-No effects of dc or sdd but a near effect of tssm tssm. cc\*
 
-TSSm effects sdd\*
 
-SDD effects age\*\*\* tri.
+RBR cv negative skewed
+```{r}
+new_data_cv <- new_data %>% mutate(rbr_cv= log10(RBR_cv))
+hist(new_data_cv$rbr_cv)
+```
+```{r}
+sem_cv <- psem(
+  lme(rbr_cv ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age +avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML")
+)
+#summary
+summary(sem_cv)
+```
+
 
 ######## Notes
 
