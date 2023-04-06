@@ -350,15 +350,60 @@ summary(west_sem_ext)
 #examine plots
 lapply(west_sem_ext, function(i) hist(resid(i))) # looks generally normal
 
+#
+#tidy table
+modsum <- summary(west_sem_ext)$coefficients
+modsum$Estimate <- round(modsum$Estimate, 3)
+modsum$Std.Error <- round(modsum$Std.Error, 3)
+modsum$Crit.Value <- round(modsum$Crit.Value, 3)
+modsum$P.Value <- round(modsum$P.Value, 3)
+modsum$P.Value <- ifelse(modsum$P.Value<0.001, "<0.001", modsum$P.Value)
+modsum$Std.Estimate <- round(modsum$Std.Estimate, 3)
+modsum$Response <- gsub("_", " ", modsum$Response)
+modsum$Predictor <- gsub("_", " ", modsum$Predictor)
+colnames(modsum)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum %>% kable()
+write.csv(modsum, "results/results-summary-tables/Table_S3.csv")
+
 ```
 
+```{r, west med}
+west_sem_med <- psem(
+  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+)
+
+#summary
+summary(west_sem_med)
+
+#examine plots
+lapply(west_sem_ext, function(i) hist(resid(i))) # looks generally normal
+
+#
+#tidy table
+modsum_wse <- summary(west_sem_med)$coefficients
+modsum_wse$Estimate <- round(modsum_wse$Estimate, 3)
+modsum_wse$Std.Error <- round(modsum_wse$Std.Error, 3)
+modsum_wse$Crit.Value <- round(modsum_wse$Crit.Value, 3)
+modsum_wse$P.Value <- round(modsum_wse$P.Value, 3)
+modsum_wse$P.Value <- ifelse(modsum_wse$P.Value<0.001, "<0.001", modsum_wse$P.Value)
+modsum_wse$Std.Estimate <- round(modsum_wse$Std.Estimate, 3)
+modsum_wse$Response <- gsub("_", " ", modsum_wse$Response)
+modsum_wse$Predictor <- gsub("_", " ", modsum_wse$Predictor)
+colnames(modsum_wse)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_wse %>% kable()
+write.csv(modsum_wse, "results/results-summary-tables/Table_S4.csv")
+
+```
 ### east- extreme
 
 ```{r}
 east_sem_ext <- psem(
   lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-        avgBio + cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + age, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age +avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
   lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
 )
 
@@ -374,31 +419,32 @@ summary(east_sem_ext)
 #examine plots
 plot(east_sem_ext)
 lapply(east_sem_ext, function(i) hist(resid(i))) # looks generally norma
+
+#
+#tidy table
+modsum_ee <- summary(east_sem_ext)$coefficients
+modsum_ee$Estimate <- round(modsum_ee$Estimate, 3)
+modsum_ee$Std.Error <- round(modsum_ee$Std.Error, 3)
+modsum_ee$Crit.Value <- round(modsum_ee$Crit.Value, 3)
+modsum_ee$P.Value <- round(modsum_ee$P.Value, 3)
+modsum_ee$P.Value <- ifelse(modsum_ee$P.Value<0.001, "<0.001", modsum_ee$P.Value)
+modsum_ee$Std.Estimate <- round(modsum_ee$Std.Estimate, 3)
+modsum_ee$Response <- gsub("_", " ", modsum_ee$Response)
+modsum_ee$Predictor <- gsub("_", " ", modsum_ee$Predictor)
+colnames(modsum_ee)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_ee %>% kable()
+write.csv(modsum_ee, "results/results-summary-tables/Table_S5.csv")
+
 ```
 
-### West - median
 
-```{r, median burn severity }
-west_sem_med <- psem(
-  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + age, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
-)
-
-#summary
-summary(west_sem_med)
-
-#examine plots
-lapply(west_sem_med, function(i) hist(resid(i))) # looks generally normal
-```
 ### East SEM - med
 
 ```{r}
 east_sem_med <- psem(
   lme(RBR_median ~ dc + tssm + sdd +tri +age + 
         avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + age, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age + avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
   lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
 )
 
@@ -407,26 +453,28 @@ summary(east_sem_med)
 
 #examine plots
 lapply(east_sem_med, function(i) hist(resid(i))) # looks generally normal
+
+#
+#tidy table
+modsum_em <- summary(east_sem_med)$coefficients
+modsum_em$Estimate <- round(modsum_em$Estimate, 3)
+modsum_em$Std.Error <- round(modsum_em$Std.Error, 3)
+modsum_em$Crit.Value <- round(modsum_em$Crit.Value, 3)
+modsum_em$P.Value <- round(modsum_em$P.Value, 3)
+modsum_em$P.Value <- ifelse(modsum_em$P.Value<0.001, "<0.001", modsum_em$P.Value)
+modsum_em$Std.Estimate <- round(modsum_em$Std.Estimate, 3)
+modsum_em$Response <- gsub("_", " ", modsum_em$Response)
+modsum_em$Predictor <- gsub("_", " ", modsum_em$Predictor)
+colnames(modsum_em)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_em %>% kable()
+write.csv(modsum_em, "results/results-summary-tables/Table_S6.csv")
+
 ```
 
 
 
-RBR cv negative skewed
-```{r}
-new_data_cv <- new_data %>% mutate(rbr_cv= log10(RBR_cv))
-hist(new_data_cv$rbr_cv)
-```
 
-```{r}
-sem_cv <- psem(
-  lme(rbr_cv ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + age +avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML")
-)
-#summary
-summary(sem_cv)
-```
+
 
 
 ######## Notes
