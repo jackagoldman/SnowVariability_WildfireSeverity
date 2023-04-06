@@ -416,6 +416,7 @@ RBR cv negative skewed
 new_data_cv <- new_data %>% mutate(rbr_cv= log10(RBR_cv))
 hist(new_data_cv$rbr_cv)
 ```
+
 ```{r}
 sem_cv <- psem(
   lme(rbr_cv ~ dc + tssm + sdd +tri +age + 
