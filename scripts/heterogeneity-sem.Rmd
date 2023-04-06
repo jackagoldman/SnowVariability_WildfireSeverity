@@ -1,0 +1,62 @@
+---
+title: "heterogeneity-seasonality-sem"
+author: "Jack A Goldman"
+date: "2023-04-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+df_snow <- read.csv("Data/0-forest-snow-fire-data.csv") %>% 
+  filter(Fire_Year < 2020 | Fire_Year <=2001) 
+
+#where are nas
+nas <-  df_snow %>% 
+  select_if(function(x) any(is.na(x))) #ecoregion na's
+
+#omit na's
+new_data <- df_snow %>% select(-c(ecoregion)) %>% na.omit(.)
+
+#make sure DC is greater than 0
+new_data <- new_data %>% filter( dc > 0) 
+
+#lets get fires that are bigger than 500ha
+new_data <- new_data %>% filter(size_class >=2)
+
+```
+
+
+
+```{r}
+#create season
+new_data <- new_data %>% 
+  mutate(fmonth = lubridate::month(Fire_Start),
+         season = case_when(fmonth <= 6 ~ 1,
+                            fmonth > 6 & fmonth <=8 ~ 2,
+                          fmonth > 8 ~ 3))
+
+#east vs. west
+new_data_w <- new_data %>% filter(pyroregion == 1)
+new_data_e <- new_data %>% filter(pyroregion == 0)
+
+```
+
+RBR cv negative skewed
+```{r}
+new_data_cv <- new_data %>% mutate(rbr_cv= log10(RBR_cv))
+hist(new_data_cv$rbr_cv)
+```
+
+```{r}
+sem_cv <- psem(
+  lme(rbr_cv ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age +avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML")
+)
+#summary
+summary(sem_cv)
+```
