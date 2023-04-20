@@ -4,7 +4,6 @@ author: "Jack A Goldman"
 date: "2023-04-04"
 output: html_document
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = "/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/")
@@ -53,6 +52,8 @@ new_data <- new_data %>% mutate(rbr_qs = sqrt((max(RBR_quant+1)-RBR_quant)))
 hist(new_data$rbr_qs)
 ```
 
+
+
 ```{r}
 # fire seasonality
 
@@ -84,25 +85,85 @@ east_fl <- new_data_e  %>%  filter(season ==3)# 11 observations
 
 ```
 
+check normality for each dataset 
+```{r}
+# west boreal
+hist(west_sp$RBR_median) # slightly negatively skewed
+hist(west_sm$RBR_median) # good.
+hist(west_fl$RBR_median) # slightly positively skewed
+
+# 
+test <- west_sp %>% mutate(rbr_m = sqrt(max(RBR_median+1) - RBR_median))
+hist(test$rbr_m)
+#
+test1 <- west_fl %>% mutate(rbr_m = sqrt(RBR_median))
+hist(test1$rbr_m)
+qqnorm(test1$rbr_m)
+```
 
 
 
 ### West - spring
 
-```{r}
-```{r, median burn severity }
-west_sem_med <- psem(
+```{r, west sem med spring}
+
+west_sp_med <- psem(
   lme(RBR_median ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + age, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = west_sp, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age + avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = west_sp, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = west_sp, method = "ML")
 )
 
 #summary
-summary(west_sem_med)
+summary(west_sp_med)
 
 #examine plots
-lapply(west_sem_med, function(i) hist(resid(i))) # looks generally normal
-```
+lapply(west_sp_med, function(i) hist(resid(i))) # looks generally normal
 
+
+#tidy table
+modsum_ <- summary(west_sm_med)$coefficients
+modsum_em$Estimate <- round(modsum_em$Estimate, 3)
+modsum_em$Std.Error <- round(modsum_em$Std.Error, 3)
+modsum_em$Crit.Value <- round(modsum_em$Crit.Value, 3)
+modsum_em$P.Value <- round(modsum_em$P.Value, 3)
+modsum_em$P.Value <- ifelse(modsum_em$P.Value<0.001, "<0.001", modsum_em$P.Value)
+modsum_em$Std.Estimate <- round(modsum_em$Std.Estimate, 3)
+modsum_em$Response <- gsub("_", " ", modsum_em$Response)
+modsum_em$Predictor <- gsub("_", " ", modsum_em$Predictor)
+colnames(modsum_em)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_em %>% kable()
+write.csv(modsum_em, "results/results-summary-tables/Table_S7.csv")
+```
+### West - summer
+```{r, west sem med summer}
+
+west_sm_med <- psem(
+  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = west_sm, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age + avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = west_sm, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = west_sm, method = "ML")
+)
+
+#summary
+summary(west_sm_med)
+
+#examine plots
+lapply(west_sm_med, function(i) hist(resid(i))) # looks generally normal
+
+#tidy table
+modsum_smm <- summary(west_sm_med)$coefficients
+modsum_smm$Estimate <- round(modsum_smm$Estimate, 3)
+modsum_smm$Std.Error <- round(modsum_smm$Std.Error, 3)
+modsum_smm$Crit.Value <- round(modsum_smm$Crit.Value, 3)
+modsum_smm$P.Value <- round(modsum_smm$P.Value, 3)
+modsum_smm$P.Value <- ifelse(modsum_smm$P.Value<0.001, "<0.001", modsum_smm$P.Value)
+modsum_smm$Std.Estimate <- round(modsum_smm$Std.Estimate, 3)
+modsum_smm$Response <- gsub("_", " ", modsum_smm$Response)
+modsum_smm$Predictor <- gsub("_", " ", modsum_smm$Predictor)
+colnames(modsum_smm)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_smm %>% knitr::kable()
+write.csv(modsum_smm, "results/results-summary-tables/Table_S8_wsmm.csv")
+
+```
 
