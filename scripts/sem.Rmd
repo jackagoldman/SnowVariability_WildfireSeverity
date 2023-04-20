@@ -295,22 +295,6 @@ modsum
 write.csv(modsum, "results/results-summary-tables/Table_S2.csv")
 ```
 
-Estimate total effects
-
-```{r}
-library(semEff)
-sem_med_2_eff <- list(
-  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
-        avgBio, random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
-  lme(tssm ~ sdd + tri +dc + age,random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
-  lme(sdd ~ avgBio + age + tri, random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML")
-)
-
-# boostrap total effects - 10000 times
- med.full.sem.boot <- bootEff(sem_med_2_eff, R = 10000, seed = 429, parallel = "no") # failed with NA warning
-
-```
-
 
 ## **What happens when we look at pyrozone patterns?**
 
