@@ -1,0 +1,201 @@
+---
+title: "east-west-sem"
+author: "Jack A Goldman"
+date: "2023-04-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/")
+
+```
+
+
+## Data analysis for structural equation Model
+
+Load packages
+
+```{r}
+library(piecewiseSEM)
+library(nlme)
+library(tidyverse)
+
+```
+
+Read in data
+
+```{r}
+df_snow <- read.csv("Data/0-forest-snow-fire-data.csv") %>% 
+  filter(Fire_Year < 2020 | Fire_Year <=2001) 
+
+#where are nas
+nas <-  df_snow %>% 
+  select_if(function(x) any(is.na(x))) #ecoregion na's
+
+#omit na's
+new_data <- df_snow %>% select(-c(ecoregion)) %>% na.omit(.)
+
+#make sure DC is greater than 0
+new_data <- new_data %>% filter( dc > 0) 
+
+
+
+```
+
+Divide into east and west
+```{r}
+#east vs. west
+new_data_w <- new_data %>% filter(pyroregion == 1)
+new_data_e <- new_data %>% filter(pyroregion == 0)
+```
+
+
+## Western Boreal Shield of Ontario
+
+```{r, Extreme Burn Severity Western Boreal Shield Of Ontario}
+new_data_w1 = new_data_w %>% mutate(dc= c(scale(dc)),
+                                    tssm = c(scale(tssm)),
+                                    sdd = c(scale(sdd)),
+                                    tri = c(scale(tri)),
+                                    age = c(scale(age)),
+                                    avgbio = c(scale(avgBio)))
+
+west_sem_ext <- psem(
+  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
+  lme(tssm ~ sdd + tri + dc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML")
+)
+
+#summary
+summary(west_sem_ext)
+
+#examine plots
+lapply(west_sem_ext, function(i) hist(resid(i))) # looks generally normal
+
+```
+
+
+```{r, summary table for west extreme} 
+#tidy table
+modsum_west_ext <- summary(west_sem_ext)$coefficients
+modsum_west_ext$Estimate <- round(modsum_west_ext$Estimate, 3)
+modsum_west_ext$Std.Error <- round(modsum_west_ext$Std.Error, 3)
+modsum_west_ext$Crit.Value <- round(modsum_west_ext$Crit.Value, 3)
+modsum_west_ext$P.Value <- round(modsum_west_ext$P.Value, 3)
+modsum_west_ext$P.Value <- ifelse(modsum_west_ext$P.Value<0.001, "<0.001", modsum_west_ext$P.Value)
+modsum_west_ext$Std.Estimate <- round(modsum_west_ext$Std.Estimate, 3)
+modsum_west_ext$Response <- gsub("_", " ", modsum_west_ext$Response)
+modsum_west_ext$Predictor <- gsub("_", " ", modsum_west_ext$Predictor)
+colnames(modsum_west_ext)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_west_ext %>% kable()
+write.csv(modsum_west_ext, "results/results-summary-tables/Table-3-sem-ext-west.csv")
+
+```
+
+```{r, west med}
+west_sem_med <- psem(
+  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+)
+
+#summary
+summary(west_sem_med)
+
+#examine plots
+lapply(west_sem_med, function(i) hist(resid(i))) # looks generally normal
+
+#
+#tidy table
+modsum_wm <- summary(west_sem_med)$coefficients
+modsum_wm$Estimate <- round(modsum_wm$Estimate, 3)
+modsum_wm$Std.Error <- round(modsum_wm$Std.Error, 3)
+modsum_wm$Crit.Value <- round(modsum_wm$Crit.Value, 3)
+modsum_wm$P.Value <- round(modsum_wm$P.Value, 3)
+modsum_wm$P.Value <- ifelse(modsum_wm$P.Value<0.001, "<0.001", modsum_wm$P.Value)
+modsum_wm$Std.Estimate <- round(modsum_wm$Std.Estimate, 3)
+modsum_wm$Response <- gsub("_", " ", modsum_wm$Response)
+modsum_wm$Predictor <- gsub("_", " ", modsum_wm$Predictor)
+colnames(modsum_wm)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_wm %>% kable()
+write.csv(modsum_wm, "results/results-summary-tables/Table-4-sem-med-west.csv")
+
+```
+
+## Eastern boreal shield
+
+Eastern boreal shield extreme
+```{r}
+east_sem_ext <- psem(
+  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age +avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+)
+
+#cc may be better than avgBio here
+#summary
+summary(east_sem_ext)
+
+###### looks like we have  an independence claim
+#tssm ~ age - this is different from the west model and the full model
+
+
+
+#examine plots
+plot(east_sem_ext)
+lapply(east_sem_ext, function(i) hist(resid(i))) # looks generally norma
+
+#
+#tidy table
+modsum_ee <- summary(east_sem_ext)$coefficients
+modsum_ee$Estimate <- round(modsum_ee$Estimate, 3)
+modsum_ee$Std.Error <- round(modsum_ee$Std.Error, 3)
+modsum_ee$Crit.Value <- round(modsum_ee$Crit.Value, 3)
+modsum_ee$P.Value <- round(modsum_ee$P.Value, 3)
+modsum_ee$P.Value <- ifelse(modsum_ee$P.Value<0.001, "<0.001", modsum_ee$P.Value)
+modsum_ee$Std.Estimate <- round(modsum_ee$Std.Estimate, 3)
+modsum_ee$Response <- gsub("_", " ", modsum_ee$Response)
+modsum_ee$Predictor <- gsub("_", " ", modsum_ee$Predictor)
+colnames(modsum_ee)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_ee %>% kable()
+write.csv(modsum_ee, "results/results-summary-tables/Table-5-sem-ext-east.csv")
+
+```
+
+### East SEM - med
+
+```{r}
+east_sem_med <- psem(
+  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age + avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+)
+
+#summary
+summary(east_sem_med)
+
+#examine plots
+lapply(east_sem_med, function(i) hist(resid(i))) # looks generally normal
+
+#
+#tidy table
+modsum_em <- summary(east_sem_med)$coefficients
+modsum_em$Estimate <- round(modsum_em$Estimate, 3)
+modsum_em$Std.Error <- round(modsum_em$Std.Error, 3)
+modsum_em$Crit.Value <- round(modsum_em$Crit.Value, 3)
+modsum_em$P.Value <- round(modsum_em$P.Value, 3)
+modsum_em$P.Value <- ifelse(modsum_em$P.Value<0.001, "<0.001", modsum_em$P.Value)
+modsum_em$Std.Estimate <- round(modsum_em$Std.Estimate, 3)
+modsum_em$Response <- gsub("_", " ", modsum_em$Response)
+modsum_em$Predictor <- gsub("_", " ", modsum_em$Predictor)
+colnames(modsum_em)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_em %>% kable()
+write.csv(modsum_em, "results/results-summary-tables/Table-6-sem-med-east.csv")
+
+```
+
