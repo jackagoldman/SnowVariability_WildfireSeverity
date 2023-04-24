@@ -154,10 +154,6 @@ AIC(mean_bio, mean_cc) # CC is greater by 1.300 , I chose to use bio because it 
 
 ### Extreme
 
-```{r}
-
-```
-
 ```{r, Extreme all of Ontario}
 sem_ext <- psem(
   lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
@@ -230,7 +226,7 @@ modsum$Predictor <- gsub("_", " ", modsum$Predictor)
 colnames(modsum)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
 modsum
 
-write.csv(modsum, "results/results-summary-tables/Table_S1.csv")
+write.csv(modsum, "results/results-summary-tables/Table-1-sem-ext-ont.csv")
 ```
 
 ### Median burn severity for all of Ontario
@@ -280,33 +276,39 @@ negligible.
 Clean summary table - code from [@ramus2022]
 
 ```{r}
-modsum <- summary(sem_med_2)$coefficients
-modsum$Estimate <- round(modsum$Estimate, 3)
-modsum$Std.Error <- round(modsum$Std.Error, 3)
-modsum$Crit.Value <- round(modsum$Crit.Value, 3)
-modsum$P.Value <- round(modsum$P.Value, 3)
-modsum$P.Value <- ifelse(modsum$P.Value<0.001, "<0.001", modsum$P.Value)
-modsum$Std.Estimate <- round(modsum$Std.Estimate, 3)
-modsum$Response <- gsub("_", " ", modsum$Response)
-modsum$Predictor <- gsub("_", " ", modsum$Predictor)
-colnames(modsum)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum
+modsum_med_all <- summary(sem_med_2)$coefficients
+modsum_med_all$Estimate <- round(modsum_med_all$Estimate, 3)
+modsum_med_all$Std.Error <- round(modsum_med_all$Std.Error, 3)
+modsum_med_all$Crit.Value <- round(modsum_med_all$Crit.Value, 3)
+modsum_med_all$P.Value <- round(modsum_med_all$P.Value, 3)
+modsum_med_all$P.Value <- ifelse(modsum_med_all$P.Value<0.001, "<0.001", modsum_med_all$P.Value)
+modsum_med_all$Std.Estimate <- round(modsum_med_all$Std.Estimate, 3)
+modsum_med_all$Response <- gsub("_", " ", modsum_med_all$Response)
+modsum_med_all$Predictor <- gsub("_", " ", modsum_med_all$Predictor)
+colnames(modsum_med_all)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_med_all
 
-write.csv(modsum, "results/results-summary-tables/Table_S2.csv")
+write.csv(modsum_med_all, "results/results-summary-tables/Table-2-sem-med-ont.csv")
 ```
 
 
-## **What happens when we look at pyrozone patterns?**
+## What happens when we look at pyrozone patterns?
 
 ### Western Boreal Shield of Ontario
 
 ```{r, Extreme Burn Severity Western Boreal Shield Of Ontario}
+new_data_w1 = new_data_w %>% mutate(dc= c(scale(dc)),
+                                    tssm = c(scale(tssm)),
+                                    sdd = c(scale(sdd)),
+                                    tri = c(scale(tri)),
+                                    age = c(scale(age)),
+                                    avgbio = c(scale(avgBio)))
 
 west_sem_ext <- psem(
   lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
-  lme(tssm ~ sdd + tri + dc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
+  lme(tssm ~ sdd + tri + dc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
+  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML")
 )
 
 #summary
@@ -317,18 +319,18 @@ lapply(west_sem_ext, function(i) hist(resid(i))) # looks generally normal
 
 #
 #tidy table
-modsum <- summary(west_sem_ext)$coefficients
-modsum$Estimate <- round(modsum$Estimate, 3)
-modsum$Std.Error <- round(modsum$Std.Error, 3)
-modsum$Crit.Value <- round(modsum$Crit.Value, 3)
-modsum$P.Value <- round(modsum$P.Value, 3)
-modsum$P.Value <- ifelse(modsum$P.Value<0.001, "<0.001", modsum$P.Value)
-modsum$Std.Estimate <- round(modsum$Std.Estimate, 3)
-modsum$Response <- gsub("_", " ", modsum$Response)
-modsum$Predictor <- gsub("_", " ", modsum$Predictor)
-colnames(modsum)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum %>% kable()
-write.csv(modsum, "results/results-summary-tables/Table_S3.csv")
+modsum_west_ext <- summary(west_sem_ext)$coefficients
+modsum_west_ext$Estimate <- round(modsum_west_ext$Estimate, 3)
+modsum_west_ext$Std.Error <- round(modsum_west_ext$Std.Error, 3)
+modsum_west_ext$Crit.Value <- round(modsum_west_ext$Crit.Value, 3)
+modsum_west_ext$P.Value <- round(modsum_west_ext$P.Value, 3)
+modsum_west_ext$P.Value <- ifelse(modsum_west_ext$P.Value<0.001, "<0.001", modsum_west_ext$P.Value)
+modsum_west_ext$Std.Estimate <- round(modsum_west_ext$Std.Estimate, 3)
+modsum_west_ext$Response <- gsub("_", " ", modsum_west_ext$Response)
+modsum_west_ext$Predictor <- gsub("_", " ", modsum_west_ext$Predictor)
+colnames(modsum_west_ext)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_west_ext %>% kable()
+write.csv(modsum_west_ext, "results/results-summary-tables/Table-3-sem-ext-west.csv")
 
 ```
 
@@ -344,22 +346,22 @@ west_sem_med <- psem(
 summary(west_sem_med)
 
 #examine plots
-lapply(west_sem_ext, function(i) hist(resid(i))) # looks generally normal
+lapply(west_sem_med, function(i) hist(resid(i))) # looks generally normal
 
 #
 #tidy table
-modsum_wse <- summary(west_sem_med)$coefficients
-modsum_wse$Estimate <- round(modsum_wse$Estimate, 3)
-modsum_wse$Std.Error <- round(modsum_wse$Std.Error, 3)
-modsum_wse$Crit.Value <- round(modsum_wse$Crit.Value, 3)
-modsum_wse$P.Value <- round(modsum_wse$P.Value, 3)
-modsum_wse$P.Value <- ifelse(modsum_wse$P.Value<0.001, "<0.001", modsum_wse$P.Value)
-modsum_wse$Std.Estimate <- round(modsum_wse$Std.Estimate, 3)
-modsum_wse$Response <- gsub("_", " ", modsum_wse$Response)
-modsum_wse$Predictor <- gsub("_", " ", modsum_wse$Predictor)
-colnames(modsum_wse)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_wse %>% kable()
-write.csv(modsum_wse, "results/results-summary-tables/Table_S4.csv")
+modsum_wm <- summary(west_sem_med)$coefficients
+modsum_wm$Estimate <- round(modsum_wm$Estimate, 3)
+modsum_wm$Std.Error <- round(modsum_wm$Std.Error, 3)
+modsum_wm$Crit.Value <- round(modsum_wm$Crit.Value, 3)
+modsum_wm$P.Value <- round(modsum_wm$P.Value, 3)
+modsum_wm$P.Value <- ifelse(modsum_wm$P.Value<0.001, "<0.001", modsum_wm$P.Value)
+modsum_wm$Std.Estimate <- round(modsum_wm$Std.Estimate, 3)
+modsum_wm$Response <- gsub("_", " ", modsum_wm$Response)
+modsum_wm$Predictor <- gsub("_", " ", modsum_wm$Predictor)
+colnames(modsum_wm)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_wm %>% kable()
+write.csv(modsum_wm, "results/results-summary-tables/Table-4-sem-med-west.csv")
 
 ```
 
@@ -399,7 +401,7 @@ modsum_ee$Response <- gsub("_", " ", modsum_ee$Response)
 modsum_ee$Predictor <- gsub("_", " ", modsum_ee$Predictor)
 colnames(modsum_ee)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
 modsum_ee %>% kable()
-write.csv(modsum_ee, "results/results-summary-tables/Table_S5.csv")
+write.csv(modsum_ee, "results/results-summary-tables/Table-5-sem-ext-east.csv")
 
 ```
 
@@ -432,7 +434,7 @@ modsum_em$Response <- gsub("_", " ", modsum_em$Response)
 modsum_em$Predictor <- gsub("_", " ", modsum_em$Predictor)
 colnames(modsum_em)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
 modsum_em %>% kable()
-write.csv(modsum_em, "results/results-summary-tables/Table_S6.csv")
+write.csv(modsum_em, "results/results-summary-tables/Table-6-sem-med-east.csv")
 
 ```
 
