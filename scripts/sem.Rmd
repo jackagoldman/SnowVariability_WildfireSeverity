@@ -1,5 +1,5 @@
 ---
-title: "sem"
+title: "ontario-wide-sem"
 author: "Jack Goldman"
 date: "2023-03-06"
 output: html_document
@@ -23,8 +23,19 @@ Load packages
 library(piecewiseSEM)
 library(nlme)
 library(tidyverse)
+```
+
+Source functions
+
+```{r}
+#indirect effects function (call ind.eff)
+source("scripts/indirect-effects-function.R")
+
+#vif function (call vif.lme)
+source("scripts/vif-nlme-function.R")
 
 ```
+
 
 Read in data
 
@@ -55,6 +66,23 @@ new_data <- new_data %>% mutate(rbr_qs = sqrt((max(RBR_quant+1)-RBR_quant)))
 hist(new_data$rbr_qs)
 ```
 
+
+Check the distribution of SDD and TSSM
+
+```{r}
+# check distribution SDD
+hist(new_data$sdd)
+qqnorm(new_data$sdd)
+
+#TSSm
+hist(new_data$tssm)
+qqnorm(new_data$tssm)
+
+
+```
+
+
+
 *Notes:* Fit structural equation model - all fires: - I removed climate
 data because DC takes into consideration ppt and temperature from the
 first day of the fire season. - Should snow Accumulation day be included
@@ -69,46 +97,11 @@ As biomass increases, ignition probability is higher, and as canopy
 closure increases, ignition and spread is more ikely and as age
 increases, more flammable fuel.
 
-Get month/season of fire of fire
 
-```{r}
-
-
-# fire seasonality
-
-#create season
-new_data <- new_data %>% 
-  mutate(fmonth = lubridate::month(Fire_Start),
-         season = case_when(fmonth <= 6 ~ 1,
-                            fmonth > 6 & fmonth <=8 ~ 2,
-                          fmonth > 8 ~ 3))
-
-#east vs. west
-new_data_w <- new_data %>% filter(pyroregion == 1)
-new_data_e <- new_data %>% filter(pyroregion == 0)
-
-#spring fires
-new_data_sp <- new_data %>% filter(season == 1) # 195 observations
-west_sp <- new_data_w %>% filter(season == 1) # 126 observations
-east_sp <- new_data_e %>% filter(season == 1) # 69 observations 
-
-#summer fires
-new_data_sm <- new_data %>% filter(season == 2) # 412 observations
-west_sm <- new_data_w %>% filter(season == 2)# 297 observations
-east_sm <- new_data_e  %>%  filter(season ==2)# 115 observations
-
-#fall fires
-new_data_fl <- new_data %>% filter(season == 3) # 82 observations
-west_fl <- new_data_w %>% filter(season == 3)# 71 observations
-east_fl <- new_data_e  %>%  filter(season ==3)# 11 observations
-
-
-```
 
 Test individual model pathways for multicollinearity using VIF function
 
 ```{r, Extreme burn severity}
-source("scripts/vif-nlme-function.R")
 
 #cc and avg biomass are highly correlated
 vif.lme(lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
@@ -135,6 +128,8 @@ AIC(sdd_bio, sdd_cc)# biomass has lower AIC
 
 ```
 
+
+
 ```{r, Median Burn Severity}
 #cc and avg biomass are highly correlated
 vif.lme(lme(RBR_median ~ dc + tssm + sdd +tri +age + 
@@ -150,6 +145,18 @@ AIC(mean_bio, mean_cc) # CC is greater by 1.300 , I chose to use bio because it 
 
 ```
 
+Look at each models residual vs. fitted plot
+```{r}
+plot(lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+         avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
+plot(lme(tssm ~ sdd + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
+
+plot(lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
+
+```
+
+
+
 # All of Ontario
 
 ### Extreme
@@ -162,9 +169,9 @@ sem_ext <- psem(
   lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML")
 )
 
-
 #summary
 summary(sem_ext)
+
 ```
 
 There was an significant independence claim which was that drought code
@@ -175,7 +182,7 @@ include the pathway tssm \<- dc.
 sem_ext_2 <- psem(
   lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
         avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
-  lme(tssm ~ sdd + tri + dc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ sdd + tri + dc + age + avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
   lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML")
 )
 
@@ -229,6 +236,15 @@ modsum
 write.csv(modsum, "results/results-summary-tables/Table-1-sem-ext-ont.csv")
 ```
 
+calculate indirect effects 
+
+```{r}
+ext_ont_ind_effects <- ind.eff(modsum, response = "extreme")
+
+ext_ont_ind_effects
+```
+
+
 ### Median burn severity for all of Ontario
 
 ```{r}
@@ -251,7 +267,7 @@ since snowmelt - update model to include pathway of tssm \<- dc
 sem_med_2 <- psem(
   lme(RBR_median ~ dc + tssm + sdd +tri +age + 
         avgBio, random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
-  lme(tssm ~ sdd + tri +dc + age,random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ sdd + tri +dc + age + avgBio,random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
   lme(sdd ~ avgBio + age + tri, random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML")
 )
 
@@ -292,182 +308,11 @@ write.csv(modsum_med_all, "results/results-summary-tables/Table-2-sem-med-ont.cs
 ```
 
 
-## What happens when we look at pyrozone patterns?
-
-### Western Boreal Shield of Ontario
-
-```{r, Extreme Burn Severity Western Boreal Shield Of Ontario}
-new_data_w1 = new_data_w %>% mutate(dc= c(scale(dc)),
-                                    tssm = c(scale(tssm)),
-                                    sdd = c(scale(sdd)),
-                                    tri = c(scale(tri)),
-                                    age = c(scale(age)),
-                                    avgbio = c(scale(avgBio)))
-
-west_sem_ext <- psem(
-  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
-  lme(tssm ~ sdd + tri + dc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML")
-)
-
-#summary
-summary(west_sem_ext)
-
-#examine plots
-lapply(west_sem_ext, function(i) hist(resid(i))) # looks generally normal
-
-#
-#tidy table
-modsum_west_ext <- summary(west_sem_ext)$coefficients
-modsum_west_ext$Estimate <- round(modsum_west_ext$Estimate, 3)
-modsum_west_ext$Std.Error <- round(modsum_west_ext$Std.Error, 3)
-modsum_west_ext$Crit.Value <- round(modsum_west_ext$Crit.Value, 3)
-modsum_west_ext$P.Value <- round(modsum_west_ext$P.Value, 3)
-modsum_west_ext$P.Value <- ifelse(modsum_west_ext$P.Value<0.001, "<0.001", modsum_west_ext$P.Value)
-modsum_west_ext$Std.Estimate <- round(modsum_west_ext$Std.Estimate, 3)
-modsum_west_ext$Response <- gsub("_", " ", modsum_west_ext$Response)
-modsum_west_ext$Predictor <- gsub("_", " ", modsum_west_ext$Predictor)
-colnames(modsum_west_ext)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_west_ext %>% kable()
-write.csv(modsum_west_ext, "results/results-summary-tables/Table-3-sem-ext-west.csv")
-
-```
-
-```{r, west med}
-west_sem_med <- psem(
-  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
-)
-
-#summary
-summary(west_sem_med)
-
-#examine plots
-lapply(west_sem_med, function(i) hist(resid(i))) # looks generally normal
-
-#
-#tidy table
-modsum_wm <- summary(west_sem_med)$coefficients
-modsum_wm$Estimate <- round(modsum_wm$Estimate, 3)
-modsum_wm$Std.Error <- round(modsum_wm$Std.Error, 3)
-modsum_wm$Crit.Value <- round(modsum_wm$Crit.Value, 3)
-modsum_wm$P.Value <- round(modsum_wm$P.Value, 3)
-modsum_wm$P.Value <- ifelse(modsum_wm$P.Value<0.001, "<0.001", modsum_wm$P.Value)
-modsum_wm$Std.Estimate <- round(modsum_wm$Std.Estimate, 3)
-modsum_wm$Response <- gsub("_", " ", modsum_wm$Response)
-modsum_wm$Predictor <- gsub("_", " ", modsum_wm$Predictor)
-colnames(modsum_wm)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_wm %>% kable()
-write.csv(modsum_wm, "results/results-summary-tables/Table-4-sem-med-west.csv")
-
-```
-
-### east- extreme
-
 ```{r}
-east_sem_ext <- psem(
-  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + age +avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
-)
 
-#cc may be better than avgBio here
-#summary
-summary(east_sem_ext)
+med_ont_ind_effects <- ind.eff(modsum_med_all, response = "median")
 
-###### looks like we have  an independence claim
-#tssm ~ age - this is different from the west model and the full model
-
-
-
-#examine plots
-plot(east_sem_ext)
-lapply(east_sem_ext, function(i) hist(resid(i))) # looks generally norma
-
-#
-#tidy table
-modsum_ee <- summary(east_sem_ext)$coefficients
-modsum_ee$Estimate <- round(modsum_ee$Estimate, 3)
-modsum_ee$Std.Error <- round(modsum_ee$Std.Error, 3)
-modsum_ee$Crit.Value <- round(modsum_ee$Crit.Value, 3)
-modsum_ee$P.Value <- round(modsum_ee$P.Value, 3)
-modsum_ee$P.Value <- ifelse(modsum_ee$P.Value<0.001, "<0.001", modsum_ee$P.Value)
-modsum_ee$Std.Estimate <- round(modsum_ee$Std.Estimate, 3)
-modsum_ee$Response <- gsub("_", " ", modsum_ee$Response)
-modsum_ee$Predictor <- gsub("_", " ", modsum_ee$Predictor)
-colnames(modsum_ee)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_ee %>% kable()
-write.csv(modsum_ee, "results/results-summary-tables/Table-5-sem-ext-east.csv")
-
+med_ont_ind_effects
+```
 ```
 
-### East SEM - med
-
-```{r}
-east_sem_med <- psem(
-  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + age + avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
-)
-
-#summary
-summary(east_sem_med)
-
-#examine plots
-lapply(east_sem_med, function(i) hist(resid(i))) # looks generally normal
-
-#
-#tidy table
-modsum_em <- summary(east_sem_med)$coefficients
-modsum_em$Estimate <- round(modsum_em$Estimate, 3)
-modsum_em$Std.Error <- round(modsum_em$Std.Error, 3)
-modsum_em$Crit.Value <- round(modsum_em$Crit.Value, 3)
-modsum_em$P.Value <- round(modsum_em$P.Value, 3)
-modsum_em$P.Value <- ifelse(modsum_em$P.Value<0.001, "<0.001", modsum_em$P.Value)
-modsum_em$Std.Estimate <- round(modsum_em$Std.Estimate, 3)
-modsum_em$Response <- gsub("_", " ", modsum_em$Response)
-modsum_em$Predictor <- gsub("_", " ", modsum_em$Predictor)
-colnames(modsum_em)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_em %>% kable()
-write.csv(modsum_em, "results/results-summary-tables/Table-6-sem-med-east.csv")
-
-```
-
-######## Notes
-
-When looking at the results from the updated sem, we find that: 1. DC
-has a significant positive effect on extreme burn severity, we find a 2.
-time since snow melt had a significant negative effect on extreme burn
-severity , for every 1 day that the fire burned closer to the snow melt
-date, we save decrease in burn severity. 3. sdd had a significant
-negative effect on extreme burn severity, -1.8 coeff 4. age, avgBio and
-cc all has significant effects, age was most significant with every 1.9
-year increase in age, burn severity increased. 5. as biomass decreased
-burn severity descreased, for everty 2% decrease in burn severity we saw
-a decrease in burn severity 6. as CC increased burn severity increased,
-for every 2 % increase in canopy cover we observed an increase in burn
-severity
-
-Our model also showed that time since snow melt is - 1. significantly
-affect by snow disturbance date, for every day that snowmelt timing day
-becomes earlier, we observed a decrease in tssm. suggesting that burn
-day, or ignition became earlier based on snowmelt. Therefore snowmelt
-might lead to earlier fires. This relationship is represented in the
-literature 2. time since snowmelt was significantly effect by terrain
-ruggedness index -
-
-SDD is significantly effect by: cc *avgbio* **age**\* tri\*\*
-
-Our hypothesized relationship structure only explained 11% (17%) of the
-variance in extreme burn severity. However, SDD had a stronger
-relationship with ext severity than DC.
-
-Our hypothesized relationship structure only explained 28% (67%) of the
-variance in tssm. This suggests that tssm which could be thought of as a
-proxy for ignition, can be moderately explained by our relationship
-structure.

@@ -52,8 +52,7 @@ new_data <- new_data %>% mutate(rbr_qs = sqrt((max(RBR_quant+1)-RBR_quant)))
 hist(new_data$rbr_qs)
 ```
 
-
-
+Get fire season and split data
 ```{r}
 # fire seasonality
 
