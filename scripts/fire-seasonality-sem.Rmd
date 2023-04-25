@@ -70,16 +70,16 @@ new_data_e <- new_data %>% filter(pyroregion == 0)
 #spring fires
 new_data_sp <- new_data %>% filter(season == 1) # 195 observations
 west_sp <- new_data_w %>% filter(season == 1) # 126 observations
-east_sp <- new_data_e %>% filter(season == 1) # 69 observations 
+east_sp <- new_data_e %>% filter(season == 1) # 69 observations  - not enough with CC
 
 #summer fires
-new_data_sm <- new_data %>% filter(season == 2) # 412 observations
+new_data_sm <- new_data %>% filter(season == 2) # 412 observations - 
 west_sm <- new_data_w %>% filter(season == 2)# 297 observations
 east_sm <- new_data_e  %>%  filter(season ==2)# 115 observations
 
 #fall fires
-new_data_fl <- new_data %>% filter(season == 3) # 82 observations
-west_fl <- new_data_w %>% filter(season == 3)# 71 observations
+new_data_fl <- new_data %>% filter(season == 3) # 82 observations - 2 over with cc
+west_fl <- new_data_w %>% filter(season == 3)# 71 observations - not enough with cc
 east_fl <- new_data_e  %>%  filter(season ==3)# 11 observations
 
 ```
