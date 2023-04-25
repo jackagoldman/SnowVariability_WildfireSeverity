@@ -65,5 +65,6 @@ ind.eff <- function(df, response){
     colnames(table2) = cols
     return(table2)
   }
-  
 }
+  
+  
