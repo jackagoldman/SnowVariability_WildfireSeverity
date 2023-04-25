@@ -31,8 +31,14 @@ Source functions
 #indirect effects function (call ind.eff)
 source("scripts/indirect-effects-function.R")
 
+#total effects function (call tot.eff)
+source("scripts/total-effects-function.R")
+
 #vif function (call vif.lme)
 source("scripts/vif-nlme-function.R")
+
+#plot themes
+source("scripts/plot_theme.R")
 
 ```
 
@@ -245,6 +251,15 @@ ext_ont_ind_effects
 ```
 
 
+Calculate total effects
+```{r}
+ext_ont_total_effects <- tot.eff(modsum, response = "extreme")
+
+ext_ont_total_effects
+```
+
+
+
 ### Median burn severity for all of Ontario
 
 ```{r}
@@ -316,9 +331,42 @@ med_ont_ind_effects
 
 ```
 
+```{r}
+med_ont_tot_effects <- tot.eff(modsum_med_all, response = "median")
+
+med_ont_tot_effects
+```
+It seems that the signs flipped between total indirect effects and total effects in this equation
+check to see if it makes sense
+
 plot the indirect effects of forest structure on burn severity
 ```{r}
-dotchart(med_ont_ind_effects$`Indirect Effect`, labels = med_ont_ind_effects$Pathway, pch = 21, bg = "green", pt.cex = 1.5)
+med_ont_ind_eff_sf <- med_ont_ind_effects %>% 
+  filter(Mediator == "snow free date") %>% 
+  mutate(`Snow Free Date` = rep("Snow Free Date"))
+med_ont_ind_eff_sfd <- med_ont_ind_effects %>% 
+  filter( Mediator == "snow free duration")%>% 
+  mutate(`Snow Free Duration` = rep("Snow Free Duration"))
+med_ont_tot_effects <- med_ont_tot_effects %>% 
+  rename(tot_ind_eff = "Total Indirect Effect") %>% 
+  rename(tot_eff ="Total Effect") %>% 
+  mutate(`Total Indirect Effect` = rep("Total Indirect Effect"),
+                                     `Total Effect`= rep("Total Effect"))
+
+ ggplot()+
+  geom_point(data = med_ont_ind_eff_sf, aes(x = `Indirect Effect`, y = Pathway, color = "Snow Free Date"), size = 5) +
+  geom_point(data = med_ont_ind_eff_sfd, aes(x = `Indirect Effect`, y = Pathway, color = "Snow Free Duration"), size = 5) +
+  geom_point(data = med_ont_tot_effects, aes(x = tot_ind_eff, y = Pathway, color = "Total Indirect Effect"), size = 5)+ 
+  geom_point(data = med_ont_tot_effects, aes(x= tot_eff, y = Pathway, color = "Total Effect"), size =5) + 
+  theme_bw()+
+  theme(axis.title = element_text(size = 14, family = "Helvetica"), 
+        axis.text = element_text(size = 10, family = "Helvetica"),
+    panel.background = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + 
+  theme(legend.position = c(0.8, 0.87))
+
+
+
 
 ```
 
