@@ -312,7 +312,13 @@ write.csv(modsum_med_all, "results/results-summary-tables/Table-2-sem-med-ont.cs
 
 med_ont_ind_effects <- ind.eff(modsum_med_all, response = "median")
 
-med_ont_ind_effects
+med_ont_ind_effects 
+
 ```
+
+plot the indirect effects of forest structure on burn severity
+```{r}
+dotchart(med_ont_ind_effects$`Indirect Effect`, labels = med_ont_ind_effects$Pathway, pch = 21, bg = "green", pt.cex = 1.5)
+
 ```
 

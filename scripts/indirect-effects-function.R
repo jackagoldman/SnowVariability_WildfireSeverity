@@ -42,6 +42,15 @@ ind.eff <- function(df, response){
                        age_sf, abio_sf, age_sfd, abio_sfd), ncol =3)
     table1 = as.table(matrix1)
     colnames(table1) = cols
+    table1 = as.data.frame.matrix(table1)
+    rownames(table1) = NULL
+    table1<- tidyr::as_tibble(table1)
+    
+    table1 <- dplyr::mutate(table1, Response = rep("Extreme Burn Severity"))
+    
+    table1 <- dplyr::relocate(table1, Response, .before = "Indirect Effect")
+    table1$`Indirect Effect` = as.numeric(table1$`Indirect Effect`)
+    
     return(table1)
   }
   if(response == "median"){
@@ -63,6 +72,14 @@ ind.eff <- function(df, response){
                        age_sf, abio_sf, age_sfd, abio_sfd), ncol =3)
     table2 = as.table(matrix2)
     colnames(table2) = cols
+    table2 = as.data.frame.matrix(table2)
+    rownames(table2) = NULL
+    table2<- tidyr::as_tibble(table2)
+    
+    table2 <- dplyr::mutate(table2, Response = rep("Median Burn Severity"))
+    
+    table2 <- dplyr::relocate(table2, Response, .before = "Indirect Effect")
+    table2$`Indirect Effect` = as.numeric(table2$`Indirect Effect`)
     return(table2)
   }
 }
