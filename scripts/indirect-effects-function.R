@@ -55,15 +55,15 @@ ind.eff <- function(df, response){
   if(response == "median"){
     x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
     y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
-    z = df[df$Predictor == "tssm" & df$Response == "RBR_median",8]  
+    z = df[df$Predictor == "tssm" & df$Response == "RBR median",8]  
     age = (x * y *z) # age pathway
     x1 = df[df$Predictor == "avgBio" & df$Response == "sdd",8] 
     y1 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
-    z1 = df[df$Predictor == "tssm" & df$Response == "RBR_median", 8]
+    z1 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
     abio = (x1 * y1 *z1) # avgbio pathway
     x2 = df[df$Predictor == "cc" & df$Response == "sdd",8] 
     y2 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
-    z2 = df[df$Predictor == "tssm" & df$Response == "RBR_median", 8]
+    z2 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
     cc = (x2 *y2  * z2) #cc pathway
     cols = c("Pathway", "Indirect Effect")
     matrix2 = matrix(c("Stand age", "Average Biomass", "Canopy Closure",
