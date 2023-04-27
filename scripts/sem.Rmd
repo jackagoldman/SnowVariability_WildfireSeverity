@@ -37,9 +37,6 @@ source("scripts/total-effects-function.R")
 #vif function (call vif.lme)
 source("scripts/vif-nlme-function.R")
 
-#plot themes
-source("scripts/plot_theme.R")
-
 ```
 
 
@@ -162,17 +159,18 @@ plot(lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.actio
 ```
 
 
-
 # All of Ontario
 
 ### Extreme
 
 ```{r, Extreme all of Ontario}
 sem_ext <- psem(
-  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-         avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
-  lme(tssm ~ sdd + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML")
+  lme(rbr_qs ~ dc + tssm + sdd +tri +age + cc + avgBio, 
+      random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ sdd  + dc + age, 
+      random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
+  lme(sdd ~  avgBio + age + cc + tri, 
+      random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML")
 )
 
 #summary
@@ -180,54 +178,10 @@ summary(sem_ext)
 
 ```
 
-There was an significant independence claim which was that drought code
-has a significant impact on time since snowmelt. We refit the model to
-include the pathway tssm \<- dc.
-
-```{r, Extreme all of Ontario refit final model}
-sem_ext_2 <- psem(
-  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + age + avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML")
-)
-
-#summary
-summary(sem_ext_2)
-
-lapply(sem_ext_2, function(i) hist(resid(i))) # looks good
-
-```
-
-SDD did not have an impact on extreme burn severity - this suggests that
-snowmelt timing does not influence burn severity, a possible explanation
-for this is that snowmelt timing is heterogeneous across a landscape and
-by averaging snowmelt timing and rbr across the perimeter we are
-homogeneize both SDD and RBR, therefore we are unable to pick up
-variations in both sdd/rbr. Further investigations that consider
-variation in both. TSSM had a significant impact on extreme burn
-severity - As time sine snowmelt increased, burn severity increased. DC
-had a significant impact on extreme burn severity - As DC increased,
-burn severity decreased. Forest structural diversity was a strong
-predictor of extreme burn severity: - as age increased, burn severity
-decreased - older stands decreased burn severity. - as biomass
-increased, burn severity increased - overall biomass increased burn
-severity. - as canopy closure increased burn severity decreased -
-suggesting that live foliage biomass significantly reduces burn
-severity, this may be a result of reduced flammability of live foliage.
-SDD had a significant impact on time since snowmelt - as snowmelt got
-later in the year, ignition date decreased. As DC increased, time since
-snowmelt increased - this suggests that decreases in fuel moisture
-significantly are a strong predictor of ignition and that ignitions were
-more likely later in the year when drought code increased. SDD was
-significantly influence by Biomass, age and topography; - as biomass
-increased, SDD was earlier - as age increased, SDD was later - as
-topography increased, sdd was earlier
-
 Produce a clean summary table and write to csv - code from [@ramus2022]
 
 ```{r, Extreme All of Ontario Clean Summary Table}
-modsum <- summary(sem_ext_2)$coefficients
+modsum <- summary(sem_ext)$coefficients
 modsum$Estimate <- round(modsum$Estimate, 3)
 modsum$Std.Error <- round(modsum$Std.Error, 3)
 modsum$Crit.Value <- round(modsum$Crit.Value, 3)
@@ -264,10 +218,12 @@ ext_ont_total_effects
 
 ```{r}
 sem_med <- psem(
-  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
-        avgBio, random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
-  lme(tssm ~ sdd + tri, random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
-  lme(sdd ~ avgBio + age + tri,random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML")
+  lme(RBR_median ~ dc + tssm + sdd +tri +age + cc +avgBio, 
+      random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ sdd + dc + age,
+      random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
+  lme(sdd ~ avgBio + age + cc +tri,
+      random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML")
 )
 
 
@@ -275,39 +231,11 @@ sem_med <- psem(
 summary(sem_med)
 ```
 
-Independence claim suggest significant impact of drought code on time
-since snowmelt - update model to include pathway of tssm \<- dc
-
-```{r}
-sem_med_2 <- psem(
-  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
-        avgBio, random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
-  lme(tssm ~ sdd + tri +dc + age + avgBio,random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
-  lme(sdd ~ avgBio + age + tri, random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML")
-)
-
-
-#summary
-summary(sem_med_2)
-
-lapply(sem_med_2, function(i) hist(resid(i))) # looks good
-
-```
-
-SDD has an effect on median burn severity , as snowmelt increased median
-burn severity decreased. - the difference between this and extreme is
-consistent with the literature that suggests that more extreme fire
-events are caused by extreme fire weather and when fire weather is
-extreme it minimizes or negates the impact of other drivers. I.e.
-extreme fire weather is more powerful and overcomes in the importance of
-other drivers. Therefore it is expected that extreme severity events
-occur under extreme fire conditions making snowmelt timing impact
-negligible.
 
 Clean summary table - code from [@ramus2022]
 
 ```{r}
-modsum_med_all <- summary(sem_med_2)$coefficients
+modsum_med_all <- summary(sem_med)$coefficients
 modsum_med_all$Estimate <- round(modsum_med_all$Estimate, 3)
 modsum_med_all$Std.Error <- round(modsum_med_all$Std.Error, 3)
 modsum_med_all$Crit.Value <- round(modsum_med_all$Crit.Value, 3)

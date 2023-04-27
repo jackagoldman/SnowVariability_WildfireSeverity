@@ -24,9 +24,71 @@
 
 ind.eff <- function(df, response){
   if(response == "extreme"){
+    x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
+    y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
+    z = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]  
+    age = (x*y*z) # age pathway
+    x1 = df[df$Predictor == "avgBio" & df$Response == "sdd",8] 
+    y1 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z1 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
+    abio = (x1 * y1 *z1) # avgbio pathway
+    x2 = df[df$Predictor == "cc" & df$Response == "sdd",8] 
+    y2 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z2 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
+    cc = (x2 *y2* z2) #cc pathway
+    cols = c("Pathway",  "Indirect Effect")
+    matrix1 = matrix(c("Stand age", "Average Biomass", "Canopy Closure",
+                       age, abio, cc), ncol =2, )
+    table1 = as.table(matrix1)
+    colnames(table1) = cols
+    table1 = as.data.frame.matrix(table1)
+    rownames(table1) = NULL
+    table1<- tidyr::as_tibble(table1)
+    
+    table1 <- dplyr::mutate(table1, Response = rep("Extreme Burn Severity"))
+    
+    table1 <- dplyr::relocate(table1, Response, .before = "Indirect Effect")
+    table1$`Indirect Effect` = as.numeric(table1$`Indirect Effect`)
+    
+    return(table1)
+  }
+  if(response == "median"){
+    x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
+    y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
+    z = df[df$Predictor == "tssm" & df$Response == "RBR_median",8]  
+    age = (x * y *z) # age pathway
+    x1 = df[df$Predictor == "avgBio" & df$Response == "sdd",8] 
+    y1 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z1 = df[df$Predictor == "tssm" & df$Response == "RBR_median", 8]
+    abio = (x1 * y1 *z1) # avgbio pathway
+    x2 = df[df$Predictor == "cc" & df$Response == "sdd",8] 
+    y2 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z2 = df[df$Predictor == "tssm" & df$Response == "RBR_median", 8]
+    cc = (x2 *y2  * z2) #cc pathway
+    cols = c("Pathway", "Indirect Effect")
+    matrix2 = matrix(c("Stand age", "Average Biomass", "Canopy Closure",
+                       age, abio, cc), ncol =2)
+    table2 = as.table(matrix2)
+    colnames(table2) = cols
+    table2 = as.data.frame.matrix(table2)
+    rownames(table2) = NULL
+    table2<- tidyr::as_tibble(table2)
+    
+    table2 <- dplyr::mutate(table2, Response = rep("Median Burn Severity"))
+    
+    table2 <- dplyr::relocate(table2, Response, .before = "Indirect Effect")
+    table2$`Indirect Effect` = as.numeric(table2$`Indirect Effect`)
+    return(table2)
+  }
+}
+
+#ind.eff2
+
+ind.eff2 <- function(df, response){
+  if(response == "extreme"){
     x = df[13,8] # 13 is age -> sdd
     y = df[3,8]  # sdd -> rbr
-    age_sf = (x * y) # age snow free as mediator
+    age_sf = (x * y ) # age snow free as mediator
     x1 = df[12,8] # 12 is avgBio -> sdd
     y1 = df[3, 8] # sdd -> rbr
     abio_sf = (x1 * y1) # snow free as mediator
@@ -83,5 +145,6 @@ ind.eff <- function(df, response){
     return(table2)
   }
 }
-  
+
+
   
