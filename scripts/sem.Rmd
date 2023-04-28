@@ -106,55 +106,40 @@ Test individual model pathways for multicollinearity using VIF function
 
 ```{r, Extreme burn severity}
 
-#cc and avg biomass are highly correlated
+#VIF cutoff = 10
+
 vif.lme(lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
     avgBio + cc, random = list(size_class =~1, Fire_Year =~1), data = new_data))
 
-vif.lme(lme(tssm ~ sdd + tri , random = list(size_class =~1, Fire_Year =~1), data = new_data))
+vif.lme(lme(tssm ~ sdd + dc + age + cc + avgBio , random = list(size_class =~1, Fire_Year =~1), data = new_data))
 
-#cc and avg biomass are highly correlated
+
 vif.lme(lme(sdd ~ cc + avgBio + age + tri , random = list(size_class =~1, Fire_Year =~1), data = new_data))
 
-#compare models with cc or avgbio AIC 
-rbr_bio <- lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-    avgBio,random = list(size_class =~1, Fire_Year =~1), data = new_data)
 
-rbr_cc <- lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-    cc   , random = list(size_class =~1, Fire_Year =~1), data = new_data)
-AIC(rbr_bio, rbr_cc) # CC is greater by .400 , I chose to use bio because it better predicts sdd
-
-sdd_bio <- lme(sdd ~  avgBio + age + tri , random = list(size_class =~1, Fire_Year =~1), data = new_data)
-
-sdd_cc <- lme(sdd ~  cc+ age + tri , random = list(size_class =~1, Fire_Year =~1), data = new_data)
-
-AIC(sdd_bio, sdd_cc)# biomass has lower AIC
 
 ```
 
 
 
 ```{r, Median Burn Severity}
-#cc and avg biomass are highly correlated
+#vif cutoff = 10
 vif.lme(lme(RBR_median ~ dc + tssm + sdd +tri +age + 
     avgBio + cc, random = list(size_class =~1, Fire_Year =~1), data = new_data))
 
-#compare models with cc or avgbio AIC 
-mean_bio <- lme(RBR_median ~ dc + tssm + sdd +tri +age + 
-    avgBio,random = list(size_class =~1, Fire_Year =~1), data = new_data)
+vif.lme(lme(tssm ~ sdd + dc , random = list(size_class =~1, Fire_Year =~1), data = new_data))
 
-mean_cc <- lme(RBR_median ~ dc + tssm + sdd +tri +age + 
-    cc   , random = list(size_class =~1, Fire_Year =~1), data = new_data)
-AIC(mean_bio, mean_cc) # CC is greater by 1.300 , I chose to use bio because it better predicts sdd
+vif.lme(lme(sdd ~ avgBio + age + cc + tri , random = list(size_class =~1, Fire_Year =~1), data = new_data))
 
 ```
 
 Look at each models residual vs. fitted plot
 ```{r}
 plot(lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-         avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
-plot(lme(tssm ~ sdd + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
+         avgBio + cc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
+plot(lme(tssm ~ sdd + dc + age, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
 
-plot(lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
+plot(lme(sdd ~  avgBio + age + cc + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
 
 ```
 
@@ -172,6 +157,7 @@ sem_ext <- psem(
   lme(sdd ~  avgBio + age + cc + tri, 
       random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML")
 )
+
 
 #summary
 summary(sem_ext)
@@ -202,6 +188,12 @@ calculate indirect effects
 ext_ont_ind_effects <- ind.eff(modsum, response = "extreme")
 
 ext_ont_ind_effects
+```
+Specific indirect effects
+```{r}
+ext_spec_ind_eff <- spec.ind.eff(modsum, response = "extreme")
+
+ext_spec_ind_eff
 ```
 
 
@@ -250,7 +242,7 @@ modsum_med_all
 write.csv(modsum_med_all, "results/results-summary-tables/Table-2-sem-med-ont.csv")
 ```
 
-
+total indirect effects
 ```{r}
 
 med_ont_ind_effects <- ind.eff(modsum_med_all, response = "median")
@@ -259,6 +251,15 @@ med_ont_ind_effects
 
 ```
 
+specific indirect effects
+
+```{r}
+med_ont_spec_ind_eff <- spec.ind.eff(modsum_med_all, response = "median")
+
+med_ont_spec_ind_eff
+```
+
+total direct effects
 ```{r}
 med_ont_tot_effects <- tot.eff(modsum_med_all, response = "median")
 

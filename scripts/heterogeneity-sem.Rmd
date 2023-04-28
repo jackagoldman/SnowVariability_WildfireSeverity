@@ -61,7 +61,7 @@ hist(new_data_cv$rbr_cv)
 ```{r}
 sem_cv <- psem(
   lme(rbr_cv ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML"),
+        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
   lme(tssm ~ sdd + tri + dc + age +avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML"),
   lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML")
 )

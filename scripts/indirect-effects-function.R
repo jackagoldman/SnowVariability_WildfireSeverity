@@ -36,9 +36,12 @@ ind.eff <- function(df, response){
     y2 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
     z2 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
     cc = (x2 *y2* z2) #cc pathway
+    x3 = df[df$Predictor == "dc" & df$Response == "tssm", 8]
+    y3 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
+    dc = (x3 * y3)
     cols = c("Pathway",  "Indirect Effect")
-    matrix1 = matrix(c("Stand age", "Average Biomass", "Canopy Closure",
-                       age, abio, cc), ncol =2, )
+    matrix1 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drought Code",
+                       age, abio, cc,dc ), ncol =2, )
     table1 = as.table(matrix1)
     colnames(table1) = cols
     table1 = as.data.frame.matrix(table1)
@@ -65,9 +68,12 @@ ind.eff <- function(df, response){
     y2 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
     z2 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
     cc = (x2 *y2  * z2) #cc pathway
+    x3 = df[df$Predictor == "dc" & df$Response == "tssm", 8]
+    y3 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
+    dc = (x3 * y3)
     cols = c("Pathway", "Indirect Effect")
-    matrix2 = matrix(c("Stand age", "Average Biomass", "Canopy Closure",
-                       age, abio, cc), ncol =2)
+    matrix2 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drougth Code", 
+                       age, abio, cc, dc), ncol =2)
     table2 = as.table(matrix2)
     colnames(table2) = cols
     table2 = as.data.frame.matrix(table2)
@@ -82,26 +88,25 @@ ind.eff <- function(df, response){
   }
 }
 
-#ind.eff2
+# Specific indirect effects
 
-ind.eff2 <- function(df, response){
+# the effect of age, cc, bio on bs through sfd
+
+spec.ind.eff <- function(df, response){
   if(response == "extreme"){
-    x = df[13,8] # 13 is age -> sdd
-    y = df[3,8]  # sdd -> rbr
-    age_sf = (x * y ) # age snow free as mediator
-    x1 = df[12,8] # 12 is avgBio -> sdd
-    y1 = df[3, 8] # sdd -> rbr
-    abio_sf = (x1 * y1) # snow free as mediator
-    x2 = df[10, 8] # age -> tssm
-    y2 = df[2, 8] # tssm -> rbr
-    age_sfd = (x2 * y2) # snow free duration as mediator
-    x3 = df[11, 8] # abio -> tssm
-    y3 = df[2, 8] # tssm -> rbr
-    abio_sfd = (x3 * y3) # snow free duration as mediator
-    cols = c("Pathway", "Mediator" , "Indirect Effect")
-    matrix1 = matrix(c("Stand age", "Average Biomass", "Stand age", "Average Biomass",
-                       "snow free date", "snow free date" , "snow free duration", "snow free duration",
-                       age_sf, abio_sf, age_sfd, abio_sfd), ncol =3)
+    x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
+    y = df[df$Predictor == "sdd" & df$Response == "rbr qs", 8]  
+    age = (x*y) # age pathway
+    x1 = df[df$Predictor == "avgBio" & df$Response == "sdd",8] 
+    y1 = df[df$Predictor == "sdd" & df$Response == "rbr qs", 8]
+    abio = (x1 * y1) # avgbio pathway
+    x2 = df[df$Predictor == "cc" & df$Response == "sdd",8] 
+    y2 = df[df$Predictor == "sdd" & df$Response == "rbr qs", 8]
+    cc = (x2 *y2) #cc pathway
+    cols = c("Pathway", "Mediator", "Specific Indirect Effect")
+    matrix1 = matrix(c("Stand age", "Average Biomass", "Canopy Closure",
+                       "Snow Free Date", "Snow Free Date", "Snow Free Date", 
+                       age, abio, cc ), ncol =3 )
     table1 = as.table(matrix1)
     colnames(table1) = cols
     table1 = as.data.frame.matrix(table1)
@@ -110,28 +115,25 @@ ind.eff2 <- function(df, response){
     
     table1 <- dplyr::mutate(table1, Response = rep("Extreme Burn Severity"))
     
-    table1 <- dplyr::relocate(table1, Response, .before = "Indirect Effect")
-    table1$`Indirect Effect` = as.numeric(table1$`Indirect Effect`)
+    table1 <- dplyr::relocate(table1, Response, .before = "Specific Indirect Effect")
+    table1$`Specific Indirect Effect` = as.numeric(table1$`Specific Indirect Effect`)
     
     return(table1)
   }
   if(response == "median"){
-    x = df[13,8] # 13 is age -> sdd
-    y = df[3,8]  # sdd -> rbr
-    age_sf = (x * y) # age snow free as mediator
-    x1 = df[12,8] # 12 is avgBio -> sdd
-    y1 = df[3, 8] # sdd -> rbr
-    abio_sf = (x1 * y1) # snow free as mediator
-    x2 = df[10, 8] # age -> tssm
-    y2 = df[2, 8] # tssm -> rbr
-    age_sfd = (x2 * y2) # snow free duration as mediator
-    x3 = df[11, 8] # abio -> tssm
-    y3 = df[2, 8] # tssm -> rbr
-    abio_sfd = (x3 * y3) # snow free duration as mediator
-    cols = c("Pathway", "Mediator" , "Indirect Effect")
-    matrix2 = matrix(c("Stand age", "Average Biomass", "Stand age", "Average Biomass",
-                       "snow free date", "snow free date" , "snow free duration", "snow free duration",
-                       age_sf, abio_sf, age_sfd, abio_sfd), ncol =3)
+    x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
+    y = df[df$Predictor == "sdd" & df$Response == "RBR median", 8]  
+    age = (x*y) # age pathway
+    x1 = df[df$Predictor == "avgBio" & df$Response == "sdd",8] 
+    y1 = df[df$Predictor == "sdd" & df$Response == "RBR median", 8]
+    abio = (x1 * y1) # avgbio pathway
+    x2 = df[df$Predictor == "cc" & df$Response == "sdd",8] 
+    y2 = df[df$Predictor == "sdd" & df$Response == "RBR median", 8]
+    cc = (x2 *y2) #cc pathway
+    cols = c("Pathway", "Mediator", "Specific Indirect Effect")
+    matrix2 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", 
+                       "Snow Free Date", "Snow Free Date", "Snow Free Date", 
+                       age, abio, cc ), ncol =3, )
     table2 = as.table(matrix2)
     colnames(table2) = cols
     table2 = as.data.frame.matrix(table2)
@@ -140,11 +142,8 @@ ind.eff2 <- function(df, response){
     
     table2 <- dplyr::mutate(table2, Response = rep("Median Burn Severity"))
     
-    table2 <- dplyr::relocate(table2, Response, .before = "Indirect Effect")
-    table2$`Indirect Effect` = as.numeric(table2$`Indirect Effect`)
+    table2 <- dplyr::relocate(table2, Response, .before = "Specific Indirect Effect")
+    table2$`Specific Indirect Effect` = as.numeric(table2$`Specific Indirect Effect`)
     return(table2)
   }
 }
-
-
-  

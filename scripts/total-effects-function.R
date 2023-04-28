@@ -12,55 +12,61 @@
 # to response. These needs to be adjusted according to variables of interest
 # names of columns also need to be adjusted
 
-# notes: model structure must be specified this way
-# rbr_qs ~ dc + tssm + sdd +tri +age + avgBio 
-# tssm ~ sdd + tri + dc + age + avgBio
-# sdd ~  avgBio + age + tri
-
-# this function is currently set up to measure the indirect effects of forest structure on 
-# wildfire burn severity through the mediators: snow free date and snow free duration
-
 #function
 
 tot.eff <- function(df, response){
   if(response == "extreme"){
-    x = df[13,8] # 13 is age -> sdd
-    y = df[3,8]  # sdd -> rbr
-    age_sf = (x * y) # age snow free as mediator
-    x1 = df[12,8] # 12 is avgBio -> sdd
-    y1 = df[3, 8] # sdd -> rbr
-    abio_sf = (x1 * y1) # snow free as mediator
-    x2 = df[10, 8] # age -> tssm
-    y2 = df[2, 8] # tssm -> rbr
-    age_sfd = (x2 * y2) # snow free duration as mediator
-    x3 = df[11, 8] # abio -> tssm
-    y3 = df[2, 8] # tssm -> rbr
-    abio_sfd = (x3 * y3) # snow free duration as mediator
+    x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
+    y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
+    z = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
+    #total indirect effect
+    age = (x+y+z) # age pathway
+    x1 = df[df$Predictor == "avgBio" & df$Response == "sdd",8] 
+    y1 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z1 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
+    #total indirect effect
+    abio = (x1 + y1 + z1) # avgbio pathway
+    x2 = df[df$Predictor == "cc" & df$Response == "sdd",8] 
+    y2 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z2 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
+    #total indirect effect
+    cc = (x2 + y2 + z2) #cc pathway
+    x3 = df[df$Predictor == "dc" & df$Response == "tssm", 8]
+    y3 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
+    dc = (x3 + y3)
     
-    #total indirect sum age on extreme
-    ind_sum_age <- (age_sf + age_sfd)
     
     #direct effect of age on extreme
-    tot_age <- df[13,8]
+    tot_age <- df[df$Predictor == "age" & df$Response == "rbr qs", 8]
     
     #total direct effect of age on extreme
-    sum.tot_age <- (ind_sum_age + tot_age)
+    sum.tot_age <- (age + tot_age)
     
-    #total indirect sum avgbio on extreme
-    ind_sum_bio <- (abio_sf + abio_sfd)
-    
+  
     #direct effect of avgbio on extreme
-    tot_bio <- df[12,8]
+    tot_bio <- df[df$Predictor == "avgBio" & df$Response == "rbr qs", 8]
     
     #total direct effect of avgbio on extreme
-    sum.tot_bio <- (ind_sum_bio + tot_bio)
+    sum.tot_bio <- (abio + tot_bio)
+    
+    #direct effect of avgbio on extreme
+    tot_cc <- df[df$Predictor == "cc" & df$Response == "rbr qs", 8]
+    
+    #total direct effect of avgbio on extreme
+    sum.tot_cc <- (cc + tot_bio)
+    
+    #direct effect of dc on extreme
+    tot_dc <- df[df$Predictor == "dc" & df$Response == "rbr qs", 8]
+    
+    #total direct effect of avgbio on extreme
+    sum.tot_dc <- (dc + tot_dc)
     
     #assign col names
     cols = c("Pathway", "Total Indirect Effect", "Total Effect")
     
     #develop matrix
-    matrix1 = matrix(c("Stand age", "Average Biomass",
-                       ind_sum_age, ind_sum_bio, sum.tot_age, sum.tot_bio), ncol =3, nrow =2)
+    matrix1 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drought Code",
+                       age, abio, cc, dc, sum.tot_age, sum.tot_bio, sum.tot_cc, sum.tot_dc), ncol =3, nrow =4)
     
     #table to matrix
     table1 = as.table(matrix1)
@@ -90,19 +96,21 @@ tot.eff <- function(df, response){
     return(table1)
   }
   if(response == "median"){
-    x = df[13,8] # 13 is age -> sdd
-    y = df[3,8]  # sdd -> rbr
-    age_sf = (x * y) # age snow free as mediator
-    x1 = df[12,8] # 12 is avgBio -> sdd
-    y1 = df[3, 8] # sdd -> rbr
-    abio_sf = (x1 * y1) # snow free as mediator
-    x2 = df[10, 8] # age -> tssm
-    y2 = df[2, 8] # tssm -> rbr
-    age_sfd = (x2 * y2) # snow free duration as mediator
-    x3 = df[11, 8] # abio -> tssm
-    y3 = df[2, 8] # tssm -> rbr
-    abio_sfd = (x3 * y3) # snow free duration as mediator
-    
+    x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
+    y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
+    z = df[df$Predictor == "tssm" & df$Response == "RBR median",8]  
+    age = (x * y *z) # age pathway
+    x1 = df[df$Predictor == "avgBio" & df$Response == "sdd",8] 
+    y1 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z1 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
+    abio = (x1 * y1 *z1) # avgbio pathway
+    x2 = df[df$Predictor == "cc" & df$Response == "sdd",8] 
+    y2 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z2 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
+    cc = (x2 *y2  * z2) #cc pathway
+    x3 = df[df$Predictor == "dc" & df$Response == "tssm", 8]
+    y3 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
+    dc = (x3 * y3)
     #total indirect sum age on median
     ind_sum_age <- (age_sf + age_sfd)
     
