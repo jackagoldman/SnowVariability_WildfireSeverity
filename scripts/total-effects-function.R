@@ -98,43 +98,55 @@ tot.eff <- function(df, response){
   if(response == "median"){
     x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
     y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
-    z = df[df$Predictor == "tssm" & df$Response == "RBR median",8]  
-    age = (x * y *z) # age pathway
+    z = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
+    #total indirect effect
+    age = (x+y+z) # age pathway
     x1 = df[df$Predictor == "avgBio" & df$Response == "sdd",8] 
     y1 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
     z1 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
-    abio = (x1 * y1 *z1) # avgbio pathway
+    #total indirect effect
+    abio = (x1 + y1 + z1) # avgbio pathway
     x2 = df[df$Predictor == "cc" & df$Response == "sdd",8] 
     y2 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
     z2 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
-    cc = (x2 *y2  * z2) #cc pathway
+    #total indirect effect
+    cc = (x2 + y2 + z2) #cc pathway
     x3 = df[df$Predictor == "dc" & df$Response == "tssm", 8]
     y3 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
-    dc = (x3 * y3)
-    #total indirect sum age on median
-    ind_sum_age <- (age_sf + age_sfd)
+    dc = (x3 + y3)
     
-    #direct effect of age on median
-    tot_age <- df[13,8]
     
-    #total direct effect of age on median
-    sum.tot_age <- (ind_sum_age + tot_age)
+    #direct effect of age on extreme
+    tot_age <- df[df$Predictor == "age" & df$Response == "RBR median", 8]
     
-    #total indirect sum avgbio on median
-    ind_sum_bio <- (abio_sf + abio_sfd)
+    #total direct effect of age on extreme
+    sum.tot_age <- (age + tot_age)
     
-    #direct effect of avgbio on median
-    tot_bio <- df[12,8]
     
-    #total direct effect of avgbio on median
-    sum.tot_bio <- (ind_sum_bio + tot_bio)
+    #direct effect of avgbio on extreme
+    tot_bio <- df[df$Predictor == "avgBio" & df$Response == "RBR median", 8]
     
-    #make column names
+    #total direct effect of avgbio on extreme
+    sum.tot_bio <- (abio + tot_bio)
+    
+    #direct effect of avgbio on extreme
+    tot_cc <- df[df$Predictor == "cc" & df$Response == "RBR median", 8]
+    
+    #total direct effect of avgbio on extreme
+    sum.tot_cc <- (cc + tot_bio)
+    
+    #direct effect of dc on extreme
+    tot_dc <- df[df$Predictor == "dc" & df$Response == "RBR median", 8]
+    
+    #total direct effect of avgbio on extreme
+    sum.tot_dc <- (dc + tot_dc)
+    
+    #assign col names
     cols = c("Pathway", "Total Indirect Effect", "Total Effect")
     
-    #create matrix
-    matrix2 = matrix(c("Stand age", "Average Biomass", 
-                       ind_sum_age, ind_sum_bio, sum.tot_age, sum.tot_bio), ncol =3, nrow = 2)
+    #develop matrix
+    matrix2 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drought Code",
+                       age, abio, cc, dc, sum.tot_age, sum.tot_bio, sum.tot_cc, sum.tot_dc), ncol =3, nrow =4)
     
     # matrix as table
     table2 = as.table(matrix2)

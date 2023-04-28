@@ -121,7 +121,7 @@ lapply(west_sp_med, function(i) hist(resid(i))) # looks generally normal
 
 
 #tidy table
-modsum_ <- summary(west_sm_med)$coefficients
+modsum_em <- summary(west_sp_med)$coefficients
 modsum_em$Estimate <- round(modsum_em$Estimate, 3)
 modsum_em$Std.Error <- round(modsum_em$Std.Error, 3)
 modsum_em$Crit.Value <- round(modsum_em$Crit.Value, 3)
@@ -131,7 +131,7 @@ modsum_em$Std.Estimate <- round(modsum_em$Std.Estimate, 3)
 modsum_em$Response <- gsub("_", " ", modsum_em$Response)
 modsum_em$Predictor <- gsub("_", " ", modsum_em$Predictor)
 colnames(modsum_em)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_em %>% kable()
+modsum_em 
 write.csv(modsum_em, "results/results-summary-tables/Table_S7.csv")
 ```
 ### West - summer
@@ -161,7 +161,7 @@ modsum_smm$Std.Estimate <- round(modsum_smm$Std.Estimate, 3)
 modsum_smm$Response <- gsub("_", " ", modsum_smm$Response)
 modsum_smm$Predictor <- gsub("_", " ", modsum_smm$Predictor)
 colnames(modsum_smm)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_smm %>% knitr::kable()
+modsum_smm
 write.csv(modsum_smm, "results/results-summary-tables/Table_S8_wsmm.csv")
 
 ```
