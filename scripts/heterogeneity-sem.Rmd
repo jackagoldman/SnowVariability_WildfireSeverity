@@ -57,14 +57,59 @@ RBR cv negative skewed
 new_data_cv <- new_data %>% mutate(rbr_cv= log10(RBR_cv))
 hist(new_data_cv$rbr_cv)
 ```
+subset data to fire bigger than 200 ha
+```{r}
+new_data_cv <- new_data_cv %>% 
+  filter(FIRE_FINAL >= 500)
+```
+
 
 ```{r}
 sem_cv <- psem(
+    lme(sdd ~  avgBio + cc+ age + tri, random = ~1 | Fire_Year, na.action = na.omit, data = new_data_cv, method = "ML"),
+  lme(tssm ~ sdd + age + dc + tri  , random = ~1 | Fire_Year, na.action = na.omit, data = new_data_cv, method = "ML"),
   lme(rbr_cv ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + age +avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_dat_1, method = "ML")
+        avgBio + cc , random = ~1 | Fire_Year, na.action = na.omit, data = new_data_cv, method = "ML")
 )
 #summary
 summary(sem_cv)
 ```
+
+dsep claim for snow free duration and average bio. This dsep pvalue is marginal.
+Because the c-statistic is high and the fit seems good. We rejected this dsep claim
+and then proceeded with our proposed model.
+
+Compared to our other models. We found that for fires greater than 500ha, 
+snow free date was only marginally effected by avg biomass and tri with p-value = 0.06.
+This could be because when looking at a different spatial scale, the amount of forest cover changes.
+Therefore this would suggest that at bigger spatial scales the effect of forest cover on snow free duration is not as strong. For topography, this suggests that at larger spatial scales, it is more difficult to detect an
+effect of topography on burn sdd. 
+
+Lets examine these relationships
+```{r}
+#avgBio
+# with points
+ggplot(data = new_data_cv, aes(x = avgBio, y = sdd)) +
+  geom_point()+
+  geom_smooth(method = "lm")
+
+#without points
+ggplot(data = new_data_cv, aes(x = avgBio, y = sdd)) +
+  geom_smooth(method = "lm")
+
+#tri
+#with points
+ggplot(data = new_data_cv, aes(x = tri, y = sdd)) +
+  geom_point()+
+  geom_smooth(method = "lm") 
+# it seems like this relationship is driven heavily by outliers, this suggests that it more complex landscapes
+# sdd date happens earlier
+
+#without points
+ggplot(data = new_data_cv, aes(x = tri, y = sdd)) +
+  geom_smooth(method = "lm")
+
+plot(lm(sdd ~tri, data = new_data_cv))
+summary(lme(sdd ~ avgBio, random = ~1 | Fire_Year, data = new_data_cv))
+```
+

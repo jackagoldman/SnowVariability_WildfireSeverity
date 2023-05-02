@@ -72,7 +72,7 @@ ind.eff <- function(df, response){
     y3 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
     dc = (x3 * y3)
     cols = c("Pathway", "Indirect Effect")
-    matrix2 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drougth Code", 
+    matrix2 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drought Code", 
                        age, abio, cc, dc), ncol =2)
     table2 = as.table(matrix2)
     colnames(table2) = cols

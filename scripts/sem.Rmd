@@ -137,6 +137,8 @@ Look at each models residual vs. fitted plot
 ```{r}
 plot(lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
          avgBio + cc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
+plot(lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+         avgBio + cc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
 plot(lme(tssm ~ sdd + dc + age, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
 
 plot(lme(sdd ~  avgBio + age + cc + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
@@ -150,12 +152,13 @@ plot(lme(sdd ~  avgBio + age + cc + tri, random = ~1 | Fire_Year/size_class, na.
 
 ```{r, Extreme all of Ontario}
 sem_ext <- psem(
-  lme(rbr_qs ~ dc + tssm + sdd +tri +age + cc + avgBio, 
+  lme(sdd ~  avgBio + age + cc + tri, 
       random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
   lme(tssm ~ sdd  + dc + age, 
       random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
-  lme(sdd ~  avgBio + age + cc + tri, 
+   lme(rbr_qs ~ dc + tssm + sdd +tri +age + cc + avgBio, 
       random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML")
+  
 )
 
 
@@ -163,6 +166,12 @@ sem_ext <- psem(
 summary(sem_ext)
 
 ```
+
+Original model had no effect of age on tssm. However dsep test means suggests 
+that age is dseparated which means that it should be included in the model.
+As age increases, snow free duration increases. 
+
+
 
 Produce a clean summary table and write to csv - code from [@ramus2022]
 
@@ -210,12 +219,12 @@ ext_ont_total_effects
 
 ```{r}
 sem_med <- psem(
-  lme(RBR_median ~ dc + tssm + sdd +tri +age + cc +avgBio, 
-      random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
-  lme(tssm ~ sdd + dc + age,
-      random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML"),
-  lme(sdd ~ avgBio + age + cc +tri,
-      random = list(size_class =~1, Fire_Year =~1), na.action = na.omit, data = new_data, method = "ML")
+    lme(sdd ~ avgBio + age + cc +tri,
+      random = ~1 |Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ sdd + dc + age, 
+      random = ~1 |Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
+   lme(RBR_median ~ dc + tssm + sdd +tri +age + cc +avgBio, 
+      random = ~1 |Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML")
 )
 
 
@@ -237,7 +246,10 @@ modsum_med_all$Std.Estimate <- round(modsum_med_all$Std.Estimate, 3)
 modsum_med_all$Response <- gsub("_", " ", modsum_med_all$Response)
 modsum_med_all$Predictor <- gsub("_", " ", modsum_med_all$Predictor)
 colnames(modsum_med_all)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_med_all
+modsum_med_all %>% 
+  kbl(caption = "piecewiseSEM results for median burn severity in Ontario Boreal Shield", 
+      booktabs = T) %>% 
+  kable_classic(full_width = F, html_font = "Cambria")
 
 write.csv(modsum_med_all, "results/results-summary-tables/Table-2-sem-med-ont.csv")
 ```

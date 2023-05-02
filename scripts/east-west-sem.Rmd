@@ -20,7 +20,7 @@ Load packages
 library(piecewiseSEM)
 library(nlme)
 library(tidyverse)
-
+library(kableExtra)
 ```
 
 Read in data
@@ -53,6 +53,12 @@ new_data_e <- new_data %>% filter(pyroregion == 0)
 
 ## Western Boreal Shield of Ontario
 
+```{r}
+hist(new_data_w$rbr_qs) # ok 
+hist(new_data_w$RBR_median) # ok
+```
+
+
 ```{r, Extreme Burn Severity Western Boreal Shield Of Ontario}
 new_data_w1 = new_data_w %>% mutate(dc= c(scale(dc)),
                                     tssm = c(scale(tssm)),
@@ -60,12 +66,13 @@ new_data_w1 = new_data_w %>% mutate(dc= c(scale(dc)),
                                     tri = c(scale(tri)),
                                     age = c(scale(age)),
                                     avgbio = c(scale(avgBio)))
-
+#removed topography and age effects of SFDR which were not in our hypothesized dag originally
+#and got a good fishers C
 west_sem_ext <- psem(
-  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
-  lme(tssm ~ sdd + tri + dc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML")
+  lme(sdd ~  avgBio + age + cc+ tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
+  lme(tssm ~ sdd +  + dc   , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
+   lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+        avgBio + cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML")
 )
 
 #summary
@@ -89,17 +96,23 @@ modsum_west_ext$Std.Estimate <- round(modsum_west_ext$Std.Estimate, 3)
 modsum_west_ext$Response <- gsub("_", " ", modsum_west_ext$Response)
 modsum_west_ext$Predictor <- gsub("_", " ", modsum_west_ext$Predictor)
 colnames(modsum_west_ext)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_west_ext %>% kable()
+modsum_west_ext %>% 
+  kbl(caption = "piecewiseSEM results for extreme burn severity in Western Ontario Boreal Shield", 
+      booktabs = T) %>% 
+  kable_classic(full_width = F, html_font = "Cambria")
+
 write.csv(modsum_west_ext, "results/results-summary-tables/Table-3-sem-ext-west.csv")
 
 ```
 
 ```{r, west med}
+
+#also removed topography and age from the TSSM in our dag
 west_sem_med <- psem(
-  lme(RBR_median ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+ lme(sdd ~  avgBio + age + cc+ tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+  lme(tssm ~ sdd +  dc  , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+   lme(RBR_median ~ dc + tssm + sdd +tri +age + 
+        avgBio + cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
 )
 
 #summary
@@ -120,20 +133,32 @@ modsum_wm$Std.Estimate <- round(modsum_wm$Std.Estimate, 3)
 modsum_wm$Response <- gsub("_", " ", modsum_wm$Response)
 modsum_wm$Predictor <- gsub("_", " ", modsum_wm$Predictor)
 colnames(modsum_wm)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_wm %>% kable()
+modsum_wm %>% 
+  kbl(caption = "piecewiseSEM results for median burn severity in western Ontario boreal shield", 
+      booktabs = T) %>% 
+  kable_classic(full_width = F, html_font = "Cambria")
 write.csv(modsum_wm, "results/results-summary-tables/Table-4-sem-med-west.csv")
 
 ```
 
 ## Eastern boreal shield
 
+```{r}
+hist(new_data_e$RBR_median)# ok
+hist(new_data_e$rbr_qs) # seems ok but there is a funky tail situation going on.
+```
+
+
 Eastern boreal shield extreme
 ```{r}
+#added age as a causal parent of SFDR  (TSSM) because they are not conditionally independent... However
+# the fischer c-statistic was still very high. Therefore I should probably think about this
+# p-value was equal to 0.005
 east_sem_ext <- psem(
-  lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + age +avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+  lme(sdd ~  avgBio + age + cc+ tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(tssm ~ sdd +  dc + age  , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+   lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
+        avgBio + cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
 )
 
 #cc may be better than avgBio here
@@ -161,7 +186,10 @@ modsum_ee$Std.Estimate <- round(modsum_ee$Std.Estimate, 3)
 modsum_ee$Response <- gsub("_", " ", modsum_ee$Response)
 modsum_ee$Predictor <- gsub("_", " ", modsum_ee$Predictor)
 colnames(modsum_ee)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_ee %>% kable()
+modsum_ee %>% 
+  kbl(caption = "piecewiseSEM results for extreme burn severity in the boreal shield of eastern Ontario", 
+      booktabs = T) %>% 
+  kable_classic(full_width = F, html_font = "Cambria")
 write.csv(modsum_ee, "results/results-summary-tables/Table-5-sem-ext-east.csv")
 
 ```
@@ -169,11 +197,15 @@ write.csv(modsum_ee, "results/results-summary-tables/Table-5-sem-ext-east.csv")
 ### East SEM - med
 
 ```{r}
+
+#same thing with age and SFDR as above. left out of model
 east_sem_med <- psem(
+  lme(sdd ~  avgBio + age + cc+ tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  
+  lme(tssm ~ sdd + dc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  
   lme(RBR_median ~ dc + tssm + sdd +tri +age + 
-        avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(tssm ~ sdd + tri + dc + age + avgBio, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(sdd ~  avgBio + age + tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+        avgBio + cc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
 )
 
 #summary
@@ -194,7 +226,10 @@ modsum_em$Std.Estimate <- round(modsum_em$Std.Estimate, 3)
 modsum_em$Response <- gsub("_", " ", modsum_em$Response)
 modsum_em$Predictor <- gsub("_", " ", modsum_em$Predictor)
 colnames(modsum_em)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_em %>% kable()
+modsum_em %>% 
+  kbl(caption = "piecewiseSEM results for extreme burn severity in Western Ontario Boreal Shield", 
+      booktabs = T) %>% 
+  kable_classic(full_width = F, html_font = "Cambria")
 write.csv(modsum_em, "results/results-summary-tables/Table-6-sem-med-east.csv")
 
 ```
