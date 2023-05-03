@@ -282,6 +282,11 @@ check to see if it makes sense
 
 plot the indirect effects of forest structure on burn severity
 ```{r}
+
+med_ont_eff <-  med_ont_ind_effects %>% 
+  left_join(med_ont_tot_effects, by = c("Pathway", "Response"))
+
+
 med_ont_ind_eff_sf <- med_ont_ind_effects %>% 
   filter(Mediator == "snow free date") %>% 
   mutate(`Snow Free Date` = rep("Snow Free Date"))

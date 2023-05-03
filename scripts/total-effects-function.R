@@ -20,20 +20,20 @@ tot.eff <- function(df, response){
     y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
     z = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
     #total indirect effect
-    age = (x+y+z) # age pathway
+    age = (x*y*z) # age pathway
     x1 = df[df$Predictor == "avgBio" & df$Response == "sdd",8] 
     y1 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
     z1 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
     #total indirect effect
-    abio = (x1 + y1 + z1) # avgbio pathway
+    abio = (x1* y1 * z1) # avgbio pathway
     x2 = df[df$Predictor == "cc" & df$Response == "sdd",8] 
     y2 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
     z2 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
     #total indirect effect
-    cc = (x2 + y2 + z2) #cc pathway
+    cc = (x2 * y2 * z2) #cc pathway
     x3 = df[df$Predictor == "dc" & df$Response == "tssm", 8]
     y3 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
-    dc = (x3 + y3)
+    dc = (x3 * y3)
     
     
     #direct effect of age on extreme
@@ -53,7 +53,7 @@ tot.eff <- function(df, response){
     tot_cc <- df[df$Predictor == "cc" & df$Response == "rbr qs", 8]
     
     #total direct effect of avgbio on extreme
-    sum.tot_cc <- (cc + tot_bio)
+    sum.tot_cc <- (cc + tot_cc)
     
     #direct effect of dc on extreme
     tot_dc <- df[df$Predictor == "dc" & df$Response == "rbr qs", 8]
@@ -62,11 +62,11 @@ tot.eff <- function(df, response){
     sum.tot_dc <- (dc + tot_dc)
     
     #assign col names
-    cols = c("Pathway", "Total Indirect Effect", "Total Effect")
+    cols = c("Pathway", "Total Causal Effect", "Direct Effect")
     
     #develop matrix
     matrix1 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drought Code",
-                       age, abio, cc, dc, sum.tot_age, sum.tot_bio, sum.tot_cc, sum.tot_dc), ncol =3, nrow =4)
+                      sum.tot_age, sum.tot_bio, sum.tot_cc, sum.tot_dc, tot_age, tot_bio, tot_cc, tot_dc), ncol =3, nrow =4)
     
     #table to matrix
     table1 = as.table(matrix1)
@@ -87,11 +87,11 @@ tot.eff <- function(df, response){
     table1 <- dplyr::mutate(table1, Response = rep("Extreme Burn Severity"))
     
     #move response column
-    table1 <- dplyr::relocate(table1, Response, .before = "Total Indirect Effect")
+    table1 <- dplyr::relocate(table1, Response, .before = "Total Causal Effect")
     
     #change total effect to numeric
-    table1$`Total Indirect Effect` = as.numeric(table1$`Total Indirect Effect`)
-    table1$`Total Effect` = as.numeric(table1$`Total Effect`)
+    table1$`Total Causal Effect` = as.numeric(table1$`Total Causal Effect`)
+    table1$`Direct Effect` = as.numeric(table1$`Direct Effect`)
     
     return(table1)
   }
@@ -100,20 +100,20 @@ tot.eff <- function(df, response){
     y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
     z = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
     #total indirect effect
-    age = (x+y+z) # age pathway
+    age = (x*y*z) # age pathway
     x1 = df[df$Predictor == "avgBio" & df$Response == "sdd",8] 
     y1 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
     z1 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
     #total indirect effect
-    abio = (x1 + y1 + z1) # avgbio pathway
+    abio = (x1 * y1 * z1) # avgbio pathway
     x2 = df[df$Predictor == "cc" & df$Response == "sdd",8] 
     y2 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
     z2 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
     #total indirect effect
-    cc = (x2 + y2 + z2) #cc pathway
+    cc = (x2 * y2 * z2) #cc pathway
     x3 = df[df$Predictor == "dc" & df$Response == "tssm", 8]
     y3 = df[df$Predictor == "tssm" & df$Response == "RBR median", 8]
-    dc = (x3 + y3)
+    dc = (x3 * y3)
     
     
     #direct effect of age on extreme
@@ -133,7 +133,7 @@ tot.eff <- function(df, response){
     tot_cc <- df[df$Predictor == "cc" & df$Response == "RBR median", 8]
     
     #total direct effect of avgbio on extreme
-    sum.tot_cc <- (cc + tot_bio)
+    sum.tot_cc <- (cc + tot_cc)
     
     #direct effect of dc on extreme
     tot_dc <- df[df$Predictor == "dc" & df$Response == "RBR median", 8]
@@ -142,11 +142,11 @@ tot.eff <- function(df, response){
     sum.tot_dc <- (dc + tot_dc)
     
     #assign col names
-    cols = c("Pathway", "Total Indirect Effect", "Total Effect")
+    cols = c("Pathway", "Total Causal Effect", "Direct Effect")
     
     #develop matrix
     matrix2 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drought Code",
-                       age, abio, cc, dc, sum.tot_age, sum.tot_bio, sum.tot_cc, sum.tot_dc), ncol =3, nrow =4)
+                       sum.tot_age, sum.tot_bio, sum.tot_cc, sum.tot_dc, tot_age, tot_bio, tot_cc, tot_dc), ncol =3, nrow =4)
     
     # matrix as table
     table2 = as.table(matrix2)
@@ -167,11 +167,11 @@ tot.eff <- function(df, response){
     table2 <- dplyr::mutate(table2, Response = rep("Median Burn Severity"))
     
     #relocate response before indirect effect
-    table2 <- dplyr::relocate(table2, Response, .before = "Total Indirect Effect")
+    table2 <- dplyr::relocate(table2, Response, .before = "Total Causal Effect")
     
     #total indirect and total direct effect as numeric
-    table2$`Total Indirect Effect` = as.numeric(table2$`Total Indirect Effect`)
-    table2$`Total Effect`= as.numeric(table2$`Total Effect`)
+    table2$`Total Causal Effect` = as.numeric(table2$`Total Causal Effect`)
+    table2$`Direct Effect`= as.numeric(table2$`Direct Effect`)
     
     
     return(table2)
