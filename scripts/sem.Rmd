@@ -23,6 +23,7 @@ Load packages
 library(piecewiseSEM)
 library(nlme)
 library(tidyverse)
+library(kableExtra)
 ```
 
 Source functions
@@ -186,7 +187,10 @@ modsum$Std.Estimate <- round(modsum$Std.Estimate, 3)
 modsum$Response <- gsub("_", " ", modsum$Response)
 modsum$Predictor <- gsub("_", " ", modsum$Predictor)
 colnames(modsum)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum
+modsum %>% 
+  kbl(caption = "piecewiseSEM results for burn severity extremes in Ontario Boreal Shield", 
+      booktabs = T) %>% 
+  kable_classic(full_width = F, html_font = "Cambria")
 
 write.csv(modsum, "results/results-summary-tables/Table-1-sem-ext-ont.csv")
 ```
@@ -208,9 +212,9 @@ ext_spec_ind_eff
 
 Calculate total effects
 ```{r}
-ext_ont_total_effects <- tot.eff(modsum, response = "extreme")
+ext_ont_tot_effects <- tot.eff(modsum, response = "extreme")
 
-ext_ont_total_effects
+ext_ont_tot_effects
 ```
 
 
@@ -281,7 +285,7 @@ It seems that the signs flipped between total indirect effects and total effects
 check to see if it makes sense
 
 plot the indirect effects of forest structure on burn severity
-```{r}
+```{r, median burn severity}
 
 med_ont_eff <-  med_ont_ind_effects %>% 
   left_join(med_ont_tot_effects, by = c("Pathway", "Response")) 
@@ -298,17 +302,43 @@ ggplot()+
 theme_bw()+
   theme(axis.title = element_text(size = 14, family = "Helvetica"), 
         axis.text = element_text(size = 10, family = "Helvetica"),
+        plot.title = element_text(hjust = 0.5),
     panel.background = element_blank(),
         panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + 
   theme(legend.position ="bottom") + xlab("Standardized Effects")+
-  scale_colour_viridis_d("Effect Type")
+  scale_colour_viridis_d("Effect Type", option = "viridis") +
+  labs(title = "Median Burn Severity - All Fires")
 
 
 
 
+# calculating confidence intervals for the random variables (path coefficients?)
 
 
 
+```
+```{r,extreme burn severity}
+ext_ont_eff <-  ext_ont_ind_effects %>% 
+  left_join(ext_ont_tot_effects, by = c("Pathway", "Response")) 
+ext_ont_eff$`Indirect Effect` <- round(ext_ont_eff$`Indirect Effect`, digits = 3)
+ext_ont_eff$`Total Causal Effect` <- round(ext_ont_eff$`Total Causal Effect`, digits = 3)
+
+ext_ont_eff_long <- ext_ont_eff %>% select(-c(Response)) %>% 
+  pivot_longer(!Pathway, names_to = "type", values_to = "effect")
+
+ 
+#plot
+ggplot()+
+  geom_point(data = ext_ont_eff_long, aes(x = effect, y = Pathway, colour = type), size = 5)+
+theme_bw()+
+  theme(axis.title = element_text(size = 14, family = "Helvetica"), 
+        axis.text = element_text(size = 10, family = "Helvetica"),
+        plot.title = element_text(hjust = 0.5),
+    panel.background = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + 
+  theme(legend.position ="bottom") + xlab("Standardized Effects")+
+  scale_colour_viridis_d("Effect Type") +
+  labs(title = "Burn Severity Extremes - All Fires") # +scale_y_discrete(position = "right") #y to the right to make proper pannel of plots
 
 ```
 
