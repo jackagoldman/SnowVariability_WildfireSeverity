@@ -58,7 +58,7 @@ hist(new_data_w$rbr_qs) # ok
 hist(new_data_w$RBR_median) # ok
 ```
 
-
+Calculate the free model for western boreal shield of Ontario
 ```{r, Extreme Burn Severity Western Boreal Shield Of Ontario}
 new_data_w1 = new_data_w %>% mutate(dc= c(scale(dc)),
                                     tssm = c(scale(tssm)),
@@ -104,6 +104,15 @@ modsum_west_ext %>%
 write.csv(modsum_west_ext, "results/results-summary-tables/Table-3-sem-ext-west.csv")
 
 ```
+
+
+
+
+
+
+
+
+
 
 ```{r, west med}
 
@@ -227,10 +236,9 @@ modsum_em$Response <- gsub("_", " ", modsum_em$Response)
 modsum_em$Predictor <- gsub("_", " ", modsum_em$Predictor)
 colnames(modsum_em)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
 modsum_em %>% 
-  kbl(caption = "piecewiseSEM results for extreme burn severity in Western Ontario Boreal Shield", 
+  kbl(caption = "piecewiseSEM results for median burn severity in eastern boreal shield of Ontario", 
       booktabs = T) %>% 
   kable_classic(full_width = F, html_font = "Cambria")
 write.csv(modsum_em, "results/results-summary-tables/Table-6-sem-med-east.csv")
 
 ```
-
