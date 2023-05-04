@@ -1,0 +1,115 @@
+---
+title: "multigroup-ecoregion"
+author: "Jack A Goldman"
+date: "2023-05-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Fix all of the paths
+```{r}
+new_data = new_data %>% mutate(group = case_when(pyroregion == 1 ~ "w",
+                                                 pyroregion == 0 ~ "e"))
+new_data$group <- as.factor(new_data$group)
+new_data$size_class <- as.factor(new_data$size_class)
+new_data$Fire_Year <- as.numeric(new_data$Fire_Year)
+
+new_data$sdd <- as.numeric(new_data$sdd)
+new_data$tssm <- as.numeric(new_data$tssm)
+
+ext_allp <- psem(
+  lme(sdd ~ pyroregion*avgBio + pyroregion*age + pyroregion*cc + pyroregion*tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
+  
+  lme(tssm ~ pyroregion*sdd + pyroregion*dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
+  
+   lme(rbr_qs ~ pyroregion*dc + pyroregion*tssm + pyroregion*sdd + pyroregion*tri +pyroregion*age + 
+        pyroregion*avgBio + pyroregion*cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
+)
+
+
+#summary
+summary(ext_allp, conditioning = TRUE)
+```
+
+extreme biomass
+```{r}
+ext_abio <- psem(
+  lme(sdd ~  avgBio + pyroregion*age + pyroregion*cc+ pyroregion*tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
+  
+  lme(tssm ~ sdd + pyroregion*dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
+  
+   lme(rbr_qs ~ pyroregion*dc + tssm + pyroregion*sdd + pyroregion*tri +pyroregion*age + 
+        pyroregion*avgBio + pyroregion*cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
+)
+
+
+#summary
+summary(ext_abio, conditioning = TRUE)
+```
+
+extreme canopy closure
+```{r}
+ext_cc  <- psem(
+  lme(sdd ~  pyroregion/avgBio + pyroregion/age + cc+ pyroregion/tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
+  
+  lme(tssm ~ sdd + pyroregion/dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
+  
+   lme(rbr_qs ~ pyroregion/dc + tssm + pyroregion/sdd + pyroregion/tri +pyroregion/age + 
+        pyroregion/avgBio + pyroregion/cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
+)
+
+
+
+#summary
+summary(ext_cc, conditioning = TRUE)
+```
+
+extreme age
+```{r}
+ext_age  <- psem(
+  lme(sdd ~  pyroregion*avgBio + age + pyroregion*cc+ pyroregion*tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
+  
+  lme(tssm ~ sdd + pyroregion*dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
+  
+   lme(rbr_qs ~ pyroregion*dc + tssm + pyroregion*sdd + pyroregion*tri +pyroregion*age + 
+        pyroregion*avgBio + pyroregion*cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
+)
+
+
+
+#summary
+summary(ext_age, conditioning = TRUE)
+```
+
+
+```{r}
+ext_all_chi <- fisherC(ext_allp)[,1]
+ext_all_df <- fisherC(ext_allp)
+ext_cc_chi <- fisherC(ext_cc)[,1]
+ext_cc_df <- fisherC(ext_cc)[,2]
+ext_age_chi <- fisherC(ext_age)[,1]
+ext_age_df <- fisherC(ext_age)[,2]
+ext_bio_chi <- fisherC(ext_abio)[,1]
+ext_bio_df <- fisherC(ext_abio)[,2]
+
+chi.diff_cc = (ext_cc_chi - ext_all_chi)
+df.diff_cc= (ext_cc_df - ext_all_df)
+
+1-pchisq(chi.diff_cc, df.diff_cc) # we conclude that the models are different, so indirect effects differ by group through canopy closure
+
+chi.diff_age = (ext_all_chi - ext_age_chi)
+df.diff_age= (ext_all_df - ext_age_df)
+
+1-pchisq(chi.diff_age, df.diff_age)# we conclude that the models are different, so indirect effects differ by group through age
+
+chi.diff_bio = (ext_all_chi - ext_bio_chi)
+df.diff_bio= (ext_all_df - ext_bio_df)
+
+1-pchisq(chi.diff_bio, df.diff_bio)# we conclude that the models are different, so indirect effects differ by group through age
+
+```
+
