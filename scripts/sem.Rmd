@@ -202,12 +202,6 @@ ext_ont_ind_effects <- ind.eff(modsum, response = "extreme")
 
 ext_ont_ind_effects
 ```
-Specific indirect effects
-```{r}
-ext_spec_ind_eff <- spec.ind.eff(modsum, response = "extreme")
-
-ext_spec_ind_eff
-```
 
 
 Calculate total effects
