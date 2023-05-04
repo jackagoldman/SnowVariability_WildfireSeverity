@@ -34,6 +34,11 @@ tot.eff <- function(df, response){
     x3 = df[df$Predictor == "dc" & df$Response == "tssm", 8]
     y3 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
     dc = (x3 * y3)
+     #
+    x4 = df[df$Predictor == "tri" & df$Response == "sdd", 8]
+    y4 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z4 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
+    tri = (x4 * y4 * z4)
     
     
     #direct effect of age on extreme
@@ -61,12 +66,18 @@ tot.eff <- function(df, response){
     #total direct effect of avgbio on extreme
     sum.tot_dc <- (dc + tot_dc)
     
+    #direct effect of topo on extreme
+    tot_tri <- df[df$Predictor == "tri" & df$Response == "rbr qs", 8]
+    
+    #total direct effect of avgbio on extreme
+    sum.tot_tri <- (tri + tot_tri)
+    
     #assign col names
     cols = c("Pathway", "Total Causal Effect", "Direct Effect")
     
     #develop matrix
-    matrix1 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drought Code",
-                      sum.tot_age, sum.tot_bio, sum.tot_cc, sum.tot_dc, tot_age, tot_bio, tot_cc, tot_dc), ncol =3, nrow =4)
+    matrix1 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drought","Topography",
+                      sum.tot_age, sum.tot_bio, sum.tot_cc, sum.tot_dc, sum.tot_tri, tot_age, tot_bio, tot_cc, tot_dc, tot_tri), ncol =3, nrow =5)
     
     #table to matrix
     table1 = as.table(matrix1)

@@ -39,9 +39,13 @@ ind.eff <- function(df, response){
     x3 = df[df$Predictor == "dc" & df$Response == "tssm", 8]
     y3 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
     dc = (x3 * y3)
+    x4 = df[df$Predictor == "tri" & df$Response == "sdd", 8]
+    y4 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z4 = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]
+    tri = (x4 * y4 *z4 )
     cols = c("Pathway",  "Indirect Effect")
-    matrix1 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drought Code",
-                       age, abio, cc,dc ), ncol =2, )
+    matrix1 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drought", "Topography",
+                       age, abio, cc,dc, tri), ncol =2, )
     table1 = as.table(matrix1)
     colnames(table1) = cols
     table1 = as.data.frame.matrix(table1)
