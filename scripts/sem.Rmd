@@ -291,7 +291,7 @@ med_ont_eff_long <- med_ont_eff %>% select(-c(Response)) %>%
 
  
 #plot
-ggplot()+
+med.p.all <- ggplot()+
   geom_point(data = med_ont_eff_long, aes(x = effect, y = Pathway, colour = type), size = 5)+
 theme_bw()+
   theme(axis.title = element_text(size = 14, family = "Helvetica"), 
@@ -301,16 +301,18 @@ theme_bw()+
         panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + 
   theme(legend.position ="bottom") + xlab("Standardized Effects")+
   scale_colour_viridis_d("Effect Type", option = "viridis") +
-  labs(title = "Median Burn Severity - All Fires")
+  labs(title = "Median Burn Severity - All Fires") + 
+  scale_y_discrete(position = "right") #y to the right to make proper pannel of plots
 
 
 
 
 # calculating confidence intervals for the random variables (path coefficients?)
-
+med.p.all
 
 
 ```
+
 ```{r,extreme burn severity}
 ext_ont_eff <-  ext_ont_ind_effects %>% 
   left_join(ext_ont_tot_effects, by = c("Pathway", "Response")) 
@@ -322,7 +324,7 @@ ext_ont_eff_long <- ext_ont_eff %>% select(-c(Response)) %>%
 
  
 #plot
-ggplot()+
+ext.p.all <- ggplot()+
   geom_point(data = ext_ont_eff_long, aes(x = effect, y = Pathway, colour = type), size = 5)+
 theme_bw()+
   theme(axis.title = element_text(size = 14, family = "Helvetica"), 
@@ -330,9 +332,18 @@ theme_bw()+
         plot.title = element_text(hjust = 0.5),
     panel.background = element_blank(),
         panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + 
-  theme(legend.position ="bottom") + xlab("Standardized Effects")+
+  theme(legend.position ="top") + xlab("Standardized Effects")+
   scale_colour_viridis_d("Effect Type") +
-  labs(title = "Burn Severity Extremes - All Fires") # +scale_y_discrete(position = "right") #y to the right to make proper pannel of plots
+  labs(title = "Burn Severity Extremes - All Fires") #scale_y_discrete(position = "right") #y to the right to make proper pannel of plots
 
+ext.p.all
+
+```
+
+```{r}
+library(gridExtra)
+library(patchwork)
+ext.p.all + med.p.all + guide_area() + 
+  plot_layout(guides = 'collect')
 ```
 

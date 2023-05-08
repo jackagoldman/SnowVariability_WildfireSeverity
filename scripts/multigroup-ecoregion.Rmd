@@ -9,107 +9,439 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
-Fix all of the paths
 ```{r}
-new_data = new_data %>% mutate(group = case_when(pyroregion == 1 ~ "w",
-                                                 pyroregion == 0 ~ "e"))
+library(nlme)
+library(piecewiseSEM)
+```
+
+
+
+
+Fixed for avgbio 
+```{r}
+new_data = new_data %>% mutate(group = case_when(pyroregion == 1 ~ "e",
+                                                 pyroregion == 0 ~ "w"))
 new_data$group <- as.factor(new_data$group)
 new_data$size_class <- as.factor(new_data$size_class)
 new_data$Fire_Year <- as.numeric(new_data$Fire_Year)
 
 new_data$sdd <- as.numeric(new_data$sdd)
 new_data$tssm <- as.numeric(new_data$tssm)
+new_data$pyroregion <- as.factor(new_data$pyroregion)
 
-ext_allp <- psem(
-  lme(sdd ~ pyroregion*avgBio + pyroregion*age + pyroregion*cc + pyroregion*tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
+ext_bio <- psem(
+lme(sdd ~ pyroregion/avgBio + age + cc + tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
   
-  lme(tssm ~ pyroregion*sdd + pyroregion*dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ pyroregion/sdd + dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
   
-   lme(rbr_qs ~ pyroregion*dc + pyroregion*tssm + pyroregion*sdd + pyroregion*tri +pyroregion*age + 
-        pyroregion*avgBio + pyroregion*cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
+   lme(rbr_qs ~ dc + pyroregion/tssm + sdd + tri + age + 
+        avgBio + cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
 )
 
-
 #summary
-summary(ext_allp, conditioning = TRUE)
+summary(ext_bio)$coefs
+
+
 ```
 
-extreme biomass
+
 ```{r}
-ext_abio <- psem(
-  lme(sdd ~  avgBio + pyroregion*age + pyroregion*cc+ pyroregion*tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
-  
-  lme(tssm ~ sdd + pyroregion*dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
-  
-   lme(rbr_qs ~ pyroregion*dc + tssm + pyroregion*sdd + pyroregion*tri +pyroregion*age + 
-        pyroregion*avgBio + pyroregion*cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
-)
+sem_ext_chi <- fisherC(sem_ext)[,1]
+sem_ext_df <- fisherC(sem_ext)[,2]
+ext_bio_chi <- fisherC(ext_bio)[,1]
+ext_bio_df <- fisherC(ext_bio)[,2]
 
+chi.diff_bio = (ext_bio_chi - sem_ext_chi)
+df.diff_bio= (ext_bio_df - sem_ext_df)
 
-#summary
-summary(ext_abio, conditioning = TRUE)
+1-pchisq(chi.diff_bio, df.diff_bio) # we conclude that the models are different, so indirect effects differ by group through canopy closure
+
 ```
+
 
 extreme canopy closure
 ```{r}
 ext_cc  <- psem(
-  lme(sdd ~  pyroregion/avgBio + pyroregion/age + cc+ pyroregion/tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
+  lme(sdd ~  avgBio + age + pyroregion/cc+ tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
   
-  lme(tssm ~ sdd + pyroregion/dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ pyroregion/sdd + dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
   
-   lme(rbr_qs ~ pyroregion/dc + tssm + pyroregion/sdd + pyroregion/tri +pyroregion/age + 
-        pyroregion/avgBio + pyroregion/cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
+   lme(rbr_qs ~ dc + pyroregion/tssm + sdd + tri + age + 
+        avgBio + cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
 )
-
 
 
 #summary
 summary(ext_cc, conditioning = TRUE)
 ```
 
+```{r}
+
+sem_ext_chi <- fisherC(sem_ext)[,1]
+sem_ext_df <- fisherC(sem_ext)[,2]
+ext_cc_chi <- fisherC(ext_cc)[,1]
+ext_c_df <- fisherC(ext_cc)[,2]
+
+chi.diff_cc = (ext_cc_chi - sem_ext_chi)
+df.diff_cc= (ext_cc_df - sem_ext_df)
+
+1-pchisq(chi.diff_cc, df.diff_cc) # we conclude that the models are different, so indirect effects differ by group through canopy closure
+
+```
+
+
 extreme age
 ```{r}
 ext_age  <- psem(
-  lme(sdd ~  pyroregion*avgBio + age + pyroregion*cc+ pyroregion*tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
+  lme(sdd ~  avgBio + pyroregion/age + cc+ tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
   
-  lme(tssm ~ sdd + pyroregion*dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ pyroregion/sdd + dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
   
-   lme(rbr_qs ~ pyroregion*dc + tssm + pyroregion*sdd + pyroregion*tri +pyroregion*age + 
-        pyroregion*avgBio + pyroregion*cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
+   lme(rbr_qs ~dc + pyroregion/tssm + sdd + tri + age + 
+        avgBio + cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
 )
 
-
-
-#summary
-summary(ext_age, conditioning = TRUE)
 ```
 
 
 ```{r}
-ext_all_chi <- fisherC(ext_allp)[,1]
-ext_all_df <- fisherC(ext_allp)
-ext_cc_chi <- fisherC(ext_cc)[,1]
-ext_cc_df <- fisherC(ext_cc)[,2]
+sem_ext_chi <- fisherC(sem_ext)[,1]
+sem_ext_df <- fisherC(sem_ext)[,2]
 ext_age_chi <- fisherC(ext_age)[,1]
-ext_age_df <- fisherC(ext_age)[,2]
-ext_bio_chi <- fisherC(ext_abio)[,1]
-ext_bio_df <- fisherC(ext_abio)[,2]
+ext_c_df <- fisherC(ext_age)[,2]
 
-chi.diff_cc = (ext_cc_chi - ext_all_chi)
-df.diff_cc= (ext_cc_df - ext_all_df)
+chi.diff_age = (ext_age_chi - sem_ext_chi)
+df.diff_age= (ext_age_df - sem_ext_df)
 
-1-pchisq(chi.diff_cc, df.diff_cc) # we conclude that the models are different, so indirect effects differ by group through canopy closure
-
-chi.diff_age = (ext_all_chi - ext_age_chi)
-df.diff_age= (ext_all_df - ext_age_df)
 
 1-pchisq(chi.diff_age, df.diff_age)# we conclude that the models are different, so indirect effects differ by group through age
 
-chi.diff_bio = (ext_all_chi - ext_bio_chi)
-df.diff_bio= (ext_all_df - ext_bio_df)
 
-1-pchisq(chi.diff_bio, df.diff_bio)# we conclude that the models are different, so indirect effects differ by group through age
+
+```
+
+get path coefficients
+```{r, avgbiomass}
+pc.sdd.bio.g1 <- lme(sdd ~  avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+  
+ pc.tssm.sdd.g1 <-  lme(tssm ~ sdd  ,  random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_w, method = "ML")
+  
+pc.rbr.tssm.g1 <- lme(rbr_qs ~ tssm, random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_w, method = "ML")
+
+coef1 <- coefs(pc.sdd.bio.g1)[,8]
+coef2 <- coefs(pc.tssm.sdd.g1)[,8]
+coef3 <- coefs(pc.rbr.tssm.g1)[,8]
+
+ind.path.bio.g1 <- (coef1*coef2*coef3)
+
+#east
+pc.sdd.bio.g2 <- lme(sdd ~  avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+  
+ pc.tssm.sdd.g2 <-  lme(tssm ~ sdd  ,  random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_e, method = "ML")
+  
+pc.rbr.tssm.g2 <- lme(rbr_qs ~ tssm, random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_e, method = "ML")
+
+coef1 <- coefs(pc.sdd.bio.g2)[,8]
+coef2 <- coefs(pc.tssm.sdd.g2)[,8]
+coef3 <- coefs(pc.rbr.tssm.g2)[,8]
+
+ind.path.bio.g2 <- (coef1*coef2*coef3)
+
+```
+
+```{r, canopy closure}
+#g1 = west, g2 = east
+pc.sdd.cc.g1 <- lme(sdd ~  cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+  
+ pc.tssm.sdd.g1 <-  lme(tssm ~ sdd  ,  random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_w, method = "ML")
+  
+pc.rbr.tssm.g1 <- lme(rbr_qs ~ tssm, random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_w, method = "ML")
+
+coef1 <- coefs(pc.sdd.cc.g1)[,8]
+coef2 <- coefs(pc.tssm.sdd.g1)[,8]
+coef3 <- coefs(pc.rbr.tssm.g1)[,8]
+
+ind.path.cc.g1 <- (coef1*coef2*coef3)
+
+#east
+pc.sdd.cc.g2 <- lme(sdd ~  cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+  
+ pc.tssm.sdd.g2 <-  lme(tssm ~ sdd  ,  random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_e, method = "ML")
+  
+pc.rbr.tssm.g2 <- lme(rbr_qs ~ tssm, random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_e, method = "ML")
+
+coef1 <- coefs(pc.sdd.cc.g2)[,8]
+coef2 <- coefs(pc.tssm.sdd.g2)[,8]
+coef3 <- coefs(pc.rbr.tssm.g2)[,8]
+
+ind.path.cc.g2 <- (coef1*coef2*coef3)
+
+```
+
+
+```{r, stand age}
+#g1 = west, g2 = east
+pc.sdd.age.g1 <- lme(sdd ~  age , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+  
+ pc.tssm.sdd.g1 <-  lme(tssm ~ sdd  ,  random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_w, method = "ML")
+  
+pc.rbr.tssm.g1 <- lme(rbr_qs ~ tssm, random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_w, method = "ML")
+
+coef1 <- coefs(pc.sdd.age.g1)[,8]
+coef2 <- coefs(pc.tssm.sdd.g1)[,8]
+coef3 <- coefs(pc.rbr.tssm.g1)[,8]
+
+ind.path.age.g1 <- (coef1*coef2*coef3)
+
+#east
+pc.sdd.age.g2 <- lme(sdd ~  age , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+  
+ pc.tssm.sdd.g2 <-  lme(tssm ~ sdd  ,  random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_e, method = "ML")
+  
+pc.rbr.tssm.g2 <- lme(rbr_qs ~ tssm, random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_e, method = "ML")
+
+coef1 <- coefs(pc.sdd.age.g2)[,8]
+coef2 <- coefs(pc.tssm.sdd.g2)[,8]
+coef3 <- coefs(pc.rbr.tssm.g2)[,8]
+
+ind.path.age.g2 <- (coef1*coef2*coef3)
+
+```
+
+create a dataframe
+```{r}
+names <- c("Indirect Pathway", "Path Coefficient", "Ecoregion")
+ind.mult.ext <- matrix(c("Stand Age", "Total Aboveground Biomass", "Canopy Closure",
+                         "Stand Age", "Total Aboveground Biomass", "Canopy Closure",
+                         ind.path.age.g1, ind.path.age.g2, ind.path.bio.g1, ind.path.bio.g2, 
+                         ind.path.cc.g1, ind.path.cc.g2, "West", "East","West", "East","West", "East","West", "East"), nrow =6, ncol = 3)
+ind.mult.ext <-  as.table(ind.mult.ext)
+colnames(ind.mult.ext) <-  names
+df.ind.mult.ext = as.data.frame.matrix(ind.mult.ext)
+rownames(df.ind.mult.ext) = NULL
+tbl.ind.mult.ext<- tidyr::as_tibble(df.ind.mult.ext)
+tbl.ind.mult.ext<- dplyr::mutate(tbl.ind.mult.ext, Response = rep("Burn Severity Extremes"))
+tbl.ind.mult.ext$`Path Coefficient` <- round(as.numeric(tbl.ind.mult.ext$`Path Coefficient`), digits = 3)
+
+    
+```
+
+
+Median multigroup
+```{r, biomass}
+med_bio <- psem(
+lme(sdd ~ pyroregion/avgBio + age + cc + tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
+  
+  lme(tssm ~ pyroregion/sdd + dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
+  
+   lme(RBR_median ~ dc + pyroregion/tssm + sdd + tri + age + 
+        avgBio + cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
+)
+
+```
+
+```{r}
+sem_med_chi <- fisherC(sem_med)[,1]
+sem_med_df <- fisherC(sem_med)[,2]
+med_bio_chi <- fisherC(med_bio)[,1]
+med_bio_df <- fisherC(med_bio)[,2]
+
+chi.diff_bio = (med_bio_chi - sem_med_chi)
+df.diff_bio= (med_bio_df - sem_med_df)
+
+1-pchisq(chi.diff_bio, df.diff_bio)
+```
+
+```{r, age}
+med_age <- psem(
+lme(sdd ~ avgBio + pyroregion/age + cc + tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
+  
+  lme(tssm ~ pyroregion/sdd + dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
+  
+   lme(RBR_median ~ dc + pyroregion/tssm + sdd + tri + age + 
+        avgBio + cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
+)
+
+```
+
+```{r}
+sem_med_chi <- fisherC(sem_med)[,1]
+sem_med_df <- fisherC(sem_med)[,2]
+med_age_chi <- fisherC(med_age)[,1]
+med_age_df <- fisherC(med_age)[,2]
+
+chi.diff_age = (med_age_chi - sem_med_chi)
+df.diff_age= (med_age_df - sem_med_df)
+
+1-pchisq(chi.diff_age, df.diff_age)
+```
+
+
+```{r, canopy closure}
+med_cc <- psem(
+lme(sdd ~ avgBio + age + pyroregion/cc + tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
+  
+  lme(tssm ~ pyroregion/sdd + dc ,  random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML"),
+  
+   lme(RBR_median ~ dc + pyroregion/tssm + sdd + tri + age + 
+        avgBio + cc , random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion),na.action = na.omit, data = new_data, method = "ML")
+)
+
+```
+
+```{r}
+sem_med_chi <- fisherC(sem_med)[,1]
+sem_med_df <- fisherC(sem_med)[,2]
+med_cc_chi <- fisherC(med_cc)[,1]
+med_cc_df <- fisherC(med_cc)[,2]
+
+chi.diff_cc = (med_cc_chi - sem_med_chi)
+df.diff_cc= (med_cc_df - sem_med_df)
+
+1-pchisq(chi.diff_cc, df.diff_cc)
+```
+
+get path coefficients
+```{r, avgbiomass}
+pc.sdd.bio.g1 <- lme(sdd ~  avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+  
+ pc.tssm.sdd.g1 <-  lme(tssm ~ sdd  ,  random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_w, method = "ML")
+  
+pc.rbr.tssm.g1 <- lme(RBR_median ~ tssm, random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_w, method = "ML")
+
+coef1 <- coefs(pc.sdd.bio.g1)[,8]
+coef2 <- coefs(pc.tssm.sdd.g1)[,8]
+coef3 <- coefs(pc.rbr.tssm.g1)[,8]
+
+ind.path.bio.g1 <- (coef1*coef2*coef3)
+
+#east
+pc.sdd.bio.g2 <- lme(sdd ~  avgBio , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+  
+ pc.tssm.sdd.g2 <-  lme(tssm ~ sdd  ,  random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_e, method = "ML")
+  
+pc.rbr.tssm.g2 <- lme(RBR_median ~ tssm, random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_e, method = "ML")
+
+coef1 <- coefs(pc.sdd.bio.g2)[,8]
+coef2 <- coefs(pc.tssm.sdd.g2)[,8]
+coef3 <- coefs(pc.rbr.tssm.g2)[,8]
+
+ind.path.bio.g2 <- (coef1*coef2*coef3)
+
+```
+
+```{r, canopy closure}
+#g1 = west, g2 = east
+pc.sdd.cc.g1 <- lme(sdd ~  cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+  
+ pc.tssm.sdd.g1 <-  lme(tssm ~ sdd  ,  random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_w, method = "ML")
+  
+pc.rbr.tssm.g1 <- lme(RBR_median ~ tssm, random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_w, method = "ML")
+
+coef1 <- coefs(pc.sdd.cc.g1)[,8]
+coef2 <- coefs(pc.tssm.sdd.g1)[,8]
+coef3 <- coefs(pc.rbr.tssm.g1)[,8]
+
+ind.path.cc.g1 <- (coef1*coef2*coef3)
+
+#east
+pc.sdd.cc.g2 <- lme(sdd ~  cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+  
+ pc.tssm.sdd.g2 <-  lme(tssm ~ sdd  ,  random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_e, method = "ML")
+  
+pc.rbr.tssm.g2 <- lme(RBR_median ~ tssm, random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_e, method = "ML")
+
+coef1 <- coefs(pc.sdd.cc.g2)[,8]
+coef2 <- coefs(pc.tssm.sdd.g2)[,8]
+coef3 <- coefs(pc.rbr.tssm.g2)[,8]
+
+ind.path.cc.g2 <- (coef1*coef2*coef3)
+
+```
+
+
+```{r, stand age}
+#g1 = west, g2 = east
+pc.sdd.age.g1 <- lme(sdd ~  age , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
+  
+ pc.tssm.sdd.g1 <-  lme(tssm ~ sdd  ,  random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_w, method = "ML")
+  
+pc.rbr.tssm.g1 <- lme(RBR_median ~ tssm, random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_w, method = "ML")
+
+coef1 <- coefs(pc.sdd.age.g1)[,8]
+coef2 <- coefs(pc.tssm.sdd.g1)[,8]
+coef3 <- coefs(pc.rbr.tssm.g1)[,8]
+
+ind.path.age.g1 <- (coef1*coef2*coef3)
+
+#east
+pc.sdd.age.g2 <- lme(sdd ~  age , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
+  
+ pc.tssm.sdd.g2 <-  lme(tssm ~ sdd  ,  random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_e, method = "ML")
+  
+pc.rbr.tssm.g2 <- lme(RBR_median ~ tssm, random = ~1 | Fire_Year/size_class,na.action = na.omit, data = new_data_e, method = "ML")
+
+coef1 <- coefs(pc.sdd.age.g2)[,8]
+coef2 <- coefs(pc.tssm.sdd.g2)[,8]
+coef3 <- coefs(pc.rbr.tssm.g2)[,8]
+
+ind.path.age.g2 <- (coef1*coef2*coef3)
+
+```
+
+create a dataframe
+```{r}
+names <- c("Indirect Pathway", "Path Coefficient", "Ecoregion")
+ind.mult.med <- matrix(c("Stand Age", "Total Aboveground Biomass", "Canopy Closure",
+                         "Stand Age", "Total Aboveground Biomass", "Canopy Closure",
+                         ind.path.age.g1, ind.path.age.g2, ind.path.bio.g1, ind.path.bio.g2, 
+                         ind.path.cc.g1, ind.path.cc.g2, "West", "East","West", "East","West", "East"), ncol = 3)
+ind.mult.med <-  as.table(ind.mult.med)
+colnames(ind.mult.med) <-  names
+df.ind.mult.med = as.data.frame.matrix(ind.mult.med)
+rownames(df.ind.mult.med) = NULL
+tbl.ind.mult.med<- tidyr::as_tibble(df.ind.mult.med)
+tbl.ind.mult.med<- dplyr::mutate(tbl.ind.mult.med, Response = rep("Median Burn Severity"))
+tbl.ind.mult.med$`Path Coefficient` <- round(as.numeric(tbl.ind.mult.med$`Path Coefficient`), digits = 3)
+```
+
+
+plot the indirect pathways
+
+```{r}
+library(ggplot2)
+```
+
+
+```{r, median}
+#plot
+ggplot()+
+  geom_point(data = tbl.ind.mult.med, aes(x = `Path Coefficient`, y = `Indirect Pathway`, colour = Ecoregion), size = 5)+
+theme_bw()+
+  theme(axis.title = element_text(size = 14, family = "Helvetica"), 
+        axis.text = element_text(size = 10, family = "Helvetica"),
+        plot.title = element_text(hjust = 0.5),
+    panel.background = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + 
+  theme(legend.position ="bottom") + xlab("Standardized Effects")+
+  scale_colour_viridis_d("Ecoregion", option = "viridis") +
+  labs(title = "Median Burn Severity - East/West Multigroup")
+
+```
+
+
+```{r}
+ggplot()+
+  geom_point(data = tbl.ind.mult.ext, aes(x = `Path Coefficient`, y = `Indirect Pathway`, colour = Ecoregion), size = 5)+
+theme_bw()+
+  theme(axis.title = element_text(size = 14, family = "Helvetica"), 
+        axis.text = element_text(size = 10, family = "Helvetica"),
+        plot.title = element_text(hjust = 0.5),
+    panel.background = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + 
+  theme(legend.position ="bottom") + xlab("Standardized Effects")+
+  scale_colour_viridis_d("Ecoregion", option = "viridis") +
+  labs(title = "Burn Severity Extremes - East/West Multigroup")
 
 ```
 
