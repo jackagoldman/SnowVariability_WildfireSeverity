@@ -24,6 +24,7 @@ library(piecewiseSEM)
 library(nlme)
 library(tidyverse)
 library(kableExtra)
+library(ggplot2)
 ```
 
 Source functions
@@ -343,7 +344,6 @@ ext.p.all
 ```{r}
 library(gridExtra)
 library(patchwork)
-ext.p.all + med.p.all + guide_area() + 
-  plot_layout(guides = 'collect')
+ext.p.all + med.p.all 
 ```
 
