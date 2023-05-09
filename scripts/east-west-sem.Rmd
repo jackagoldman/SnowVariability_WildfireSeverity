@@ -24,7 +24,6 @@ library(kableExtra)
 ```
 
 Read in data
-
 ```{r}
 df_snow <- read.csv("Data/0-forest-snow-fire-data.csv") %>% 
   filter(Fire_Year < 2020 | Fire_Year <=2001) 
