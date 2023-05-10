@@ -7,7 +7,7 @@ font-size: 12pt
 editor_options: 
   markdown: 
     wrap: 100
-bibliography: myrefs1.bib
+bibliography: references.bib
 csl: philtransrscb.csl
 header-includes:
     - \usepackage{setspace}\doublespacing
@@ -34,6 +34,14 @@ and temporal scales.
 **How it matters**:
 
 # Introduction
+
+Q1. How does stand structure and snow cover interact to influence wildfire burn severity in the
+boreal shield?
+
+Q2. do the strength of the direct and indirect relationships differ based on ecoregion and fire
+seasonality?
+
+Q3. Does snow cover influence within fire variability in burn severity?
 
 # Methods
 
@@ -72,20 +80,78 @@ other Landsat-based approaches (e.g., rNBR) as it is more sensitive to pre-fire 
 a hybrid mean-compositing approach developed for the boreal region [@holsinger.etal2021] that
 calculates the mean across a stack of pre-fire and post-fire imagery (see supplementary materials).
 
-To determine snow free date we used the global, 500-m resolution, daily snow cover product, version
-6 from NASA's Moderate Resolution SpectroRadiometer (MODIS/Terra MOD10A1) to generate maps in GEE
-for each fire perimeter using an algorithm developed for the northern hemisphere [@. SDD is the last
-date that snow is detected in a pixel, calculated as the longest period without snow after a minimum
-of 5 days of snow cover (150). Maps were produced for the entire extent of the Ontario boreal
-shield. We then calculated the mean SDD across each fire event to produce and estimate of SDD for
-each event. To produce an estimate of time since snowmelt we calculated mean SDD for each fire
-perimeter and then mean fire burn date across the fire perimeter prior to calculating the difference
-between mean fire burn date and SDD. Mean fire burn date was calculated as the julian day of
-ignition average across the entire perimeter and was determined by modifying a previous algorithm
-developed in GEE based on MODIS Terra and Aqua Thermal Anomalies and Fire Daily Global datasets
-(MOD14A1 V6 and MYD14A1) to calculate the day that a fire stopped burning (104).
+To determine snow free date (SFD) we used the global, 500-m spatial resolution, daily snow cover
+product, version 6 from NASA's Moderate Resolution SpectroRadiometer (MODIS/Terra MOD10A1) to
+generate maps in GEE for each fire perimeter using an algorithm developed for the northern
+hemisphere [@crumley.etal2020]. Snow free date is the last date that snow is detected in a pixel,
+calculated as the longest period without snow after a minimum of 5 days of snow cover. Maps were
+produced for the entire extent of the Ontario boreal shield. We then calculated the mean SFD across
+each fire event to produce an estimate of snow free date for each event. To produce an estimate of
+snow free duration (SFDR) we calculated the mean julian day that each fire started to burn day
+across the fire perimeter (julian day of burn). We then used the julian day of burn to calculate the
+difference between mean day of burn and SFD. Mean julian day of burn was calculated as the julian
+day of ignition averaged across the entire perimeter and was determined by modifying a previous
+algorithm developed in GEE based on MODIS Terra and Aqua Thermal Anomalies and Fire Daily Global
+datasets (MOD14A1 V6 and MYD14A1) to calculate the day that a fire stopped burning
+[@holsinger.etal2021].
 
-**structural equation modellin**g
+We used remotely sensed forest structure diversity data that was produced at 250m spatial resolution
+using MODIS imagery for the years 2001 and 2011 [@beaudoinMappingAttributesCanada2014]. In the
+absence of stand-replacing disturbance, we assumed that canopy cover and biomass to be constant
+between observation periods. Therefore, if the fire burned between 2002 and 2011 we assumed that
+canopy cover and biomass values were equal to 2001 and for all fires after 2011 we assumed all
+values were equal to 2011. For forest age, we used 2001 or 2011 as the reference age for all stands
+and calculated the age of the stand at the given fire year based on the reference age.
+
+We used terrain ruggedness index as a measure of topographic variation within each fire perimeter.
+Terrain ruggedness index (TRI) is calculated using a digital elevation model and is the difference
+in elevation (m) between one cell and the adjacent cell. Higher TRI values indicate more upland or
+topographically complex areas whereas lower TRI values may indicate lowland areas or less
+topographically complex areas. Topography is a strong driver of both wildfire severity
+[@harris.taylor_2017] and snowmelt [@heldmyerInvestigatingRelationshipPeak2021]. Models evaluating
+the effects of topography on severity and snowmelt have demonstrated a link between TRI and
+variation in landscape patterns of both snowmelt and wildfire severity
+[@heldmyerInvestigatingRelationshipPeak2021 @araya.etal2016]. We calculated mean TRI across each
+fire perimeter from the Canadian Digital Elevation Model (CDEM) provided by Natural Resources
+Canada.
+
+To quantify the effects of weather on wildfire severity following snowmelt we used the drought code.
+The drought code (DC) is a fire weather indices within the Canadian Forest Fire Behavior Prediction
+system used to quantify drought and is a numeric rating of the average moisture content of deep and
+compact organic layers [@chavardes.etal2019 @flanniganImpactsClimateChange2009 @girardin.etal2004a].
+This code is a frequently used indicator of seasonal drought effects on forest fuels
+[@girardin.wotton2009 @san-miguel.etal2020 @hanes.etal2020 @chavardes.etal2019 @girardin.etal2004a
+@girardin.etal2004 @flannigan.etal2016] and the inclusion of this metric was twofold. First, it
+allows us to control for potential drought effects and captures the effects of climate because it's
+a cumulative index that is updated daily based on the previous days precipitation and temperature.
+Secondly, the DC does not consider changes in moisture that occur do winter snow cover and begins at
+an arbitrary value at the beginning of the snow free season. Because it is used by forest managers
+across the globe to monitor wildfire risk, it may be a poor indicator of drought conditions,
+especially in the early spring. Therefore, its inclusion allows us to compare the effects of SFD and
+SFDR on wildfire severity in the presence of DC. We interpolated DC using thin plate splines to the
+centroid of each fire perimeter from weather stations across our study region for the julian day of
+burn.
+
+**Data summary**
+
+To address our objectives, we summarized burn severity by calculating the median and 90th percentile
+RBR within each fire perimeter. We used median and 90th percentile RBR as the dependent variable in
+our analyses. Median burn severity was used as measure of central tendency to describe the overall
+trends in burn severity. We chose to measure the 90th percentile of burn severity within each
+perimeter to represent burn severity extremes, which can be used to as a proxy to asses the drivers
+of more high-severity fires. If the 90th percentile within a fire is high, it suggests that the fire
+burned at a high-severity compared to a wildfire were the 90th percentile was lower. We referred to
+the 90th percentile as burn severity extremes.
+
+The independent variables used our analyses were SFD, SFDR, TRI, DC, stand age, canopy closure and
+total aboveground biomass.
+
+For stand structure, we produced an estimate of stand age , canopy closure and total average biomass
+for each fire perimeter by calculating the mean value of all pixels within an individual fire event.
+
+size class
+
+**Statistical Analyses**
 
 # Results
 
@@ -96,7 +162,7 @@ good-of-fit static for both burn severity extremes (*C* = 14.177, *df* = 8 , *p*
 burn severity (*C* = 14.177, *df* = 8 , *p* = 0.077) and revealed both direct and indirect
 relationships between forest structural diversity, snow cover dynamics and burn severity. Our models
 of median burn severity and burn severity extremes explained a high proportion of variance in both
-snow free date *R*~2~ = 0.67 and snow free duration *R*~2~ = 0.84. Our models expalined a higher
+snow free date *R*~2~ = 0.67 and snow free duration *R*~2~ = 0.84. Our models explained a higher
 proportion of variance in burn severity extremes *R*~2~ = 0.20 relative to our models of median burn
 severity *R*~2~ = 0.12.
 
