@@ -141,17 +141,53 @@ trends in burn severity. We chose to measure the 90th percentile of burn severit
 perimeter to represent burn severity extremes, which can be used to as a proxy to asses the drivers
 of more high-severity fires. If the 90th percentile within a fire is high, it suggests that the fire
 burned at a high-severity compared to a wildfire were the 90th percentile was lower. We referred to
-the 90th percentile as burn severity extremes.
+the 90th percentile as burn severity extremes. The independent variables used our analyses were SFD,
+SFDR, TRI, DC, stand age, canopy closure and total aboveground biomass. For stand structure, we
+produced an estimate of stand age , canopy closure and total average biomass for each fire perimeter
+by calculating the mean value of all pixels within an individual fire event. Likewise for SFD, we
+calculated as the mean value of all pixels within a fire event and SFDR was calculated as the
+difference between julian day of burn and snow free date. TRI was also average across the fire
+perimeter.
 
-The independent variables used our analyses were SFD, SFDR, TRI, DC, stand age, canopy closure and
-total aboveground biomass.
+We classified fires into three size classes based on previously defined thresholds of final fire
+size for fires that burned in Canada's boreal forest [@stocks.etal2002]. Small fires were classified
+as fires with a final size of \< 500 ha , medium fires where classified as fires with a final size
+between 500 ha and 10,000 ha and large fires where all fires with a final size \> 10,000 ha.
 
-For stand structure, we produced an estimate of stand age , canopy closure and total average biomass
-for each fire perimeter by calculating the mean value of all pixels within an individual fire event.
-
-size class
+Fires were classified into spring, summer and fall based on the julian day of burn. Fires where
+julian day of burn was between April and June were classified as spring fires, following previous
+studies in the boreal shield ecoregion of Ontario [@hanes.etal2020]. Summer fires were fires with a
+julian day of burn in July or August, and fall fires were fires with a julian day of burn of
+September or later.
 
 **Statistical Analyses**
+
+We examined the direct and indirect effects of snow free date, snow free duration and forest
+structure on wildfire burn severity using piecewise structural equation modeling (pSEM). Compared to
+traditional variance-covariance structural equation modeling, piecewise approach is more flexible
+when dealing with problems that are common with environmental data, such as multivariate normality
+and independence of errors [@lefcheck2016].
+
+We began by specifying an a priori model of expected causal relationships between all variables
+(Figure 1). We propose that forest structure represented by mean total aboveground biomass, mean
+stand age and canopy closure within a fire perimeter will have direct effects on snow free date and
+duration by increasing canopy interception, ablation, and sublimation. Yet, forest structure will
+also influence wildfire burn severity. In addition, DC will influence wildfire burn severity and
+snow free duration as drought increases the likelihood of observing an ignition in the boreal shield
+of Ontario [@hanes.etal2020]. This model is subsequently a general test of mediation of forest
+structure on the effects of SFD and SFDR on wildfire burn severity. We fit linear mixed effects
+models using the nlme package in *R* [@pinheiroNlmeLinearNonlinear2023]. We fit our model with
+random intercepts of both fire size class, and fire year (2001-2019) to control for fire size and
+interannual effects. The strength of the direct vs. indirect effects were measured using the
+standardized regression coeffiecents. Overall model structure and goodness of fit was evaluated
+using Shipley\'s test of directed separation [@shipley2009] and Fischer's C-statistic for pSEM
+[@shipley.douma2020].
+
+To assess how spatial and temporal scale influence the strength of the hypothesized causal
+relationships we built models at different spatial and temporal scales and compared the strengths of
+the standardized regression coefficients. We begun by testing our hypothesized causal structure on
+the entire boreal shield ecoregion of Ontario. Although there is significant variation in climate
+and weather patterns across the
 
 # Results
 
