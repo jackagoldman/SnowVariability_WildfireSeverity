@@ -42,6 +42,12 @@ new_data <- new_data %>% filter( dc > 0)
 
 ```
 
+Transform the rbr quant
+```{r}
+new_data <- new_data %>% mutate(rbr_qs = sqrt((max(RBR_quant+1)-RBR_quant)))
+
+```
+
 Divide into east and west
 ```{r}
 #east vs. west
@@ -71,7 +77,7 @@ west_sem_ext <- psem(
   lme(sdd ~  avgBio + age + cc+ tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
   lme(tssm ~ sdd +  + dc   , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
    lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
-        avgBio + cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML")
+        avgBio + cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
 )
 
 #summary
@@ -95,10 +101,13 @@ modsum_west_ext$Std.Estimate <- round(modsum_west_ext$Std.Estimate, 3)
 modsum_west_ext$Response <- gsub("_", " ", modsum_west_ext$Response)
 modsum_west_ext$Predictor <- gsub("_", " ", modsum_west_ext$Predictor)
 colnames(modsum_west_ext)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_west_ext %>% 
+modsum_west_ext <- sem_table(west_sem_ext)
+west_ext_tbl <- modsum_west_ext %>% 
   kbl(caption = "piecewiseSEM results for extreme burn severity in Western Ontario Boreal Shield", 
       booktabs = T) %>% 
   kable_classic(full_width = F, html_font = "Cambria")
+
+modsum_west_ext
 
 write.csv(modsum_west_ext, "results/results-summary-tables/Table-3-sem-ext-west.csv")
 
@@ -141,6 +150,8 @@ modsum_wm$Std.Estimate <- round(modsum_wm$Std.Estimate, 3)
 modsum_wm$Response <- gsub("_", " ", modsum_wm$Response)
 modsum_wm$Predictor <- gsub("_", " ", modsum_wm$Predictor)
 colnames(modsum_wm)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_west_ext <- sem_table(west_sem_ext)
+
 modsum_wm %>% 
   kbl(caption = "piecewiseSEM results for median burn severity in western Ontario boreal shield", 
       booktabs = T) %>% 

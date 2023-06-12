@@ -1,0 +1,151 @@
+---
+title: "Manuscript"
+format: docx
+editor: visual
+date: "2023-03-20"
+bibliography: manuscript/references.bib
+csl: manuscript/philtransrscb.csl
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/")
+
+library(tidyverse)
+library(kableExtra)
+```
+
+# Abstract
+
+**The one question is**: Climate warming is expected to increase fire severity, while reducing snowfall, and causing earlier snowmelt and lengthening summer drought and fire season duration. To date, the relationship between snow cover dynamics and wildfire severity remains uncertain.
+
+**Here we do**: We used structural equation modelling to test a hypothesized causal structure between stand structure, snow cover dynamics, and burn severity for 689 fires that burn in the boreal forest of Ontario between 2002-2019. 
+
+**What we found**: We found that the relationship between stand structure and burn severity was strongly mediated by snow cover, and that the strength of the relationships differed across spatial and temporal scales.
+
+**How it matters**:
+
+# Introduction
+
+Q1. How does stand structure and snow cover interact to influence wildfire burn severity in the boreal shield?
+
+Q2. do the strength of the direct and indirect relationships differ based on ecoregion and fire seasonality?
+
+Q3. Does snow cover influence within fire variability in burn severity?
+
+# Methods
+
+*Study Area*
+
+Our study was focused on the boreal shield ecoregion of Ontario.
+
+Between 2008 and 2018, over a third of the wildfires that burned in the boreal forest of Canada occurred in the Ontario's boreal shield ecoregion [@coops.etal2018].
+
+*Data*
+
+**raw data**
+
+Wildfires occurrence and polygon data were obtained for the years 2002 to 2019 from the Fire Disturbance Area database created and openly distributed by the government of Ontario. We excluded all fires that were classified as prescribed burns in the database. Fires that burn through a previously burnt area, referred to as reburns, may burn more or less severely than fires that burnt in areas without recent history of previous wildfire [@whitman.etal2019]. Therefore, we excluded all reburns in our data following preexisting protocol outlined in [@whitman.etal2022]. Fires were removed if the overlap between polygons were greater than the smallest area burned in our dataset (40ha) and the gap between the fires was equal to or less than 26 years. We chose 26 years because that represents the earliest year in which we had fire perimeter data for the first fire in our dataset. After filtering out prescribed fires and reburns we had a total of 710 fires that burned during 2002-2019.
+
+**data processing**
+
+Remotely sensed burn severity maps were obtained from Google Earth Engine (GEE) at a 30m spatial resolution based on fire perimeters for wildfires that burned between 2002-2019. Burn severity was measured using the relativized burn ratio (RBR). RBR is a Landsat-based fire severity metric that represents the change in forest cover following a fire relative to the amount of pre-fire vegetative cover rather than the absolute change. RBR is a more robust measure of burn severity comparing to other Landsat-based approaches (e.g., rNBR) as it is more sensitive to pre-fire values [@parks.etal2014]. Burn severity maps were generated from Landsat TM, ETM+ and OLI imagery following a hybrid mean-compositing approach developed for the boreal region [@holsinger.etal2021] that calculates the mean across a stack of pre-fire and post-fire imagery (see supplementary materials).
+
+To determine snow free date (SFD) we used the global, 500-m spatial resolution, daily snow cover product, version 6 from NASA's Moderate Resolution SpectroRadiometer (MODIS/Terra MOD10A1) to generate maps in GEE for each fire perimeter using an algorithm developed for the northern hemisphere [@crumley.etal2020]. Snow free date is the last date that snow is detected in a pixel, calculated as the longest period without snow after a minimum of 5 days of snow cover. Maps were produced for the entire extent of the Ontario boreal shield. We then calculated the mean SFD across each fire event to produce an estimate of snow free date for each event. To produce an estimate of snow free duration (SFDR) we calculated the mean julian day that each fire started to burn day across the fire perimeter (julian day of burn). We then used the julian day of burn to calculate the difference between mean day of burn and SFD. Mean julian day of burn was calculated as the julian day of ignition averaged across the entire perimeter and was determined by modifying a previous algorithm developed in GEE based on MODIS Terra and Aqua Thermal Anomalies and Fire Daily Global datasets (MOD14A1 V6 and MYD14A1) to calculate the day that a fire stopped burning [@holsinger.etal2021].
+
+We used remotely sensed forest structure diversity data that was produced at 250m spatial resolution using MODIS imagery for the years 2001 and 2011 [@beaudoinMappingAttributesCanada2014]. In the absence of stand-replacing disturbance, we assumed that canopy cover and biomass to be constant between observation periods. Therefore, if the fire burned between 2002 and 2011 we assumed that canopy cover and biomass values were equal to 2001 and for all fires after 2011 we assumed all values were equal to 2011. For forest age, we used 2001 or 2011 as the reference age for all stands and calculated the age of the stand at the given fire year based on the reference age.
+
+We used terrain ruggedness index as a measure of topographic variation within each fire perimeter. Terrain ruggedness index (TRI) is calculated using a digital elevation model and is the difference in elevation (m) between one cell and the adjacent cell. Higher TRI values indicate more upland or topographically complex areas whereas lower TRI values may indicate lowland areas or less topographically complex areas. Topography is a strong driver of both wildfire severity [@harris.taylor_2017] and snowmelt [@heldmyerInvestigatingRelationshipPeak2021]. Models evaluating the effects of topography on severity and snowmelt have demonstrated a link between TRI and variation in landscape patterns of both snowmelt and wildfire severity [@heldmyerInvestigatingRelationshipPeak2021 @araya.etal2016]. We calculated mean TRI across each fire perimeter from the Canadian Digital Elevation Model (CDEM) provided by Natural Resources Canada.
+
+To quantify the effects of weather on wildfire severity following snowmelt we used the drought code. The drought code (DC) is a fire weather indices within the Canadian Forest Fire Behavior Prediction system used to quantify drought and is a numeric rating of the average moisture content of deep and compact organic layers [@chavardes.etal2019 @flanniganImpactsClimateChange2009 @girardin.etal2004a]. This code is a frequently used indicator of seasonal drought effects on forest fuels [@girardin.wotton2009 @san-miguel.etal2020 @hanes.etal2020 @chavardes.etal2019 @girardin.etal2004a @girardin.etal2004 @flannigan.etal2016] and the inclusion of this metric was twofold. First, it allows us to control for potential drought effects and captures the effects of climate because it's a cumulative index that is updated daily based on the previous days precipitation and temperature. Secondly, the DC does not consider changes in moisture that occur do winter snow cover and begins at an arbitrary value at the beginning of the snow free season. Because it is used by forest managers across the globe to monitor wildfire risk, it may be a poor indicator of drought conditions, especially in the early spring. Therefore, its inclusion allows us to compare the effects of SFD and SFDR on wildfire severity in the presence of DC. We interpolated DC using thin plate splines to the centroid of each fire perimeter from weather stations across our study region for the julian day of burn.
+
+**Data summary**
+
+To address our objectives, we summarized burn severity by calculating the median and 90th percentile RBR within each fire perimeter. We used median and 90th percentile RBR as the dependent variable in our analyses. Median burn severity was used as measure of central tendency to describe the overall trends in burn severity. We chose to measure the 90th percentile of burn severity within each perimeter to represent burn severity extremes, which can be used to as a proxy to asses the drivers of more high-severity fires. If the 90th percentile within a fire is high, it suggests that the fire burned at a high-severity compared to a wildfire were the 90th percentile was lower. We referred to the 90th percentile as burn severity extremes. The independent variables used our analyses were SFD, SFDR, TRI, DC, stand age, canopy closure and total aboveground biomass. For stand structure, we produced an estimate of stand age , canopy closure and total average biomass for each fire perimeter by calculating the mean value of all pixels within an individual fire event. Likewise for SFD, we calculated as the mean value of all pixels within a fire event and SFDR was calculated as the difference between julian day of burn and snow free date. TRI was also average across the fire perimeter.
+
+We classified fires into three size classes based on previously defined thresholds of final fire size for fires that burned in Canada's boreal forest [@stocks.etal2002]. Small fires were classified as fires with a final size of \< 500 ha , medium fires where classified as fires with a final size between 500 ha and 10,000 ha and large fires where all fires with a final size \> 10,000 ha.
+
+Fires were classified into spring, summer and fall based on the julian day of burn. Fires where julian day of burn was between April and June were classified as spring fires, following previous studies in the boreal shield ecoregion of Ontario [@hanes.etal2020]. Summer fires were fires with a julian day of burn in July or August, and fall fires were fires with a julian day of burn of September or later.
+
+**Statistical Analyses**
+
+We examined the direct and indirect effects of snow free date, snow free duration and forest structure on wildfire burn severity using piecewise structural equation modeling (pSEM). Compared to traditional variance-covariance structural equation modeling, piecewise approach is more flexible when dealing with problems that are common with environmental data, such as multivariate normality and independence of errors [@lefcheck2016].
+
+We began by specifying an a priori model of expected causal relationships between all variables (Figure 1). We propose that forest structure represented by mean total aboveground biomass, mean stand age and canopy closure within a fire perimeter will have direct effects on snow free date and duration by increasing canopy interception, ablation, and sublimation. Yet, forest structure will also influence wildfire burn severity. In addition, DC will influence wildfire burn severity and snow free duration as drought increases the likelihood of observing an ignition in the boreal shield of Ontario [@hanes.etal2020]. This model is subsequently a general test of mediation of forest structure on the effects of SFD and SFDR on wildfire burn severity. We fit linear mixed effects models using the nlme package in *R* [@pinheiroNlmeLinearNonlinear2023]. We fit our model with random intercepts of both fire size class, and fire year (2001-2019) to control for fire size and interannual effects. The strength of the direct, indirect effects and total effects were measured using the standardized regression coeffiecents. Direct effects are quantified as the strength of the pathway between a parent (i.e., cause) and its child (i.e., effect). Indirect effects are the product of all the standardized regression coefficients for all indirect pathways traversed to get from a parent to a child. Total causal effects are quantified as the sum of both direct and indirect pathways.
+
+Overall model structure and goodness of fit was evaluated using Shipley's test of directed separation [@shipley2009] and Fischer's C-statistic for pSEM [@shipley.douma2020]. Shipley's test of directed separation tests whether the data can generate the hypothesized causal structure of the DAG (figure 1), that is, whether the relationships specified in the DAG are supported by the data. Directed separation tests whether a variable is conditionally independent from another variable given a conditioning set. For example, whether... If test of directed separation in data are not conditionally independent, it implies that it implies that the understanding of the causes in nature as specified by our causal structure is wrong. Fischer's C-statistic is used to test whether you hypothesized causal structure is due to sampling variation. If the C-statistic is greater than $\alpha$ = 0.05. , you can accept your hypothesized structure as the observed differences could reasonably occur due to sampling variation.
+
+We square root transformed extreme burn severity.
+
+To assess how spatial and temporal scale influence the strength of the hypothesized causal relationships we built models at different spatial and temporal scales and compared the strengths of the standardized regression coefficients. We started with testing our hypothesized causal structure on the entire boreal shield ecoregion of Ontario. Although there is significant east-west variation in climate and weather patterns and fire regimes across the boreal shield of Ontario [@beverly.martell2005 @hanes.etal2020 @hanes.etal2019], this allowed us to compare how relationships change with scale, and whether certain relationships remain constant at different spatial scales.
+
+After testing our structure across the entire boreal shield of Ontario, we split the our data into east (n = ....) and west (n =...) boreal shield ecozones and examined how the strengths of the relationships differed from east to west and across scales. To investigate potential causal heterogeneity (i.e., whether the indirect effects of forest structure are different between or among groups) in our hypothesized causal relationships given differences between ecozones we conducted a multigroup analysis [@douma.shipley2021]. We initially fit a model for each ecoregion x response combination where we allowed all path coefficients to be estimated as free parameters. We then fit subsequent models for each indirect pathway from a forest structure variable (i.e., canopy closure, biomass, stand age) to burn severity. In each model, we fixed the coefficients of all the paths along the indirect pathways we were interested in by group (i.e., ecozone). For example, for the indirect causal pathways between stand age and burn severity, we fixed all the paths from stand age -\> snow free date -\> snow free duration and snow free duration -\> burn severity. To calculate whether the paths differ by group (i.e., ecoregion) for each pathway of interest we summed both the chi-square of each model and the degrees of freedom, and then calculated the difference between the chi-square and degrees of freedom of the model where all paths are estimated freely and the fixed model. We then tested the difference in chi-square and degrees of freedom against a chi-square distribution. If the p-value is greater than $\alpha$ = 0.05. then we conclude that the indirect pathway differs between groups.
+
+To examine the effect of fire size on our hypothesize causal structure we split our data into three groups based representing large, medium or small fires based on threshold assigned previously based on [@stocks.etal2002]. Due to sample size limitations we conducted this analysis only for the subset of fires that burned in the boreal shield west ecozone (n = ....). To compare differences in hypothesized causal relationships we first fit models for both medium and extreme burn severity for each fire size by initially leaving all paths free. We then preformed a multigroup analysis to examine whether the indirect effects of forest structure are different between or among fire sizes. **NOTE is the multigroup analysis examining diferences between seasons or ecoregions**
+
+To examine the role of fire seasonality we split our fires into spring, summer and fall for the entire boreal shield ecoregion and fit our initial models for each season and response (median or extreme burn severity) combination. Since there is variation in fire seasonality across ecozones we compared difference in the hypothesize causal relationships using a multigroup analysis where we fixed the pathways by ecozone.
+
+To test whether snow free date and snow free duration cause changes in the variation in burn severity within an individual fire we measured the coefficient of variation of burn severity within each perimeter. Therefore, this analysis examined whether the strengths of our hypothesized causal relationships differed when the observed response was coefficient of variation of burn severity within each fire perimeter. Since patches of high-severity fire are larger in large fires [@cansler2014 @harvey.etal2016a], for this analysis we used only fires that were greater than 500 ha.
+
+# Results
+
+*Ontario boreal shield*
+
+Across our entire study region, our structural equation model fit the data well with based on good-of-fit static for both burn severity extremes (*C* = 14.177, *df* = 8 , *p* = 0.077) and median burn severity (*C* = 14.177, *df* = 8 , *p* = 0.077) and revealed both direct and indirect relationships between forest structural diversity, snow cover dynamics and burn severity. Our models of median burn severity and burn severity extremes explained a high proportion of variance in both snow free date *R*~2~ = 0.67 and snow free duration *R*~2~ = 0.84. Our models explained a higher proportion of variance in burn severity extremes *R*~2~ = 0.20 relative to our models of median burn severity *R*~2~ = 0.12.
+
+We found a significant and negative direct relationship between total aboveground biomass and snow free date (fig 1a., Table 1). Stand age had a significant but positive direct relationship on snow free date (fig 1a, Table 1). We did not find a significant relationship between percent canopy closure and snow free date (fig 1a, Table 1). Topography, represented by terrain ruggedness index, had a significant and negative direct relationship on snow free date (fig 1a, Table 1). We found a significant but negative direct relationship of snow free date on snow free duration (fig 1a, Table 1). We found significant but positive direct relationships of both drought and stand age on snow free duration, with a stronger direct relationship between drought and snow free duration (fig 1a, Table 1). Drought and snow free duration had significant direct relationships on median burn severity and burn severity extremes (fig 1a, Table 1). Drought had a negative relationship with burn severity extremes but a positive relationship with median burn severity (fig 1a, Table 1). The relationship between snow free duration and median burn severity was negative whereas the relationship between burn severity extremes and snow free duration was positive (fig 1a, Table 1). All forest structure metrics had no significant direct relationship with median burn severity but all metrics had a significant direct relationship with burn severity extremes (Table 1). Stand age and canopy closure had a negative relationship with burn severity extremes whereas total aboveground biomass have a positive relationship (fig1a).
+
+The indirect relationship between forest structural diversity and median burn severity - calculated by multiplying the standardized regression coefficients of the path coefficients - showed that the effects of stand age were stronger than canopy closure but similar to that of total aboveground biomass, although stand age was positive whereas biomass was negative (fig 1b). In contrast, the direct effect of canopy closure on median burn severity is stronger than both stand age and total aboveground biomass, both of which had relatively low direct effects (fig 1b). More importantly, the total causal effects of total aboveground biomass and canopy closure were similar and much strong than stand age (fig 1b).
+
+The indirect effects of forest structural diversity on burn severity extremes were strongest for stand age compare to both total aboveground biomass and canopy closure (fig 1a). The indirect relationships for canopy closure and total aboveground biomass were positive whereas stand age had a negative indirect relationship with burn severity extremes. Critically, the total causal effects of total aboveground biomass were stronger compared to both stand age and canopy closure (fig 1a). Total aboveground biomass and canopy closure had positive indirect relationships and stand age had a negative indirect relationship.
+
+The indirect relationship of drought were strongest for burn severity extremes compared to median burn severity. Yet, drought had an indirect positive relationship with burn severity extremes and indirect negative relationship for median burn severity (fig1a, fig1b). The total cause effects of drought were positive. In contrast, topography had a positive indirect relationship with both median burn severity and burn severity extremes, yet these relationships were weaker than drought. However, because the indirect relationship of drought on burn median burn severity was strongly negative and the direct relationship was strongly positive, the strength and direction of these effects cancel each other out and the total causal effects of drought on median burn severity to be weaker than topography (fig 1b).
+
+*East vs. West Ontario*
+
+For western Ontario, our structural equation model fit the data better compared to the models for all of Ontario based on the goodness-of-fit statistic for both burn severity extremes (*C* = 9.864, *df* = 10, *p* = 0.453) and median burn severity (*C* = 9.864, *df* = 10, *p* = 0.453) . Our model of median burn severity explained a higher proportion of variance in snow free date *R*~2~ = 0., compared to burn severity extremes *R*~2~ = 0 @tbl-west-ext. Yet, our model of median burn severity explained a higher, yet similar proportion of variance in snow free duration *R*~2~ = 0., compared to burn severity extremes *R*~2~ = 0.83. Overall, out model of median burn severity explained a higher but similar proportion of variation *R*~2~ = 0., compared to burn severity extremes *R*~2~ = 0..
+
+For eastern Ontario, our model fit the data better compare
+
+extreme *R*~2~ = 0.63 sdd, 0.83 sfd 0.2 ext
+
+Median 0.78, 0.87, 0.28
+
+*Multigroup - East vs. West Ontario*
+
+*Fire size*
+
+*Multigroup - Fire size*
+
+*Fire seasonality*
+
+*Fire Heterogeneity*
+
+# Discussion
+
+# Figures
+
+```{r, my dag}
+
+```
+
+# Tables
+
+```{r echo = FALSE, results = 'asis'}
+#| label: tbl-west-ext
+
+
+west_ext_tbl <- read.csv( "results/results-summary-tables/Table-3-sem-ext-west.csv")
+colnames(west_ext_tbl)[10] <-""
+west_ext_tbl <- west_ext_tbl[ , !names(west_ext_tbl) %in% c("X")] ## works as expected
+west_ext_tbl %>% 
+  kbl(caption = "piecewiseSEM results for extreme burn severity in Western Ontario Boreal Shield", 
+      booktabs = T) %>% 
+  kable_classic(full_width = F, html_font = "Cambria")
+
+
+
+
+
+```

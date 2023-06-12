@@ -1,6 +1,6 @@
 ---
 title: "forest-snow-fire-manuscript"
-output: word_document
+output: bookdown::word_document2
 date: "2023-03-20"
 geometry: margin=1.0in
 font-size: 12pt
@@ -11,10 +11,16 @@ bibliography: references.bib
 csl: philtransrscb.csl
 header-includes:
     - \usepackage{setspace}\doublespacing
+always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/")
+
+library(tidyverse)
+library(kableExtra)
+library(bookdown)
 ```
 
 # Abstract
@@ -178,16 +184,76 @@ of Ontario [@hanes.etal2020]. This model is subsequently a general test of media
 structure on the effects of SFD and SFDR on wildfire burn severity. We fit linear mixed effects
 models using the nlme package in *R* [@pinheiroNlmeLinearNonlinear2023]. We fit our model with
 random intercepts of both fire size class, and fire year (2001-2019) to control for fire size and
-interannual effects. The strength of the direct vs. indirect effects were measured using the
-standardized regression coeffiecents. Overall model structure and goodness of fit was evaluated
-using Shipley\'s test of directed separation [@shipley2009] and Fischer's C-statistic for pSEM
-[@shipley.douma2020].
+interannual effects. The strength of the direct, indirect effects and total effects were measured
+using the standardized regression coeffiecents. Direct effects are quantified as the strength of the
+pathway between a parent (i.e., cause) and its child (i.e., effect). Indirect effects are the
+product of all the standardized regression coefficients for all indirect pathways traversed to get
+from a parent to a child. Total causal effects are quantified as the sum of both direct and indirect
+pathways.
+
+Overall model structure and goodness of fit was evaluated using Shipley's test of directed
+separation [@shipley2009] and Fischer's C-statistic for pSEM [@shipley.douma2020]. Shipley's test of
+directed separation tests whether the data can generate the hypothesized causal structure of the DAG
+(figure 1), that is, whether the relationships specified in the DAG are supported by the data.
+Directed separation tests whether a variable is conditionally independent from another variable
+given a conditioning set. For example, whether... If test of directed separation in data are not
+conditionally independent, it implies that it implies that the understanding of the causes in nature
+as specified by our causal structure is wrong. Fischer's C-statistic is used to test whether you
+hypothesized causal structure is due to sampling variation. If the C-statistic is greater than alpha
+( $\alpha$ = 0.05 ) , you can accept your hypothesized structure as the observed differences could
+reasonably occur due to sampling variation.
+
+We square root transformed extreme burn severity.
 
 To assess how spatial and temporal scale influence the strength of the hypothesized causal
 relationships we built models at different spatial and temporal scales and compared the strengths of
-the standardized regression coefficients. We begun by testing our hypothesized causal structure on
-the entire boreal shield ecoregion of Ontario. Although there is significant variation in climate
-and weather patterns across the
+the standardized regression coefficients. We started with testing our hypothesized causal structure
+on the entire boreal shield ecoregion of Ontario. Although there is significant east-west variation
+in climate and weather patterns and fire regimes across the boreal shield of Ontario
+[@beverly.martell2005 @hanes.etal2020 @hanes.etal2019], this allowed us to compare how relationships
+change with scale, and whether certain relationships remain constant at different spatial scales.
+
+After testing our structure across the entire boreal shield of Ontario, we split the our data into
+east (n = ....) and west (n =...) boreal shield ecozones and examined how the strengths of the
+relationships differed from east to west and across scales. To investigate potential causal
+heterogeneity (i.e., whether the indirect effects of forest structure are different between or among
+groups) in our hypothesized causal relationships given differences between ecozones we conducted a
+multigroup analysis [@douma.shipley2021]. We initially fit a model for each ecoregion x response
+combination where we allowed all path coefficients to be estimated as free parameters. We then fit
+subsequent models for each indirect pathway from a forest structure variable (i.e., canopy closure,
+biomass, stand age) to burn severity. In each model, we fixed the coefficients of all the paths
+along the indirect pathways we were interested in by group (i.e., ecozone). For example, for the
+indirect causal pathways between stand age and burn severity, we fixed all the paths from stand age
+-\> snow free date -\> snow free duration and snow free duration -\> burn severity. To calculate
+whether the paths differ by group (i.e., ecoregion) for each pathway of interest we summed both the
+chi-square of each model and the degrees of freedom, and then calculated the difference between the
+chi-square and degrees of freedom of the model where all paths are estimated freely and the fixed
+model. We then tested the difference in chi-square and degrees of freedom against a chi-square
+distribution. If the p-value is greater than $\alpha$ = 0.05 then we conclude that the indirect
+pathway differs between groups.
+
+To examine the effect of fire size on our hypothesize causal structure we split our data into three
+groups based representing large, medium or small fires based on threshold assigned previously based
+on [@stocks.etal2002]. Due to sample size limitations we conducted this analysis only for the subset
+of fires that burned in the boreal shield west ecozone (n = ....). To compare differences in
+hypothesized causal relationships we first fit models for both medium and extreme burn severity for
+each fire size by initially leaving all paths free. We then preformed a multigroup analysis to
+examine whether the indirect effects of forest structure are different between or among fire sizes.
+**NOTE is the multigroup analysis examining diferences between seasons or ecoregions**
+
+To examine the role of fire seasonality we split our fires into spring, summer and fall for the
+entire boreal shield ecoregion and fit our initial models for each season and response (median or
+extreme burn severity) combination. Since there is variation in fire seasonality across ecozones we
+compared difference in the hypothesize causal relationships using a multigroup analysis where we
+fixed the pathways by ecozone.
+
+To test whether snow free date and snow free duration cause changes in the variation in burn
+severity within an individual fire we measured the coefficient of variation of burn severity within
+each perimeter. Therefore, this analysis examined whether the strengths of our hypothesized causal
+relationships differed when the observed response was coefficient of variation of burn severity
+within each fire perimeter. Since patches of high-severity fire are larger in large fires
+[@cansler2014 @harvey.etal2016a], for this analysis we used only fires that were greater than 500
+ha.
 
 # Results
 
@@ -251,6 +317,51 @@ topography (fig 1b).
 
 For western Ontario, our structural equation model fit the data better compared to the models for
 all of Ontario based on the goodness-of-fit statistic for both burn severity extremes (*C* = 9.864,
-*df* = 10, *p* = 0.453) and median burn severity (*C* = 9.864, *df* = 10, *p* = 0.453) .
+*df* = 10, *p* = 0.453) and median burn severity (*C* = 9.864, *df* = 10, *p* = 0.453) . Our model
+of median burn severity explained a higher proportion of variance in snow free date *R*~2~ = 0.,
+compared to burn severity extremes *R*~2~ = 0 Yet, our model of median burn severity explained a
+higher, yet similar proportion of variance in snow free duration *R*~2~ = 0., compared to burn
+severity extremes *R*~2~ = 0.83. Overall, out model of median burn severity explained a higher but
+similar proportion of variation *R*~2~ = 0., compared to burn severity extremes *R*~2~ = 0..
+
+For eastern Ontario, our model fit the data better compare
+
+extreme *R*~2~ = 0.63 sdd, 0.83 sfd 0.2 ext
+
+Median 0.78, 0.87, 0.28
+
+*Multigroup - East vs. West Ontario*
+
+*Fire size*
+
+*Multigroup - Fire size*
+
+*Fire seasonality*
+
+*Fire Heterogeneity*
 
 # Discussion
+
+# Figures
+
+```{r, my dag}
+
+```
+
+# Tables
+
+```{r west-ext-tbl, echo = FALSE, results = 'asis'}
+
+west_ext_tbl <- read.csv( "results/results-summary-tables/Table-3-sem-ext-west.csv")
+colnames(west_ext_tbl)[10] <-""
+west_ext_tbl <- west_ext_tbl[ , !names(west_ext_tbl) %in% c("X")] ## works as expected
+west_ext_tbl %>% 
+  kbl(caption = "piecewiseSEM results for extreme burn severity in Western Ontario Boreal Shield", 
+      booktabs = T) %>% 
+  kable_classic(full_width = F, html_font = "Cambria")
+
+
+
+
+
+```
