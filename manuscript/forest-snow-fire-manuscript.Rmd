@@ -49,6 +49,12 @@ seasonality?
 
 Q3. Does snow cover influence within fire variability in burn severity?
 
+remote sensing
+
+effect of scale and data assimilation
+
+why do we study the scale we do, caveats?
+
 # Methods
 
 *Study Area*
@@ -74,7 +80,7 @@ that represents the earliest year in which we had fire perimeter data for the fi
 dataset. After filtering out prescribed fires and reburns we had a total of 710 fires that burned
 during 2002-2019.
 
-**data processing**
+**data acquisition, processing and integration**
 
 Remotely sensed burn severity maps were obtained from Google Earth Engine (GEE) at a 30m spatial
 resolution based on fire perimeters for wildfires that burned between 2002-2019. Burn severity was
@@ -99,7 +105,9 @@ difference between mean day of burn and SFD. Mean julian day of burn was calcula
 day of ignition averaged across the entire perimeter and was determined by modifying a previous
 algorithm developed in GEE based on MODIS Terra and Aqua Thermal Anomalies and Fire Daily Global
 datasets (MOD14A1 V6 and MYD14A1) to calculate the day that a fire stopped burning
-[@holsinger.etal2021].
+[@holsinger.etal2021]. We acknowledge that there are potential biases in estimating snow cover from
+satellite imagery [@hall2002, @parajka2008], however previous studies have used these data to
+quantify snow free date in forest ecosystems [@gleason.etal2019].
 
 We used remotely sensed forest structure diversity data that was produced at 250m spatial resolution
 using MODIS imagery for the years 2001 and 2011 [@beaudoinMappingAttributesCanada2014]. In the
@@ -138,6 +146,8 @@ SFDR on wildfire severity in the presence of DC. We interpolated DC using thin p
 centroid of each fire perimeter from weather stations across our study region for the julian day of
 burn.
 
+In order to reduce (smooth) - signal fortin et al 2012
+
 **Data summary**
 
 To address our objectives, we summarized burn severity by calculating the median and 90th percentile
@@ -169,10 +179,10 @@ September or later.
 **Statistical Analyses**
 
 We examined the direct and indirect effects of snow free date, snow free duration and forest
-structure on wildfire burn severity using piecewise structural equation modeling (pSEM). Compared to
-traditional variance-covariance structural equation modeling, piecewise approach is more flexible
-when dealing with problems that are common with environmental data, such as multivariate normality
-and independence of errors [@lefcheck2016].
+structure on wildfire burn severity (median and 90th percentile burn severity) using piecewise
+structural equation modeling (pSEM). Compared to traditional variance-covariance structural equation
+modeling, piecewise approach is more flexible when dealing with problems that are common with
+environmental data, such as multivariate normality and independence of errors [@lefcheck2016].
 
 We began by specifying an a priori model of expected causal relationships between all variables
 (Figure 1). We propose that forest structure represented by mean total aboveground biomass, mean
@@ -184,12 +194,18 @@ of Ontario [@hanes.etal2020]. This model is subsequently a general test of media
 structure on the effects of SFD and SFDR on wildfire burn severity. We fit linear mixed effects
 models using the nlme package in *R* [@pinheiroNlmeLinearNonlinear2023]. We fit our model with
 random intercepts of both fire size class, and fire year (2001-2019) to control for fire size and
-interannual effects. The strength of the direct, indirect effects and total effects were measured
-using the standardized regression coeffiecents. Direct effects are quantified as the strength of the
-pathway between a parent (i.e., cause) and its child (i.e., effect). Indirect effects are the
-product of all the standardized regression coefficients for all indirect pathways traversed to get
-from a parent to a child. Total causal effects are quantified as the sum of both direct and indirect
-pathways.
+interannual effects. Extreme burn severity was left-skewed because it captures the 90th percentile
+within each perimeter, to correct for this we square root transformed extreme burn severity to
+reduce heteroscedascticity of the residuals. We evaluated multicollinearity by calculating the
+variance inflation factor (VIF) on each set of regressions prior to fitting the SEM using a
+threshold value of VIF \>0.8 (CITE). This approach resulted in no predictors being eliminated from
+our model.
+
+The strength of the direct, indirect effects and total effects were measured using the standardized
+regression coeffiecents. Direct effects are quantified as the strength of the pathway between a
+parent (i.e., cause) and its child (i.e., effect). Indirect effects are the product of all the
+standardized regression coefficients for all indirect pathways traversed to get from a parent to a
+child. Total causal effects are quantified as the sum of both direct and indirect pathways.
 
 Overall model structure and goodness of fit was evaluated using Shipley's test of directed
 separation [@shipley2009] and Fischer's C-statistic for pSEM [@shipley.douma2020]. Shipley's test of
@@ -202,8 +218,6 @@ as specified by our causal structure is wrong. Fischer's C-statistic is used to 
 hypothesized causal structure is due to sampling variation. If the C-statistic is greater than alpha
 ( $\alpha$ = 0.05 ) , you can accept your hypothesized structure as the observed differences could
 reasonably occur due to sampling variation.
-
-We square root transformed extreme burn severity.
 
 To assess how spatial and temporal scale influence the strength of the hypothesized causal
 relationships we built models at different spatial and temporal scales and compared the strengths of
@@ -341,6 +355,12 @@ Median 0.78, 0.87, 0.28
 *Fire Heterogeneity*
 
 # Discussion
+
+**caveats**
+
+-   scale
+
+-   limitations of inference
 
 # Figures
 
