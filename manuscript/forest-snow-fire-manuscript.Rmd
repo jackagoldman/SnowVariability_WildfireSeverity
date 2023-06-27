@@ -35,7 +35,7 @@ Ontario's boreal forest between 2002-2019. 
 
 **What we found**: We found that the relationship between stand structure and burn severity was
 strongly mediated by snow cover, and that the strength of the relationships differed across spatial
-and temporal scales.
+scales.
 
 **How it matters**:
 
