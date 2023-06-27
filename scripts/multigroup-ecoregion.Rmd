@@ -228,6 +228,22 @@ tbl.ind.mult.ext$`Path Coefficient` <- round(as.numeric(tbl.ind.mult.ext$`Path C
 
 
 Median multigroup
+
+```{r}
+sem_med <- psem(
+    lme(sdd ~ avgBio + age + cc +tri,
+      random = ~1 |Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
+  lme(tssm ~ sdd + dc + age, 
+      random = ~1 |Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
+   lme(RBR_median ~ dc + tssm + sdd +tri +age + cc +avgBio, 
+      random = ~1 |Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML")
+)
+
+
+#summary
+summary(sem_med)
+```
+
 ```{r, biomass}
 med_bio <- psem(
 lme(sdd ~ pyroregion/avgBio + age + cc + tri, random = ~1 | Fire_Year/size_class, weights=varIdent(form =~1|pyroregion), na.action = na.omit, data = new_data, method = "ML"),
@@ -265,8 +281,6 @@ lme(sdd ~ avgBio + pyroregion/age + cc + tri, random = ~1 | Fire_Year/size_class
 ```
 
 ```{r}
-sem_med_chi <- fisherC(sem_med)[,1]
-sem_med_df <- fisherC(sem_med)[,2]
 med_age_chi <- fisherC(med_age)[,1]
 med_age_df <- fisherC(med_age)[,2]
 
