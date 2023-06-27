@@ -30,8 +30,8 @@ snowfall, and causing earlier snowmelt and lengthening summer drought and fire s
 date, the relationship between snow cover dynamics and wildfire severity remains uncertain.
 
 **Here we do**: We used structural equation modelling to test a hypothesized causal structure
-between stand structure, snow cover dynamics, and burn severity for 689 fires that burn in the
-boreal forest of Ontario between 2002-2019. 
+between forest structure, snow cover dynamics, and wildfire burn severity for 689 fires that burn in
+Ontario's boreal forest between 2002-2019. 
 
 **What we found**: We found that the relationship between stand structure and burn severity was
 strongly mediated by snow cover, and that the strength of the relationships differed across spatial
@@ -329,28 +329,22 @@ topography (fig 1b).
 
 *East vs. West Ontario*
 
-For western Ontario, our structural equation model fit the data better compared to the models for
-all of Ontario based on the goodness-of-fit statistic for both burn severity extremes (*C* = 9.864,
-*df* = 10, *p* = 0.453) and median burn severity (*C* = 9.864, *df* = 10, *p* = 0.453) . Our model
-of median burn severity explained a higher proportion of variance in snow free date *R*~2~ = 0.,
-compared to burn severity extremes *R*~2~ = 0 Yet, our model of median burn severity explained a
-higher, yet similar proportion of variance in snow free duration *R*~2~ = 0., compared to burn
-severity extremes *R*~2~ = 0.83. Overall, out model of median burn severity explained a higher but
-similar proportion of variation *R*~2~ = 0., compared to burn severity extremes *R*~2~ = 0..
+For western Ontario, our SEM fit the data better compared to the models for all of Ontario based on
+the goodness-of-fit statistic for both burn severity extremes (*C* = 9.864, *df* = 10, *p* = 0.453)
+and median burn severity (*C* = 9.864, *df* = 10, *p* = 0.453) . Our model of median burn severity
+and burn severity extremes explained the same proportion variance in snow free date *R*~2~ = 0.63
+and snow free duration *R*~2~ = 0.83. Yet, our model of extreme burn severity explained a higher
+proportion of variation in severity *R*~2~ = 0.20, compared to median burn severity *R*~2~ = 0.13.
 
-For eastern Ontario, our model fit the data better compare
-
-extreme *R*~2~ = 0.63 sdd, 0.83 sfd 0.2 ext
-
-Median 0.78, 0.87, 0.28
+For eastern Ontario, our SEM did not fit the data better compared to the model for all of Ontario
+for extreme (*C* = 15.483, *df* = 10, *p* = 0.115) and median burn severity (*C* = 15.483, *df* =
+10, *p* = 0.115). Similarly to western Ontario, the model of median burn severity and burn severity
+extremes explained the same proportion variance in snow free date *R*~2~ = 0.78 and snow free
+duration *R*~2~ = 0.87. Compared to western Ontario, our model explained more variance in both snow
+free date and snow free duration. Yet, our model of extreme burn severity explained a higher
+proportion of variation in severity *R*~2~ = 0.28, compared to median burn severity *R*~2~ = 0.18.
 
 *Multigroup - East vs. West Ontario*
-
-*Fire size*
-
-*Multigroup - Fire size*
-
-*Fire seasonality*
 
 *Fire Heterogeneity*
 

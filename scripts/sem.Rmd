@@ -153,6 +153,7 @@ plot(lme(sdd ~  avgBio + age + cc + tri, random = ~1 | Fire_Year/size_class, na.
 ### Extreme
 
 ```{r, Extreme all of Ontario}
+new_data <- rename(new_data, rbr_qs = "Severity")
 sem_ext <- psem(
   lme(sdd ~  avgBio + age + cc + tri, 
       random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
@@ -188,6 +189,24 @@ modsum$Std.Estimate <- round(modsum$Std.Estimate, 3)
 modsum$Response <- gsub("_", " ", modsum$Response)
 modsum$Predictor <- gsub("_", " ", modsum$Predictor)
 colnames(modsum)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum <- data.frame(modsum)
+modsum <- modsum %>% mutate(Response = case_when(
+  Response == "rbr qs" ~"Severity",
+  Response == "sdd" ~ "SFD",
+  Response == "tssm" ~ "SFDr"),
+  Predictor = case_when(
+  Predictor == "tri" ~ "Topo",
+  Predictor == "dc" ~ "Drought",
+  Predictor == "cc" ~ "Canopy Closure",
+  Predictor == "age" ~ "Stand Age",
+  Predictor == "avgBio" ~ "Biomass", 
+  Predictor == "sdd" ~ "SFD",
+  Predictor == "tssm" ~ "SFDR",
+  Predictor == "rbr qs" ~ "Severity"
+))
+colnames(modsum)[9] <-""
+
+
 modsum %>% 
   kbl(caption = "piecewiseSEM results for burn severity extremes in Ontario Boreal Shield", 
       booktabs = T) %>% 
@@ -245,6 +264,23 @@ modsum_med_all$Std.Estimate <- round(modsum_med_all$Std.Estimate, 3)
 modsum_med_all$Response <- gsub("_", " ", modsum_med_all$Response)
 modsum_med_all$Predictor <- gsub("_", " ", modsum_med_all$Predictor)
 colnames(modsum_med_all)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum_med_all <- data.frame(modsum_med_all)
+modsum_med_all<- modsum_med_all %>% mutate(Response = case_when(
+  Response == "RBR median" ~"Severity",
+  Response == "sdd" ~ "SFD",
+  Response == "tssm" ~ "SFDr"),
+  Predictor = case_when(
+  Predictor == "tri" ~ "Topo",
+  Predictor == "dc" ~ "Drought",
+  Predictor == "cc" ~ "Canopy Closure",
+  Predictor == "age" ~ "Stand Age",
+  Predictor == "avgBio" ~ "Biomass", 
+  Predictor == "sdd" ~ "SFD",
+  Predictor == "tssm" ~ "SFDR",
+  Predictor == "RBR median" ~ "Severity"
+))
+colnames(modsum_med_all)[9] <-""
+
 modsum_med_all %>% 
   kbl(caption = "piecewiseSEM results for median burn severity in Ontario Boreal Shield", 
       booktabs = T) %>% 
@@ -333,7 +369,7 @@ theme_bw()+
         plot.title = element_text(hjust = 0.5),
     panel.background = element_blank(),
         panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + 
-  theme(legend.position ="top") + xlab("Standardized Effects")+
+  theme(legend.position ="bottom") + xlab("Standardized Effects")+
   scale_colour_viridis_d("Effect Type") +
   labs(title = "Burn Severity Extremes - All Fires") #scale_y_discrete(position = "right") #y to the right to make proper pannel of plots
 

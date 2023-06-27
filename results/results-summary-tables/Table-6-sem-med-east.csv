@@ -1,15 +1,162 @@
-"","Response","Predictor","Estimate","SE","DF","t-Value","P-Value","Std. Estimate",""
-"1","RBR median","dc",0.199,0.137,153,1.446,"0.15",0.162,""
-"2","RBR median","tssm",-0.84,0.392,153,-2.142,"0.034",-0.24,"*"
-"3","RBR median","sdd",-0.169,0.712,153,-0.238,"0.812",-0.026,""
-"4","RBR median","tri",0.979,0.723,153,1.354,"0.178",0.105,""
-"5","RBR median","age",-0.055,0.597,153,-0.092,"0.927",-0.009,""
-"6","RBR median","avgBio",0.346,0.437,153,0.792,"0.43",0.077,""
-"7","tssm","sdd",-1.12,0.148,154,-7.573,"<0.001",-0.612,"***"
-"8","tssm","tri",0.056,0.112,154,0.504,"0.615",0.021,""
-"9","tssm","dc",0.267,0.015,154,17.7,"<0.001",0.76,"***"
-"10","tssm","age",0.288,0.092,154,3.12,"0.002",0.167,"**"
-"11","tssm","avgBio",-0.103,0.067,154,-1.537,"0.126",-0.081,""
-"12","sdd","avgBio",-0.084,0.033,156,-2.577,"0.011",-0.12,"*"
-"13","sdd","age",0.217,0.043,156,5.075,"<0.001",0.23,"***"
-"14","sdd","tri",-0.083,0.055,156,-1.512,"0.132",-0.057,""
+"","x"
+"1","<table class="" lightable-classic"" style=""font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;"">
+<caption>piecewiseSEM results for median burn severity in eastern boreal shield of Ontario</caption>
+ <thead>
+  <tr>
+   <th style=""text-align:left;""> Response </th>
+   <th style=""text-align:left;""> Predictor </th>
+   <th style=""text-align:right;""> Estimate </th>
+   <th style=""text-align:right;""> SE </th>
+   <th style=""text-align:right;""> DF </th>
+   <th style=""text-align:right;""> t.Value </th>
+   <th style=""text-align:left;""> P.Value </th>
+   <th style=""text-align:right;""> Std..Estimate </th>
+   <th style=""text-align:left;"">  </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style=""text-align:left;""> SFD </td>
+   <td style=""text-align:left;""> Biomass </td>
+   <td style=""text-align:right;""> -0.202 </td>
+   <td style=""text-align:right;""> 0.063 </td>
+   <td style=""text-align:right;""> 155 </td>
+   <td style=""text-align:right;""> -3.208 </td>
+   <td style=""text-align:left;""> 0.002 </td>
+   <td style=""text-align:right;""> -0.288 </td>
+   <td style=""text-align:left;""> ** </td>
+  </tr>
+  <tr>
+   <td style=""text-align:left;""> SFD </td>
+   <td style=""text-align:left;""> Stand Age </td>
+   <td style=""text-align:right;""> 0.221 </td>
+   <td style=""text-align:right;""> 0.042 </td>
+   <td style=""text-align:right;""> 155 </td>
+   <td style=""text-align:right;""> 5.208 </td>
+   <td style=""text-align:left;""> &lt;0.001 </td>
+   <td style=""text-align:right;""> 0.234 </td>
+   <td style=""text-align:left;""> *** </td>
+  </tr>
+  <tr>
+   <td style=""text-align:left;""> SFD </td>
+   <td style=""text-align:left;""> Canopy Closure </td>
+   <td style=""text-align:right;""> 0.214 </td>
+   <td style=""text-align:right;""> 0.098 </td>
+   <td style=""text-align:right;""> 155 </td>
+   <td style=""text-align:right;""> 2.179 </td>
+   <td style=""text-align:left;""> 0.031 </td>
+   <td style=""text-align:right;""> 0.178 </td>
+   <td style=""text-align:left;""> * </td>
+  </tr>
+  <tr>
+   <td style=""text-align:left;""> SFD </td>
+   <td style=""text-align:left;""> Topo </td>
+   <td style=""text-align:right;""> -0.081 </td>
+   <td style=""text-align:right;""> 0.054 </td>
+   <td style=""text-align:right;""> 155 </td>
+   <td style=""text-align:right;""> -1.498 </td>
+   <td style=""text-align:left;""> 0.136 </td>
+   <td style=""text-align:right;""> -0.056 </td>
+   <td style=""text-align:left;"">  </td>
+  </tr>
+  <tr>
+   <td style=""text-align:left;""> SFDr </td>
+   <td style=""text-align:left;""> SFD </td>
+   <td style=""text-align:right;""> -0.953 </td>
+   <td style=""text-align:right;""> 0.139 </td>
+   <td style=""text-align:right;""> 157 </td>
+   <td style=""text-align:right;""> -6.858 </td>
+   <td style=""text-align:left;""> &lt;0.001 </td>
+   <td style=""text-align:right;""> -0.520 </td>
+   <td style=""text-align:left;""> *** </td>
+  </tr>
+  <tr>
+   <td style=""text-align:left;""> SFDr </td>
+   <td style=""text-align:left;""> Drought </td>
+   <td style=""text-align:right;""> 0.264 </td>
+   <td style=""text-align:right;""> 0.015 </td>
+   <td style=""text-align:right;""> 157 </td>
+   <td style=""text-align:right;""> 17.182 </td>
+   <td style=""text-align:left;""> &lt;0.001 </td>
+   <td style=""text-align:right;""> 0.751 </td>
+   <td style=""text-align:left;""> *** </td>
+  </tr>
+  <tr>
+   <td style=""text-align:left;""> Severity </td>
+   <td style=""text-align:left;""> Drought </td>
+   <td style=""text-align:right;""> 0.209 </td>
+   <td style=""text-align:right;""> 0.138 </td>
+   <td style=""text-align:right;""> 152 </td>
+   <td style=""text-align:right;""> 1.519 </td>
+   <td style=""text-align:left;""> 0.131 </td>
+   <td style=""text-align:right;""> 0.170 </td>
+   <td style=""text-align:left;"">  </td>
+  </tr>
+  <tr>
+   <td style=""text-align:left;""> Severity </td>
+   <td style=""text-align:left;""> SFDR </td>
+   <td style=""text-align:right;""> -0.876 </td>
+   <td style=""text-align:right;""> 0.393 </td>
+   <td style=""text-align:right;""> 152 </td>
+   <td style=""text-align:right;""> -2.230 </td>
+   <td style=""text-align:left;""> 0.027 </td>
+   <td style=""text-align:right;""> -0.251 </td>
+   <td style=""text-align:left;""> * </td>
+  </tr>
+  <tr>
+   <td style=""text-align:left;""> Severity </td>
+   <td style=""text-align:left;""> SFD </td>
+   <td style=""text-align:right;""> -0.313 </td>
+   <td style=""text-align:right;""> 0.715 </td>
+   <td style=""text-align:right;""> 152 </td>
+   <td style=""text-align:right;""> -0.438 </td>
+   <td style=""text-align:left;""> 0.662 </td>
+   <td style=""text-align:right;""> -0.049 </td>
+   <td style=""text-align:left;"">  </td>
+  </tr>
+  <tr>
+   <td style=""text-align:left;""> Severity </td>
+   <td style=""text-align:left;""> Topo </td>
+   <td style=""text-align:right;""> 0.994 </td>
+   <td style=""text-align:right;""> 0.724 </td>
+   <td style=""text-align:right;""> 152 </td>
+   <td style=""text-align:right;""> 1.372 </td>
+   <td style=""text-align:left;""> 0.172 </td>
+   <td style=""text-align:right;""> 0.106 </td>
+   <td style=""text-align:left;"">  </td>
+  </tr>
+  <tr>
+   <td style=""text-align:left;""> Severity </td>
+   <td style=""text-align:left;""> Stand Age </td>
+   <td style=""text-align:right;""> -0.003 </td>
+   <td style=""text-align:right;""> 0.600 </td>
+   <td style=""text-align:right;""> 152 </td>
+   <td style=""text-align:right;""> -0.005 </td>
+   <td style=""text-align:left;""> 0.996 </td>
+   <td style=""text-align:right;""> 0.000 </td>
+   <td style=""text-align:left;"">  </td>
+  </tr>
+  <tr>
+   <td style=""text-align:left;""> Severity </td>
+   <td style=""text-align:left;""> Biomass </td>
+   <td style=""text-align:right;""> -0.365 </td>
+   <td style=""text-align:right;""> 0.847 </td>
+   <td style=""text-align:right;""> 152 </td>
+   <td style=""text-align:right;""> -0.431 </td>
+   <td style=""text-align:left;""> 0.667 </td>
+   <td style=""text-align:right;""> -0.082 </td>
+   <td style=""text-align:left;"">  </td>
+  </tr>
+  <tr>
+   <td style=""text-align:left;""> Severity </td>
+   <td style=""text-align:left;""> Canopy Closure </td>
+   <td style=""text-align:right;""> 1.282 </td>
+   <td style=""text-align:right;""> 1.293 </td>
+   <td style=""text-align:right;""> 152 </td>
+   <td style=""text-align:right;""> 0.991 </td>
+   <td style=""text-align:left;""> 0.323 </td>
+   <td style=""text-align:right;""> 0.167 </td>
+   <td style=""text-align:left;"">  </td>
+  </tr>
+</tbody>
+</table>"

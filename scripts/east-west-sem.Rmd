@@ -21,6 +21,7 @@ library(piecewiseSEM)
 library(nlme)
 library(tidyverse)
 library(kableExtra)
+source("scripts//sem-table-function.R")
 ```
 
 Read in data
@@ -74,8 +75,8 @@ new_data_w1 = new_data_w %>% mutate(dc= c(scale(dc)),
 #removed topography and age effects of SFDR which were not in our hypothesized dag originally
 #and got a good fishers C
 west_sem_ext <- psem(
-  lme(sdd ~  avgBio + age + cc+ tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
-  lme(tssm ~ sdd +  + dc   , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w1, method = "ML"),
+  lme(sdd ~  avgBio + age + cc+ tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
+  lme(tssm ~ sdd +  + dc   , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML"),
    lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
         avgBio + cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_w, method = "ML")
 )
@@ -91,21 +92,8 @@ lapply(west_sem_ext, function(i) hist(resid(i))) # looks generally normal
 
 ```{r, summary table for west extreme} 
 #tidy table
-modsum_west_ext <- summary(west_sem_ext)$coefficients
-modsum_west_ext$Estimate <- round(modsum_west_ext$Estimate, 3)
-modsum_west_ext$Std.Error <- round(modsum_west_ext$Std.Error, 3)
-modsum_west_ext$Crit.Value <- round(modsum_west_ext$Crit.Value, 3)
-modsum_west_ext$P.Value <- round(modsum_west_ext$P.Value, 3)
-modsum_west_ext$P.Value <- ifelse(modsum_west_ext$P.Value<0.001, "<0.001", modsum_west_ext$P.Value)
-modsum_west_ext$Std.Estimate <- round(modsum_west_ext$Std.Estimate, 3)
-modsum_west_ext$Response <- gsub("_", " ", modsum_west_ext$Response)
-modsum_west_ext$Predictor <- gsub("_", " ", modsum_west_ext$Predictor)
-colnames(modsum_west_ext)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_west_ext <- sem_table(west_sem_ext)
-west_ext_tbl <- modsum_west_ext %>% 
-  kbl(caption = "piecewiseSEM results for extreme burn severity in Western Ontario Boreal Shield", 
-      booktabs = T) %>% 
-  kable_classic(full_width = F, html_font = "Cambria")
+
+modsum_west_ext <- sem_table(west_sem_ext, region = "w")
 
 modsum_west_ext
 
@@ -140,23 +128,13 @@ lapply(west_sem_med, function(i) hist(resid(i))) # looks generally normal
 
 #
 #tidy table
-modsum_wm <- summary(west_sem_med)$coefficients
-modsum_wm$Estimate <- round(modsum_wm$Estimate, 3)
-modsum_wm$Std.Error <- round(modsum_wm$Std.Error, 3)
-modsum_wm$Crit.Value <- round(modsum_wm$Crit.Value, 3)
-modsum_wm$P.Value <- round(modsum_wm$P.Value, 3)
-modsum_wm$P.Value <- ifelse(modsum_wm$P.Value<0.001, "<0.001", modsum_wm$P.Value)
-modsum_wm$Std.Estimate <- round(modsum_wm$Std.Estimate, 3)
-modsum_wm$Response <- gsub("_", " ", modsum_wm$Response)
-modsum_wm$Predictor <- gsub("_", " ", modsum_wm$Predictor)
-colnames(modsum_wm)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_west_ext <- sem_table(west_sem_ext)
 
-modsum_wm %>% 
-  kbl(caption = "piecewiseSEM results for median burn severity in western Ontario boreal shield", 
-      booktabs = T) %>% 
-  kable_classic(full_width = F, html_font = "Cambria")
-write.csv(modsum_wm, "results/results-summary-tables/Table-4-sem-med-west.csv")
+modsum_west_med <- sem_table(west_sem_med, region = "w")
+
+
+
+modsum_west_med 
+write.csv(modsum_west_med, "results/results-summary-tables/Table-4-sem-med-west.csv")
 
 ```
 
@@ -175,7 +153,7 @@ Eastern boreal shield extreme
 # p-value was equal to 0.005
 east_sem_ext <- psem(
   lme(sdd ~  avgBio + age + cc+ tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
-  lme(tssm ~ sdd +  dc + age  , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(tssm ~ sdd +  dc  , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
    lme(rbr_qs ~ dc + tssm + sdd +tri +age + 
         avgBio + cc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
 )
@@ -195,20 +173,12 @@ lapply(east_sem_ext, function(i) hist(resid(i))) # looks generally norma
 
 #
 #tidy table
-modsum_ee <- summary(east_sem_ext)$coefficients
-modsum_ee$Estimate <- round(modsum_ee$Estimate, 3)
-modsum_ee$Std.Error <- round(modsum_ee$Std.Error, 3)
-modsum_ee$Crit.Value <- round(modsum_ee$Crit.Value, 3)
-modsum_ee$P.Value <- round(modsum_ee$P.Value, 3)
-modsum_ee$P.Value <- ifelse(modsum_ee$P.Value<0.001, "<0.001", modsum_ee$P.Value)
-modsum_ee$Std.Estimate <- round(modsum_ee$Std.Estimate, 3)
-modsum_ee$Response <- gsub("_", " ", modsum_ee$Response)
-modsum_ee$Predictor <- gsub("_", " ", modsum_ee$Predictor)
-colnames(modsum_ee)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_ee %>% 
-  kbl(caption = "piecewiseSEM results for extreme burn severity in the boreal shield of eastern Ontario", 
-      booktabs = T) %>% 
-  kable_classic(full_width = F, html_font = "Cambria")
+modsum_ee <- sem_table(east_sem_ext, region = "e")
+
+
+
+modsum_ee
+
 write.csv(modsum_ee, "results/results-summary-tables/Table-5-sem-ext-east.csv")
 
 ```
@@ -221,7 +191,7 @@ write.csv(modsum_ee, "results/results-summary-tables/Table-5-sem-ext-east.csv")
 east_sem_med <- psem(
   lme(sdd ~  avgBio + age + cc+ tri, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
   
-  lme(tssm ~ sdd + dc , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
+  lme(tssm ~ sdd + dc  , random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML"),
   
   lme(RBR_median ~ dc + tssm + sdd +tri +age + 
         avgBio + cc, random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data_e, method = "ML")
@@ -235,20 +205,12 @@ lapply(east_sem_med, function(i) hist(resid(i))) # looks generally normal
 
 #
 #tidy table
-modsum_em <- summary(east_sem_med)$coefficients
-modsum_em$Estimate <- round(modsum_em$Estimate, 3)
-modsum_em$Std.Error <- round(modsum_em$Std.Error, 3)
-modsum_em$Crit.Value <- round(modsum_em$Crit.Value, 3)
-modsum_em$P.Value <- round(modsum_em$P.Value, 3)
-modsum_em$P.Value <- ifelse(modsum_em$P.Value<0.001, "<0.001", modsum_em$P.Value)
-modsum_em$Std.Estimate <- round(modsum_em$Std.Estimate, 3)
-modsum_em$Response <- gsub("_", " ", modsum_em$Response)
-modsum_em$Predictor <- gsub("_", " ", modsum_em$Predictor)
-colnames(modsum_em)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
-modsum_em %>% 
-  kbl(caption = "piecewiseSEM results for median burn severity in eastern boreal shield of Ontario", 
-      booktabs = T) %>% 
-  kable_classic(full_width = F, html_font = "Cambria")
+#tidy table
+modsum_em <- sem_table(east_sem_med, region = "e")
+
+
+
+modsum_em
 write.csv(modsum_em, "results/results-summary-tables/Table-6-sem-med-east.csv")
 
 ```
