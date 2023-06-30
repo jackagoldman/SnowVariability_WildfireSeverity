@@ -80,7 +80,7 @@ that represents the earliest year in which we had fire perimeter data for the fi
 dataset. After filtering out prescribed fires and reburns we had a total of 710 fires that burned
 during 2002-2019.
 
-**data acquisition, processing and integration**
+**data acquisition, processing and assimilation**
 
 Remotely sensed burn severity maps were obtained from Google Earth Engine (GEE) at a 30m spatial
 resolution based on fire perimeters for wildfires that burned between 2002-2019. Burn severity was
@@ -147,6 +147,9 @@ centroid of each fire perimeter from weather stations across our study region fo
 burn.
 
 In order to reduce (smooth) - signal fortin et al 2012
+
+-   Because all remote sensing data aquired at different scales, we smooth data to the scale of the
+    fire perimeter by calculating the median for all remote sensing data
 
 **Data summary**
 
@@ -327,7 +330,7 @@ the direct relationship was strongly positive, the strength and direction of the
 each other out and the total causal effects of drought on median burn severity to be weaker than
 topography (fig 1b).
 
-*East vs. West Ontario*
+*East vs. West Ontario shield*
 
 For western Ontario, our SEM fit the data better compared to the models for all of Ontario based on
 the goodness-of-fit statistic for both burn severity extremes (*C* = 9.864, *df* = 10, *p* = 0.453)
@@ -344,7 +347,41 @@ duration *R*~2~ = 0.87. Compared to western Ontario, our model explained more va
 free date and snow free duration. Yet, our model of extreme burn severity explained a higher
 proportion of variation in severity *R*~2~ = 0.28, compared to median burn severity *R*~2~ = 0.18.
 
-*Multigroup - East vs. West Ontario*
+There was no significant relationship between biomass and snow free date in the western boreal
+shield but we a significant negative relationship in the eastern boreal shield (Table \@ref(tab:S3)
+\@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) . We found a significant positive relationship between
+stand age and snow free date in both ecoregions (Table \@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5)
+\@ref(tab:S6)) . We found a significant negative relationship between canopy closure and snow free
+date for the western boreal shield but a significant positive relationship in the eastern boreal
+shield (Table \@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) . We found a significant
+negative relationship between topography and snow free date in the west but not in the east (Table
+\@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) . For both ecoregions we found a significant
+negative relationship between snow free date and snow free duration and significant positive
+relationship of drought and snow free duration (Table \@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5)
+\@ref(tab:S6)) .
+
+In the eastern boreal forest ecoregion, we found a significant negative relationship between snow
+free duration and median burn severity but a significant positive relationship with burn severity
+extremes (Table \@ref(tab:S4) \@ref(tab:S6)). We also found a significant negative relationship
+between canopy closure and extreme burn severity (Table \@ref(tab:S4)).
+
+Compared to the east, in the western boreal shield we found a significant positive relationship
+between topography and median burn severity but not extreme burn severity (Table \@ref(tab:S3)
+\@ref(tab:S5)). We found a significant positive relationship between snow free duration and extreme
+burn severity but a significant negative relationship with median burn severity (Table \@ref(tab:S3)
+\@ref(tab:S5)). We found significant positive relationship between drought and both median and
+extreme burn severity (Table \@ref(tab:S3) \@ref(tab:S5)). We found significant negative
+relationship of stand age and canopy closure and positive relationship of biomass on extreme burn
+severity but no significant relationships with median burn severity(Table \@ref(tab:S3)
+\@ref(tab:S5)).
+
+Our multigroup analysis revealed that there is a difference from east to west for the indirect
+pathway between biomass and extreme burn severity (*p* (x^2~L\\ML~^) = 2.2e-11) and the indirect
+pathway between canopy closure and extreme burn severity (*p* (x^2~L\\ML~^) = 1.75e-11), but not
+difference for the indirect pathway between stand age and extreme burn severity (*p* (x^2~L\\ML~^) =
+0)(Figure \@ref(fig:fig3)). For median burn severity, we also observed a difference from east to
+west for the indirect pathway from both biomass (*p* (x^2~L\\ML~^) = 2.89e-11) and canopy closure
+(*p* (x^2~L\\ML~^) = 2.3e-11) but not for stand age (*p* (x^2~L\\ML~^) = 0)(Figure \@ref(fig:fig3)).
 
 *Fire Heterogeneity*
 
@@ -352,9 +389,11 @@ proportion of variation in severity *R*~2~ = 0.28, compared to median burn sever
 
 **caveats**
 
--   scale
+-   scale of analysis
 
 -   limitations of inference
+
+-   remote sensing
 
 # Figures
 
@@ -362,20 +401,49 @@ proportion of variation in severity *R*~2~ = 0.28, compared to median burn sever
 
 ```
 
+```{r fig3, echo = FALSE, results = 'asis'}
+
+```
+
 # Tables
 
-```{r west-ext-tbl, echo = FALSE, results = 'asis'}
-
-west_ext_tbl <- read.csv( "results/results-summary-tables/Table-3-sem-ext-west.csv")
-colnames(west_ext_tbl)[10] <-""
-west_ext_tbl <- west_ext_tbl[ , !names(west_ext_tbl) %in% c("X")] ## works as expected
-west_ext_tbl %>% 
-  kbl(caption = "piecewiseSEM results for extreme burn severity in Western Ontario Boreal Shield", 
-      booktabs = T) %>% 
-  kable_classic(full_width = F, html_font = "Cambria")
+```{r s1, echo = FALSE, results = 'asis'}
 
 
 
 
 
+
+```
+
+```{r s2, echo = FALSE, results = 'asis'}
+#
+
+```
+
+```{r S3, echo = FALSE, results = 'asis'}
+#burn severity west/ext
+
+```
+
+```{r S4, echo = FALSE, results = 'asis'}
+#burn severity east/ext}
+
+```
+
+```{r S5, echo = FALSE, results = 'asis'}
+#burn severity west/med}
+```
+
+```{r S6, echo = FALSE, results = 'asis'}
+#burn severity east/med}
+
+```
+
+```{r s7, echo = FALSE, results = 'asis'}
+#heterogeneity west
+```
+
+```{r s8, echo = FALSE, results = 'asis'}
+#heterogeneity east
 ```

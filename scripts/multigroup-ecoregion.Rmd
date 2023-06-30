@@ -80,7 +80,7 @@ summary(ext_cc, conditioning = TRUE)
 sem_ext_chi <- fisherC(sem_ext)[,1]
 sem_ext_df <- fisherC(sem_ext)[,2]
 ext_cc_chi <- fisherC(ext_cc)[,1]
-ext_c_df <- fisherC(ext_cc)[,2]
+ext_cc_df <- fisherC(ext_cc)[,2]
 
 chi.diff_cc = (ext_cc_chi - sem_ext_chi)
 df.diff_cc= (ext_cc_df - sem_ext_df)
@@ -108,7 +108,7 @@ ext_age  <- psem(
 sem_ext_chi <- fisherC(sem_ext)[,1]
 sem_ext_df <- fisherC(sem_ext)[,2]
 ext_age_chi <- fisherC(ext_age)[,1]
-ext_c_df <- fisherC(ext_age)[,2]
+ext_age_df <- fisherC(ext_age)[,2]
 
 chi.diff_age = (ext_age_chi - sem_ext_chi)
 df.diff_age= (ext_age_df - sem_ext_df)
@@ -211,8 +211,8 @@ ind.path.age.g2 <- (coef1*coef2*coef3)
 create a dataframe
 ```{r}
 names <- c("Indirect Pathway", "Path Coefficient", "Ecoregion")
-ind.mult.ext <- matrix(c("Stand Age", "Total Aboveground Biomass", "Canopy Closure",
-                         "Stand Age", "Total Aboveground Biomass", "Canopy Closure",
+ind.mult.ext <- matrix(c("Stand Age", "Biomass", "Canopy Closure",
+                         "Stand Age", "Biomass", "Canopy Closure",
                          ind.path.age.g1, ind.path.age.g2, ind.path.bio.g1, ind.path.bio.g2, 
                          ind.path.cc.g1, ind.path.cc.g2, "West", "East","West", "East","West", "East","West", "East"), nrow =6, ncol = 3)
 ind.mult.ext <-  as.table(ind.mult.ext)
@@ -288,6 +288,7 @@ chi.diff_age = (med_age_chi - sem_med_chi)
 df.diff_age= (med_age_df - sem_med_df)
 
 1-pchisq(chi.diff_age, df.diff_age)
+
 ```
 
 
@@ -406,8 +407,8 @@ ind.path.age.g2 <- (coef1*coef2*coef3)
 create a dataframe
 ```{r}
 names <- c("Indirect Pathway", "Path Coefficient", "Ecoregion")
-ind.mult.med <- matrix(c("Stand Age", "Total Aboveground Biomass", "Canopy Closure",
-                         "Stand Age", "Total Aboveground Biomass", "Canopy Closure",
+ind.mult.med <- matrix(c("Stand Age", "Biomass", "Canopy Closure",
+                         "Stand Age", "Biomass", "Canopy Closure",
                          ind.path.age.g1, ind.path.age.g2, ind.path.bio.g1, ind.path.bio.g2, 
                          ind.path.cc.g1, ind.path.cc.g2, "West", "East","West", "East","West", "East"), ncol = 3)
 ind.mult.med <-  as.table(ind.mult.med)
@@ -429,33 +430,40 @@ library(ggplot2)
 
 ```{r, median}
 #plot
-ggplot()+
+mmult_eff <- ggplot()+
   geom_point(data = tbl.ind.mult.med, aes(x = `Path Coefficient`, y = `Indirect Pathway`, colour = Ecoregion), size = 5)+
 theme_bw()+
   theme(axis.title = element_text(size = 14, family = "Helvetica"), 
         axis.text = element_text(size = 10, family = "Helvetica"),
         plot.title = element_text(hjust = 0.5),
     panel.background = element_blank(),
-        panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + 
-  theme(legend.position ="bottom") + xlab("Standardized Effects")+
+        panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + xlim(-0.015, 0.02)+ coord_flip()+ 
+  theme(legend.position ="right") + xlab("Standardized Effects")+
   scale_colour_viridis_d("Ecoregion", option = "viridis") +
-  labs(title = "Median Burn Severity - East/West Multigroup")
+  labs(title = "Median Burn Severity")
 
 ```
 
 
 ```{r}
-ggplot()+
+emult_eff <- ggplot()+
   geom_point(data = tbl.ind.mult.ext, aes(x = `Path Coefficient`, y = `Indirect Pathway`, colour = Ecoregion), size = 5)+
 theme_bw()+
   theme(axis.title = element_text(size = 14, family = "Helvetica"), 
         axis.text = element_text(size = 10, family = "Helvetica"),
         plot.title = element_text(hjust = 0.5),
     panel.background = element_blank(),
-        panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + 
-  theme(legend.position ="bottom") + xlab("Standardized Effects")+
+        panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + coord_flip()+
+  theme(legend.position ="right") + xlab("Standardized Effects")+
   scale_colour_viridis_d("Ecoregion", option = "viridis") +
-  labs(title = "Burn Severity Extremes - East/West Multigroup")
+  labs(title = "Burn Severity Extremes")
 
+```
+
+
+```{r}
+library(patchwork)
+
+emult_eff + mmult_eff + plot_layout(guides = "collect")
 ```
 

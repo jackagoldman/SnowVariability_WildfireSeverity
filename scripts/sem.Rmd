@@ -212,6 +212,8 @@ modsum %>%
       booktabs = T) %>% 
   kable_classic(full_width = F, html_font = "Cambria")
 
+modsum <- sem_table(sem_ext)
+modsum
 write.csv(modsum, "results/results-summary-tables/Table-1-sem-ext-ont.csv")
 ```
 
@@ -286,6 +288,8 @@ modsum_med_all %>%
       booktabs = T) %>% 
   kable_classic(full_width = F, html_font = "Cambria")
 
+modsum_med_all <- sem_table(sem_med)
+modsum_med_all
 write.csv(modsum_med_all, "results/results-summary-tables/Table-2-sem-med-ont.csv")
 ```
 

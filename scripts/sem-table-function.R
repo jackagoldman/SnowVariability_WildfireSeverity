@@ -38,8 +38,17 @@ colnames(x3)[9] <-""
 vector1 <- c("rbr qs")
 vector2 <- c("RBR median")
 
-
-if( vector1 %in% x2$Response & region == "w"){
+if (vector1 %in% x2$Response & (missing(region))){
+  x_table <- x3 %>% 
+    kbl(caption = "piecewiseSEM results for extreme burn severity for boreal shield of Ontario", 
+        booktabs = T) %>% 
+    kable_classic(full_width = F, html_font = "Cambria")
+} else if (vector2 %in% x2$Response & (missing(region))){
+  x_table <- x3 %>% 
+    kbl(caption = "piecewiseSEM results for median burn severity for boreal shield of Ontario", 
+        booktabs = T) %>% 
+    kable_classic(full_width = F, html_font = "Cambria")
+} else if( vector1 %in% x2$Response & region == "w"){
 x_table <- x3 %>% 
   kbl(caption = "piecewiseSEM results for extreme burn severity in western boreal shield of Ontario", 
       booktabs = T) %>% 
@@ -54,7 +63,7 @@ x_table <- x3 %>%
       kbl(caption = "piecewiseSEM results for median burn severity in western boreal shield of Ontario", 
           booktabs = T) %>% 
       kable_classic(full_width = F, html_font = "Cambria") 
-} else {
+} else if(vector2 %in% x2$Response & region == "e") {
     x_table <- x3 %>% 
       kbl(caption = "piecewiseSEM results for median burn severity in eastern boreal shield of Ontario", 
           booktabs = T) %>% 
