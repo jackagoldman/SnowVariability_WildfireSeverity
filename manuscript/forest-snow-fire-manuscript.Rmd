@@ -41,13 +41,54 @@ scales.
 
 # Introduction
 
-Q1. How does stand structure and snow cover interact to influence wildfire burn severity in the
-boreal shield?
+Earlier snowmelt, decreased snowpack, and earlier spring moisture amounts are associated with longer
+warm season droughts, with implications for the moisture availability in both spring and summer
+[@gergel.etal2017]. Similar to soils, litter fuels (i.e., surface fuels) located on the forest floor
+tend to recharge (i.e., water added to soil/litter moisture storage) during the cool season and dry
+out following snowmelt [@estes2012]. This process is facilitated by the amount of water contained in
+the snowpack. Snowpack allows snow-dominated temperate ecosystems to store more water than what
+could be contained in the soil alone. Therefore, snow cover may determine the extent to which fine
+fuels can recharge. Additionally, the release of water from the snowpack coincides with the spring
+growing season and ensures moist condition in spring, as peak moisture is synchronous with snow
+disappearance date [@harpoldSoilMoistureResponse2015]. However, snowmelt is heterogeneous at the
+landscape scale, and the timing of soil drying (and potentially litter fuels) following snowmelt can
+vary by several weeks [@harpoldSoilMoistureResponse2015, @hopmans.etal_2012] resulting in landscape
+patches of different moisture levels.
 
-Q2. do the strength of the direct and indirect relationships differ based on ecoregion and fire
-seasonality?
+Heterogeneity in snowpack amount and snowmelt are directly influenced by forest structural diversity
+-- the three-dimensional variation in the forest (i.e., age, canopy height, biomass). Forest
+structure modulates snow accumulation and disappearance by increasing canopy interception, snow
+ablation, and sublimation [@schneiderTreeSpatialPatterns2019, @rothForestImpactsSnow2017,
+@hojatimalekshah.etal2023]. In dense forests, such as the balsam fir and black spruce stands
+characteristic of the eastern boreal forest, snow intercepted by the canopy decreases snowpack
+[@balland2006] Further, relatively lower rates of solar radiation penetrating the canopy reduces
+snow ablation [@varholaForestCanopyEffects2010]. In less dense forests, such as the jack pine stands
+found in the central boreal forest, sparse canopy cover and increased distance between trees leads
+to more snowpack [@balland2006]. However, solar radiation is higher in more open canopies resulting
+in higher rates of ablation. Changes in the snowpack energy balance due to forest structure directly
+alters spring snowmelt timing [@lundquistLowerForestDensity2013
+@dickerson-langeSnowDisappearanceTiming2017 @musselmanEffectsVegetationSnow2008
+@musselmanInfluenceCanopyStructure2012] with implications for the drying rates of litter fuels and
+water stress throughout the fire season.
 
-Q3. Does snow cover influence within fire variability in burn severity?
+Previous studies in the western US suggest that many locations where aridity is increasing are also
+experienced a reduction in spring snowpack that is correlated with both summer fuel moisture and
+wildfire severity [@westerling.etal2006]. Despite the potential importance of changes in snow cover
+to wildfire severity, the direct and indirect effects of snow cover and forest structure and the
+interaction between these two factors on wildfire burn severity remain unclear. As climate warming
+increases across the globe, and especially at northern latitudes, it is imperative to understand how
+future changes in snow cover interact with stand-scale forest structure to influence wildfire burn
+severity. Such information can greatly improve our knowledge as to the combined impacts of global
+change and forest structure may contribute to wildfire severity. Additionally, this information can
+inform forest management strategies for reducing the impacts of snow cover loss through structural
+management regimes and helping understand wildfire hazard.
+
+The primary goal of this study is to illustrate how forest structure and snow cover interact to
+influence wildfire burn severity in the boreal forest of Ontario. We use structural equation
+modelling to assess the strengths of the direct and indirect relationships between forest structure
+and snow cover dynamics on wildfire burn severity. We fit models a different spatial scales to
+compare how the strengths of these relationships differ across a climatic and forest structure
+gradients. Finally, since snow cover dynamics are variable across a landscape
 
 remote sensing
 
@@ -347,32 +388,32 @@ duration *R*~2~ = 0.87. Compared to western Ontario, our model explained more va
 free date and snow free duration. Yet, our model of extreme burn severity explained a higher
 proportion of variation in severity *R*~2~ = 0.28, compared to median burn severity *R*~2~ = 0.18.
 
-There was no significant relationship between biomass and snow free date in the western boreal
-shield but we a significant negative relationship in the eastern boreal shield (Table \@ref(tab:S3)
-\@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) . We found a significant positive relationship between
-stand age and snow free date in both ecoregions (Table \@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5)
-\@ref(tab:S6)) . We found a significant negative relationship between canopy closure and snow free
-date for the western boreal shield but a significant positive relationship in the eastern boreal
-shield (Table \@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) . We found a significant
-negative relationship between topography and snow free date in the west but not in the east (Table
-\@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) . For both ecoregions we found a significant
-negative relationship between snow free date and snow free duration and significant positive
-relationship of drought and snow free duration (Table \@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5)
-\@ref(tab:S6)) .
+There was no significant direct relationship between biomass and snow free date in the western
+boreal shield but we found a significant negative relationship in the eastern boreal shield (Table
+\@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) . We found a significant positive direct
+relationship between stand age and snow free date in both ecoregions (Table \@ref(tab:S3)
+\@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) . We found a significant negative direct relationship
+between canopy closure and snow free date for the western boreal shield but a significant positive
+relationship in the eastern boreal shield (Table \@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5)
+\@ref(tab:S6)) . We found a significant negative relationship between topography and snow free date
+in the west but not in the east (Table \@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) . For
+both ecoregions we found a significant negative relationship between snow free date and snow free
+duration and significant positive relationship of drought and snow free duration (Table
+\@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) .
 
-In the eastern boreal forest ecoregion, we found a significant negative relationship between snow
-free duration and median burn severity but a significant positive relationship with burn severity
-extremes (Table \@ref(tab:S4) \@ref(tab:S6)). We also found a significant negative relationship
-between canopy closure and extreme burn severity (Table \@ref(tab:S4)).
+In the eastern boreal forest ecoregion, we found a significant negative direct relationship between
+snow free duration and median burn severity but a significant positive relationship with burn
+severity extremes (Table \@ref(tab:S4) \@ref(tab:S6)). We also found a significant negative direct
+relationship between canopy closure and extreme burn severity (Table \@ref(tab:S4)).
 
-Compared to the east, in the western boreal shield we found a significant positive relationship
-between topography and median burn severity but not extreme burn severity (Table \@ref(tab:S3)
-\@ref(tab:S5)). We found a significant positive relationship between snow free duration and extreme
-burn severity but a significant negative relationship with median burn severity (Table \@ref(tab:S3)
-\@ref(tab:S5)). We found significant positive relationship between drought and both median and
-extreme burn severity (Table \@ref(tab:S3) \@ref(tab:S5)). We found significant negative
-relationship of stand age and canopy closure and positive relationship of biomass on extreme burn
-severity but no significant relationships with median burn severity(Table \@ref(tab:S3)
+Compared to the east, in the western boreal shield we found a significant positive direct
+relationship between topography and median burn severity but not extreme burn severity (Table
+\@ref(tab:S3) \@ref(tab:S5)). We found a significant positive direct relationship between snow free
+duration and extreme burn severity but a significant negative relationship with median burn severity
+(Table \@ref(tab:S3) \@ref(tab:S5)). We found significant positive relationship between drought and
+both median and extreme burn severity (Table \@ref(tab:S3) \@ref(tab:S5)). We found significant
+negative relationship of stand age and canopy closure and positive relationship of biomass on
+extreme burn severity but no significant relationships with median burn severity(Table \@ref(tab:S3)
 \@ref(tab:S5)).
 
 Our multigroup analysis revealed that there is a difference from east to west for the indirect
@@ -385,7 +426,39 @@ west for the indirect pathway from both biomass (*p* (x^2~L\\ML~^) = 2.89e-11) a
 
 *Fire Heterogeneity*
 
-# Discussion
+For the entire boreal shield, test of directed separation revealed pathways between stand age and
+snow free duration and biomass and snow free duration that were not in our proposed hypothesized
+causal structure. We updated our model to include these paths. The updated causal model fit the data
+better compared to both median and extreme burn severity at the scale of both the entire shield and
+each ecoregion (*C* = 6.069, *df* = 6, *p* = 0.415). The updated model explained more variance in
+snow free date *R*~2~ = 0.77 and snow free duration *R*~2~ = 0.90 than previous models. The updated
+model explained more variation in heterogeneity in burn severity *R*~2~ = 0.29 compared to median
+and extreme burn severity.
+
+Stand age had a significant positive direct relationship with snow free date (*p* \<0.001), with an
+increase in stand age causing snow free date to occur 29 days later (Table \@ref(tab:s7)). Biomass,
+canopy closure and topography did not have significant direct relationships with snow free date
+(Table \@ref(tab:s7)). Snow free date had a significant direct negative relationship with snow free
+duration (*p* = 0.\<0.001), with an later snow free date decreasing duration by 34 days. Drought had
+a significant positive direct relationship with snow free duration (*p* \<0.001), as drought
+increased snow free duration increase by 67 days (Table \@ref(tab:s7)). Stand age had a significant
+positive direct relationship with snow free duration (*p* = 0.\<0.001), with an increase in stand
+age leading to longer snow free duration by 18 days (Table \@ref(tab:s7)). Biomass had a significant
+negative direct relationship with snow free duration (*p* = 0.001), with an increase in biomass
+causing snow free duration to be earlier by 11 days (Table \@ref(tab:s7)).
+
+Snow free duration (*p* = 0.006) and snow free date (*p* = 0.028) had significant positive direct
+relationships with heterogeneity in burn severity. Heterogeneity in burn severity increased by 32.8%
+as snow free duration was longer, and increased by 19.5% as snow free date was later (Table
+\@ref(tab:s7)). Topography had a significant negative direct relationship with heterogeneity in burn
+severity (*p* \<0.001), with an increase in topography leading to a 26% decrease in heterogeneity
+(Table \@ref(tab:s7)). Stand age had a significant positive direct relationship with heterogeneity
+in burn severity (*p* =0.003), with an increase in stand age causing a 26% change in heterogeneity
+(Table \@ref(tab:s7))
+
+*Discussion*
+
+Our results suggest that snow cover dynamics have a direct relationship with burn severity
 
 **caveats**
 
@@ -394,6 +467,14 @@ west for the indirect pathway from both biomass (*p* (x^2~L\\ML~^) = 2.89e-11) a
 -   limitations of inference
 
 -   remote sensing
+
+Q1. How does stand structure and snow cover interact to influence wildfire burn severity in the
+boreal shield?
+
+Q2. do the strength of the direct and indirect relationships differ based on ecoregion and fire
+seasonality?
+
+Q3. Does snow cover influence within fire variability in burn severity?
 
 # Figures
 
@@ -441,9 +522,9 @@ west for the indirect pathway from both biomass (*p* (x^2~L\\ML~^) = 2.89e-11) a
 ```
 
 ```{r s7, echo = FALSE, results = 'asis'}
-#heterogeneity west
+#heterogeneity full
 ```
 
 ```{r s8, echo = FALSE, results = 'asis'}
-#heterogeneity east
+#heterogeneity multigroup
 ```
