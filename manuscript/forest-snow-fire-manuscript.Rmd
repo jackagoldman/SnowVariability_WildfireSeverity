@@ -18,6 +18,8 @@ always_allow_html: true
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = "/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/")
 
+source("/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/scripts/sem-table-function.R")
+
 library(tidyverse)
 library(kableExtra)
 library(bookdown)
@@ -489,16 +491,17 @@ Q3. Does snow cover influence within fire variability in burn severity?
 # Tables
 
 ```{r s1, echo = FALSE, results = 'asis'}
+source("/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/scripts/sem-table-function.R")
 
+#burn severity ext
+sem_ext <- readRDS("results/results-summary-tables/Table-1-sem-ext-ont.rds")
 
-
-
-
-
+tbl <- sem_table(sem_ext)
+tbl
 ```
 
 ```{r s2, echo = FALSE, results = 'asis'}
-#
+#burn severity med
 
 ```
 
