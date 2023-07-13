@@ -35,7 +35,7 @@ date, the relationship between snow cover dynamics and wildfire severity remains
 between forest structure, snow cover dynamics, and wildfire burn severity for 689 fires that burn in
 Ontario's boreal forest between 2002-2019. 
 
-**What we found**: We found that the relationship between stand structure and burn severity was
+**What we found**: We found that the relationship between forest structure and burn severity was
 strongly mediated by snow cover, and that the strength of the relationships differed across spatial
 scales.
 
@@ -77,26 +77,33 @@ Previous studies in the western US suggest that many locations where aridity is 
 experienced a reduction in spring snowpack that is correlated with both summer fuel moisture and
 wildfire severity [@westerling.etal2006]. Despite the potential importance of changes in snow cover
 to wildfire severity, the direct and indirect effects of snow cover and forest structure and the
-interaction between these two factors on wildfire burn severity remain unclear. As climate warming
-increases across the globe, and especially at northern latitudes, it is imperative to understand how
-future changes in snow cover interact with stand-scale forest structure to influence wildfire burn
-severity. Such information can greatly improve our knowledge as to the combined impacts of global
-change and forest structure may contribute to wildfire severity. Additionally, this information can
-inform forest management strategies for reducing the impacts of snow cover loss through structural
-management regimes and helping understand wildfire hazard.
+interaction between these two factors on wildfire burn severity remain unclear. The lack of studies
+concerning the relationship between snow cover, forest structure and burn severity may be attributed
+to the lack of available data. However, remotely sensed burn severity, forest structure and snow
+cover data products now allow us to examine these questions at broad spatial scales. Although
+remotely sensed data may sacrifice accuracy at finer spatial scales, they are useful when the goal
+is to identify potential driver-response relationships at coarser spatial and temporal scales.
+Previous studies have used remotely sensed snow cover to look at the effects of forest structure on
+snow cover [@gleason.etal2019] and remotely sensed burn severity products to examine the effects of
+forest structure on burn severity [@san-miguel.etal2020], yet to our knowledge no study has examined
+these data together.
 
-The primary goal of this study is to illustrate how forest structure and snow cover interact to
-influence wildfire burn severity in the boreal forest of Ontario. We use structural equation
-modelling to assess the strengths of the direct and indirect relationships between forest structure
-and snow cover dynamics on wildfire burn severity. We fit models a different spatial scales to
-compare how the strengths of these relationships differ across a climatic and forest structure
-gradients. Finally, since snow cover dynamics are variable across a landscape
+Using remotely sensed data products, the primary goal of this study is to illustrate how forest
+structure and snow cover interact to influence wildfire burn severity in the boreal forest of
+Ontario. We use structural equation modelling to assess the strengths of the direct and indirect
+relationships between forest structure and snow cover dynamics on wildfire burn severity. We fit
+models at different spatial scales to compare how the strengths of these relationships differ across
+a climatic and forest structure gradients. Specifically, we ask (1) how does stand structure and
+snow cover interact to influence wildfire burn severity in the boreal shield? (2) do the strength of
+the direct and indirect relationships differ based on ecoregion and fire seasonality? (3) do snow
+cover dynamics influence within fire variability in burn severity?
 
-remote sensing
-
-effect of scale and data assimilation
-
-why do we study the scale we do, caveats?
+As climate warming increases across the globe, and especially at northern latitudes, it is
+imperative to understand how future changes in snow cover interact with stand-scale forest structure
+to influence wildfire burn severity. Such information can greatly improve our knowledge as to the
+combined impacts of global change and forest structure may contribute to wildfire severity.
+Additionally, this information can inform forest management strategies for reducing the impacts of
+snow cover loss through structural management regimes and helping understand wildfire hazard.
 
 # Methods
 
@@ -460,7 +467,15 @@ in burn severity (*p* =0.003), with an increase in stand age causing a 26% chang
 
 *Discussion*
 
-Our results suggest that snow cover dynamics have a direct relationship with burn severity
+**these are our results, this is what they mean when considering all the caveats**\*\*
+
+We found that snow cover dynamics have a direct relationship with burn severity that varies
+according to spatial scale and measure of burn severity. At the scale of the entire boreal shield
+region, snow free date decreases median burn severity but has no direct relationship with extreme
+burn severity. Whereas at the ecoregional scale, snow free date has no direct relationship with
+either median or extreme burn severity. However, snow free duration has opposing effects on median
+and extreme burn severity at both the scale of the boreal shield region and the ecoregional ,
+increasing extreme burn severity but decreasing median burn severity. At the ecoregion scale,
 
 **caveats**
 
@@ -477,6 +492,12 @@ Q2. do the strength of the direct and indirect relationships differ based on eco
 seasonality?
 
 Q3. Does snow cover influence within fire variability in burn severity?
+
+remote sensing
+
+effect of scale and data assimilation
+
+why do we study the scale we do, caveats?
 
 # Figures
 
