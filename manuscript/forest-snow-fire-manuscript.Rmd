@@ -93,26 +93,35 @@ structure and snow cover interact to influence wildfire burn severity in the bor
 Ontario. We use structural equation modelling to assess the strengths of the direct and indirect
 relationships between forest structure and snow cover dynamics on wildfire burn severity. We fit
 models at different spatial scales to compare how the strengths of these relationships differ across
-a climatic and forest structure gradients. Specifically, we ask (1) how does stand structure and
+gradients in climate and forest structure. Specifically, we ask (1) how does stand structure and
 snow cover interact to influence wildfire burn severity in the boreal shield? (2) do the strength of
 the direct and indirect relationships differ based on ecoregion and fire seasonality? (3) do snow
 cover dynamics influence within fire variability in burn severity?
 
 As climate warming increases across the globe, and especially at northern latitudes, it is
-imperative to understand how future changes in snow cover interact with stand-scale forest structure
-to influence wildfire burn severity. Such information can greatly improve our knowledge as to the
-combined impacts of global change and forest structure may contribute to wildfire severity.
-Additionally, this information can inform forest management strategies for reducing the impacts of
-snow cover loss through structural management regimes and helping understand wildfire hazard.
+imperative to understand how future changes in snow cover interact with lanscape-scale forest
+structure to influence wildfire burn severity. Such information can greatly improve our knowledge as
+to the combined impacts of global change and forest structure, and how they may contribute to
+wildfire severity in the future. Additionally, this information can inform forest management
+strategies for reducing the impacts of snow cover loss through structural management regimes and
+helping understand wildfire hazard.
+
+**last sentence unclear** - *reducing the impacts of snow cover loss to mitigate the potential
+negative effects of snow cover on wildfire, and to further our understanding of wildfire hazard.*
 
 # Methods
 
 *Study Area*
 
-Our study was focused on the boreal shield ecoregion of Ontario.
-
-Between 2008 and 2018, over a third of the wildfires that burned in the boreal forest of Canada
-occurred in the Ontario's boreal shield ecoregion [@coops.etal2018].
+Our study was focused on fires that burned between 2002-2019 in the boreal shield ecozone of
+Ontario. Between 2008 and 2018, over a third of the wildfires that burned in the boreal forest of
+Canada occurred in the Ontario's boreal shield ecoregion [@coops.etal2018]. There is a climate
+gradient from west to east which separates the ecozone into two ecoregions, boreal shield west (BSW)
+and boreal shield east (BSE). The BSW is drier compared to the more humid BSE, and is a more open
+jack pine (*picea banksiana*) dominated area compared to the dense black spruce (*picea mariana*)
+found in the east. Typically, studies that look at wildfires in the boreal shield ecozone compare
+the BSW and BSE directly, or sites within these regions, because the differences in climate and
+forest structure are thought to influence wildfire dynamics [@beverly.martell2005 @james.etal2017].
 
 *Data*
 
@@ -467,15 +476,38 @@ in burn severity (*p* =0.003), with an increase in stand age causing a 26% chang
 
 *Discussion*
 
-**these are our results, this is what they mean when considering all the caveats**\*\*
+Our results suggest that snow cover dynamics have a direct relationship with burn severity in
+seasonally snow-covered regions that varies according to spatial scale and measure of burn severity.
+At the ecozone scale snow free date decreases median burn severity but has no direct relationship
+with extreme burn severity. Although fuel drying is an important driver of wildfire severity, burn
+severity extremes or very high severity fires, are generally driven more by the amount of live fuels
+[@parks.etal2018a]. Similarly, our results also demonstrate that fuels are more important for
+high-severity fires, as the direct relationship between forest structure and burn severity is only
+significant for burn severity extremes. Differences between median and extreme burn severity
+suggests that wildfire severity in seasonally snow-covered regions may be driven, in part by snow
+free date except in cases where fires burn at high-severity.
 
-We found that snow cover dynamics have a direct relationship with burn severity that varies
-according to spatial scale and measure of burn severity. At the scale of the entire boreal shield
-region, snow free date decreases median burn severity but has no direct relationship with extreme
-burn severity. Whereas at the ecoregional scale, snow free date has no direct relationship with
-either median or extreme burn severity. However, snow free duration has opposing effects on median
-and extreme burn severity at both the scale of the boreal shield region and the ecoregional ,
-increasing extreme burn severity but decreasing median burn severity. At the ecoregion scale,
+In the case where fires burn at high-severity, the importance of snow free date and fuel drying may
+be inconsequential compared to the amount of live fuel. Since snow free date can be hetergeneous
+across a fire perimeter because of the direct effects of forest structure on snow accumulation and
+sublimation [@schneiderTreeSpatialPatterns2019, @rothForestImpactsSnow2017,
+@hojatimalekshah.etal2023, @balland2006, @varholaForestCanopyEffects2010]. We found that increases
+in total aboveground biomass cause earlier snow free date but increases in stand age cause later
+snow free date, and their combined effects may lead to greater heterogeneity in snow free date.
+Taken together with their direct effects on burn severity extermes, it is possible that while the
+amount of live fuel (forest structure) may increase burn severity extremes, it may simultaneously
+decrease the influence of snow free date by altering snow accumulation and sublimation.
+
+Whereas at the ecoregional scale, snow free date has no direct relationship with either median or
+extreme burn severity. However, snow free duration has opposing effects on median and extreme burn
+severity at both the ecozone and ecoregional scale, increasing extreme burn severity but decreasing
+median burn severity. At the ecoregion scale,
+
+-   more severe drought. Conditions following snow free date are important.
+
+Indirect effects and multigroup analysis
+
+-   reveals difference in stand composition from east to west
 
 **caveats**
 
