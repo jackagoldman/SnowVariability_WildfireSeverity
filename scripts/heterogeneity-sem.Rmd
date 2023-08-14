@@ -8,6 +8,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/")
+
 ```
 
 
@@ -61,18 +63,25 @@ subset data to fire bigger than 200 ha
 ```{r}
 new_data_cv <- new_data_cv %>% 
   filter(FIRE_FINAL >= 500)
+
+new_data_cv %>% filter
 ```
 
-
+# avg bio and average age affected snowfree date
 ```{r}
 sem_cv <- psem(
     lme(sdd ~  avgBio + cc+ age + tri, random = ~1 | Fire_Year, na.action = na.omit, data = new_data_cv, method = "ML"),
-  lme(tssm ~ sdd + age + dc + tri  , random = ~1 | Fire_Year, na.action = na.omit, data = new_data_cv, method = "ML"),
+  lme(tssm ~ sdd + dc  + age + avgBio  , random = ~1 | Fire_Year, na.action = na.omit, data = new_data_cv, method = "ML"),
   lme(rbr_cv ~ dc + tssm + sdd +tri +age + 
         avgBio + cc , random = ~1 | Fire_Year, na.action = na.omit, data = new_data_cv, method = "ML")
 )
 #summary
 summary(sem_cv)
+
+source("scripts/sem-table-function.R")
+modsum_cv <- sem_table_cv(sem_cv)
+
+modsum_cv
 ```
 
 dsep claim for snow free duration and average bio. This dsep pvalue is marginal.
@@ -84,6 +93,14 @@ snow free date was only marginally effected by avg biomass and tri with p-value 
 This could be because when looking at a different spatial scale, the amount of forest cover changes.
 Therefore this would suggest that at bigger spatial scales the effect of forest cover on snow free duration is not as strong. For topography, this suggests that at larger spatial scales, it is more difficult to detect an
 effect of topography on burn sdd. 
+
+
+```{r}
+new_data_cv_w <- new_data_cv %>% filter(pyroregion == 1)
+new_data_cv_e <- new_data_cv %>% filter(pyroregion == 0)
+
+```
+
 
 Lets examine these relationships
 ```{r}

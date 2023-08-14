@@ -362,8 +362,8 @@ all metrics had a significant direct relationship with burn severity extremes (T
 and canopy closure had a negative relationship with burn severity extremes whereas total aboveground
 biomass have a positive relationship (fig1a).
 
-The indirect relationship between forest structural diversity and median burn severity - calculated
-by multiplying the standardized regression coefficients of the path coefficients - showed that the
+The indirect relationship between forest structure and median burn severity - calculated by
+multiplying the standardized regression coefficients of the path coefficients - showed that the
 effects of stand age were stronger than canopy closure but similar to that of total aboveground
 biomass, although stand age was positive whereas biomass was negative (fig 1b). In contrast, the
 direct effect of canopy closure on median burn severity is stronger than both stand age and total
@@ -488,20 +488,23 @@ suggests that wildfire severity in seasonally snow-covered regions may be driven
 free date except in cases where fires burn at high-severity.
 
 In the case where fires burn at high-severity, the importance of snow free date and fuel drying may
-be inconsequential compared to the amount of live fuel. Since snow free date can be hetergeneous
-across a fire perimeter because of the direct effects of forest structure on snow accumulation and
-sublimation [@schneiderTreeSpatialPatterns2019, @rothForestImpactsSnow2017,
+be inconsequential compared to the amount of live fuel. Because of the direct effects of forest
+structure on snow accumulation and sublimation, it is possible for snow free date to be hetergeneous
+across a fire perimeter[@schneiderTreeSpatialPatterns2019, @rothForestImpactsSnow2017,
 @hojatimalekshah.etal2023, @balland2006, @varholaForestCanopyEffects2010]. We found that increases
 in total aboveground biomass cause earlier snow free date but increases in stand age cause later
 snow free date, and their combined effects may lead to greater heterogeneity in snow free date.
-Taken together with their direct effects on burn severity extermes, it is possible that while the
-amount of live fuel (forest structure) may increase burn severity extremes, it may simultaneously
-decrease the influence of snow free date by altering snow accumulation and sublimation.
+Therefore, it is possible that while the amount of live fuel (forest structure) may increase burn
+severity extremes, it may simultaneously decrease the influence of snow free date by altering snow
+accumulation and sublimation. Our study did not measure variability in snow free date across a fire
+perimeter which may have an impact on patterns in both median and extreme burn severity, and may
+have a stronger relationship with forest structure. Future studies on the relationship between snow
+cover, forest structure and wildfire severity would benefit from such an analysis.
 
-Whereas at the ecoregional scale, snow free date has no direct relationship with either median or
-extreme burn severity. However, snow free duration has opposing effects on median and extreme burn
-severity at both the ecozone and ecoregional scale, increasing extreme burn severity but decreasing
-median burn severity. At the ecoregion scale,
+At the ecoregional scale, snow free date has no direct relationship with either median or extreme
+burn severity. However, snow free duration has opposing effects on median and extreme burn severity
+at both the ecozone and ecoregional scale, increasing extreme burn severity but decreasing median
+burn severity. At the ecoregion scale,
 
 -   more severe drought. Conditions following snow free date are important.
 
@@ -520,8 +523,7 @@ Indirect effects and multigroup analysis
 Q1. How does stand structure and snow cover interact to influence wildfire burn severity in the
 boreal shield?
 
-Q2. do the strength of the direct and indirect relationships differ based on ecoregion and fire
-seasonality?
+Q2. do the strength of the direct and indirect relationships differ based on ecoregion?
 
 Q3. Does snow cover influence within fire variability in burn severity?
 
@@ -544,43 +546,36 @@ why do we study the scale we do, caveats?
 # Tables
 
 ```{r s1, echo = FALSE, results = 'asis'}
-source("/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/scripts/sem-table-function.R")
-
-#burn severity ext
-sem_ext <- readRDS("results/results-summary-tables/Table-1-sem-ext-ont.rds")
-
-tbl <- sem_table(sem_ext)
-tbl
+modsum
 ```
 
 ```{r s2, echo = FALSE, results = 'asis'}
 #burn severity med
+modsum_med_all
 
 ```
 
 ```{r S3, echo = FALSE, results = 'asis'}
 #burn severity west/ext
-
+modsum_west_ext
 ```
 
 ```{r S4, echo = FALSE, results = 'asis'}
 #burn severity east/ext}
-
+modsum_ee
 ```
 
 ```{r S5, echo = FALSE, results = 'asis'}
 #burn severity west/med}
+modsum_west_med
 ```
 
 ```{r S6, echo = FALSE, results = 'asis'}
 #burn severity east/med}
-
+modsum_em
 ```
 
 ```{r s7, echo = FALSE, results = 'asis'}
 #heterogeneity full
-```
-
-```{r s8, echo = FALSE, results = 'asis'}
-#heterogeneity multigroup
+modsum_cv
 ```
