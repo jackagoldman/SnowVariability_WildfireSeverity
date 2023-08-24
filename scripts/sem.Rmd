@@ -385,8 +385,6 @@ ext.p.all
 ```
 
 ```{r}
-library(gridExtra)
-library(patchwork)
-ext.p.all + med.p.all 
+ta
 ```
 
