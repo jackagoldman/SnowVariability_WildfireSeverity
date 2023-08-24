@@ -15,7 +15,7 @@ always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_knit$set(root.dir = "/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/")
 
 source("/Users/jgoldman/Work/PhD/forest-snow-fire-interactions/scripts/sem-table-function.R")
@@ -311,11 +311,10 @@ pathway differs between groups.
 To examine the effect of fire size on our hypothesize causal structure we split our data into three
 groups based representing large, medium or small fires based on threshold assigned previously based
 on [@stocks.etal2002]. Due to sample size limitations we conducted this analysis only for the subset
-of fires that burned in the boreal shield west ecozone (n = ....). To compare differences in
+of fires that burned in the boreal shield west ecozone (n = 284). To compare differences in
 hypothesized causal relationships we first fit models for both medium and extreme burn severity for
 each fire size by initially leaving all paths free. We then preformed a multigroup analysis to
 examine whether the indirect effects of forest structure are different between or among fire sizes.
-**NOTE is the multigroup analysis examining diferences between seasons or ecoregions**
 
 To examine the role of fire seasonality we split our fires into spring, summer and fall for the
 entire boreal shield ecoregion and fit our initial models for each season and response (median or
@@ -345,49 +344,56 @@ proportion of variance in burn severity extremes *R*~2~ = 0.20 relative to our m
 severity *R*~2~ = 0.12.
 
 We found a significant and negative direct relationship between total aboveground biomass and snow
-free date (fig 1a., Table 1). Stand age had a significant but positive direct relationship on snow
-free date (fig 1a, Table 1). We did not find a significant relationship between percent canopy
-closure and snow free date (fig 1a, Table 1). Topography, represented by terrain ruggedness index,
-had a significant and negative direct relationship on snow free date (fig 1a, Table 1). We found a
-significant but negative direct relationship of snow free date on snow free duration (fig 1a, Table
-1). We found significant but positive direct relationships of both drought and stand age on snow
-free duration, with a stronger direct relationship between drought and snow free duration (fig 1a,
-Table 1). Drought and snow free duration had significant direct relationships on median burn
-severity and burn severity extremes (fig 1a, Table 1). Drought had a negative relationship with burn
-severity extremes but a positive relationship with median burn severity (fig 1a, Table 1). The
-relationship between snow free duration and median burn severity was negative whereas the
-relationship between burn severity extremes and snow free duration was positive (fig 1a, Table 1).
-All forest structure metrics had no significant direct relationship with median burn severity but
-all metrics had a significant direct relationship with burn severity extremes (Table 1). Stand age
-and canopy closure had a negative relationship with burn severity extremes whereas total aboveground
-biomass have a positive relationship (fig1a).
+free date (Table \@ref(tab:s1) @ref(tab:s2) ). As biomass increased, we observed a decrease in snow
+free date by 22 days. Stand age had a significant but positive direct relationship on snow free date
+( Table \@ref(tab:s1)@ref(tab:s2) ), with snow free date increasing by 26 days. There was no
+significant relationship between percent canopy closure and snow free date ( Table
+\@ref(tab:s1)@ref(tab:s2) ). Topography, represented by terrain ruggedness index, had a significant
+and negative direct relationship on snow free date ( Table \@ref(tab:s1)@ref(tab:s2) ), with snow
+free date being observed 5 days earlier. Snow free date had a significant but negative direct
+relationship on snow free duration ( Table \@ref(tab:s1)@ref(tab:s2) ), later (i.e., increase) snow
+free date lead to longer snow free duration. We found significant and positive direct relationships
+of both drought and stand age on snow free duration, with a stronger direct relationship between
+drought and snow free duration, with snow free duration increasing by 66 days compared to 4 days (
+Table \@ref(tab:s1)@ref(tab:s2) ).
+
+Drought and snow free duration had significant direct relationships on median burn severity and burn
+severity extremes ( Table \@ref(tab:s1)@ref(tab:s2) ). Drought had a negative relationship with burn
+severity extremes but a positive relationship with median burn severity ( Table
+\@ref(tab:s1)@ref(tab:s2) ). The relationship between snow free duration and median burn severity
+was negative whereas the relationship between burn severity extremes and snow free duration was
+positive ( Table \@ref(tab:s1)@ref(tab:s2) ). All forest structure metrics had no significant direct
+relationship with median burn severity but all metrics had a significant direct relationship with
+burn severity extremes ( Table \@ref(tab:s1)@ref(tab:s2) ). Stand age and canopy closure had a
+negative relationship with burn severity extremes whereas total aboveground biomass have a positive
+relationship ( Table \@ref(tab:s1)@ref(tab:s2) ).
 
 The indirect relationship between forest structure and median burn severity - calculated by
 multiplying the standardized regression coefficients of the path coefficients - showed that the
 effects of stand age were stronger than canopy closure but similar to that of total aboveground
-biomass, although stand age was positive whereas biomass was negative (fig 1b). In contrast, the
-direct effect of canopy closure on median burn severity is stronger than both stand age and total
-aboveground biomass, both of which had relatively low direct effects (fig 1b). More importantly, the
-total causal effects of total aboveground biomass and canopy closure were similar and much strong
-than stand age (fig 1b).
+biomass, although stand age was positive whereas biomass was negative \@ref(fig:1b). In contrast,
+the direct effect of canopy closure on median burn severity is stronger than both stand age and
+total aboveground biomass, both of which had relatively low direct effects \@ref(fig:1b). More
+importantly, the total causal effects of total aboveground biomass and canopy closure were similar
+and much strong than stand age \@ref(fig:1b).
 
 The indirect effects of forest structural diversity on burn severity extremes were strongest for
-stand age compare to both total aboveground biomass and canopy closure (fig 1a). The indirect
+stand age compare to both total aboveground biomass and canopy closure \@ref(fig:1a). The indirect
 relationships for canopy closure and total aboveground biomass were positive whereas stand age had a
 negative indirect relationship with burn severity extremes. Critically, the total causal effects of
-total aboveground biomass were stronger compared to both stand age and canopy closure (fig 1a).
+total aboveground biomass were stronger compared to both stand age and canopy closure \@ref(fig:1a).
 Total aboveground biomass and canopy closure had positive indirect relationships and stand age had a
 negative indirect relationship.
 
 The indirect relationship of drought were strongest for burn severity extremes compared to median
 burn severity. Yet, drought had an indirect positive relationship with burn severity extremes and
-indirect negative relationship for median burn severity (fig1a, fig1b). The total cause effects of
-drought were positive. In contrast, topography had a positive indirect relationship with both median
-burn severity and burn severity extremes, yet these relationships were weaker than drought. However,
-because the indirect relationship of drought on burn median burn severity was strongly negative and
-the direct relationship was strongly positive, the strength and direction of these effects cancel
-each other out and the total causal effects of drought on median burn severity to be weaker than
-topography (fig 1b).
+indirect negative relationship for median burn severity ( Figure \@ref(fig:1a) \@ref(fig:1b)). The
+total cause effects of drought were positive. In contrast, topography had a positive indirect
+relationship with both median burn severity and burn severity extremes, yet these relationships were
+weaker than drought. However, because the indirect relationship of drought on burn median burn
+severity was strongly negative and the direct relationship was strongly positive, the strength and
+direction of these effects cancel each other out and the total causal effects of drought on median
+burn severity to be weaker than topography (Figures \@ref(fig:1b)).
 
 *East vs. West Ontario shield*
 
@@ -408,20 +414,27 @@ proportion of variation in severity *R*~2~ = 0.28, compared to median burn sever
 
 There was no significant direct relationship between biomass and snow free date in the western
 boreal shield but we found a significant negative relationship in the eastern boreal shield (Table
-\@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) . We found a significant positive direct
-relationship between stand age and snow free date in both ecoregions (Table \@ref(tab:S3)
-\@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) . We found a significant negative direct relationship
-between canopy closure and snow free date for the western boreal shield but a significant positive
-relationship in the eastern boreal shield (Table \@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5)
-\@ref(tab:S6)) . We found a significant negative relationship between topography and snow free date
-in the west but not in the east (Table \@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) . For
-both ecoregions we found a significant negative relationship between snow free date and snow free
-duration and significant positive relationship of drought and snow free duration (Table
-\@ref(tab:S3) \@ref(tab:S4)\@ref(tab:S5) \@ref(tab:S6)) .
+\@ref(tab:S3) \@ref(tab:S4) \@ref(tab:S5) \@ref(tab:S6)). As biomass increased, snow free date was
+28 days earlier. We found a significant positive direct relationship between stand age and snow free
+date in both ecoregions (Table \@ref(tab:S3) \@ref(tab:S4) \@ref(tab:S5) \@ref(tab:S6)) , with an
+increase in stand age leading to earlier snow free date by 23 days in the east and 28 days in the
+west. We found a significant negative direct relationship between canopy closure and snow free date
+for the western boreal shield but a significant positive relationship in the eastern boreal shield
+(Table \@ref(tab:S3) \@ref(tab:S4) \@ref(tab:S5) \@ref(tab:S6)). Snow free date occurred 17 days
+later in the east as canopy closure increased, but 27 days earlier in the west. We found a
+significant negative relationship between topography and snow free date in the west, with snow free
+date occuring 7 days earlier with an increase in topographic ruggedness, but not in the east (Table
+\@ref(tab:S3) \@ref(tab:S4) \@ref(tab:S5) \@ref(tab:S6)) . For both ecoregions we found a
+significant negative relationship between snow free date and snow free duration. When snow free date
+was later, snow free duration was shorter by 52 days in the east and 31 days in the west (Table
+\@ref(tab:S3) \@ref(tab:S4) \@ref(tab:S5) \@ref(tab:S6)). Additionally, there was a significant
+positive relationship of drought and snow free duration in both ecoregions, snow free duration was
+longer by 52 days in the east and 57 in the west as drought increased (Table \@ref(tab:S3)
+\@ref(tab:S4) \@ref(tab:S5) \@ref(tab:S6)) .
 
-In the eastern boreal forest ecoregion, we found a significant negative direct relationship between
-snow free duration and median burn severity but a significant positive relationship with burn
-severity extremes (Table \@ref(tab:S4) \@ref(tab:S6)). We also found a significant negative direct
+In the eastern boreal, we found a significant negative direct relationship between snow free
+duration and median burn severity but a significant positive relationship with burn severity
+extremes (Table \@ref(tab:S4) \@ref(tab:S6)). We also found a significant negative direct
 relationship between canopy closure and extreme burn severity (Table \@ref(tab:S4)).
 
 Compared to the east, in the western boreal shield we found a significant positive direct
@@ -433,6 +446,26 @@ both median and extreme burn severity (Table \@ref(tab:S3) \@ref(tab:S5)). We fo
 negative relationship of stand age and canopy closure and positive relationship of biomass on
 extreme burn severity but no significant relationships with median burn severity(Table \@ref(tab:S3)
 \@ref(tab:S5)).
+
+The indirect relationships of forest structure on burn severity extremes were marginal, yet similar
+for all metrics in both the east and west (Table \@ref(tab:1a)). In the east, biomass had a slightly
+stronger positive indirect relationship compared to the negative indirect relationships of both
+canopy closure and stand age. However, canopy closure had the strongest total causal effect on burn
+severity extremes. In contrast, in the west the indirect relationships of stand age were slightly
+stronger than canopy closure and biomass, but the indirect relationship of stand age was negative
+whereas the relationships between severity extremes, and canopy closure and biomass were both
+positive. Biomass had the strongest total causal effect in the west.
+
+Compared to burn severity extremes, the indirect relationships of forest structure on median burn
+severity were marginal, and similar for all metrics in both east and west. Similar to burn severity
+extremes, biomass had a slightly strong indirect relationship in the east, yet it was a negative
+opposed to a positive relationship (fig:\@ref(fig2)). In the west, canopy closure and stand age had
+to strongest relationship, both of which were similar although canopy closure was negative whereas
+stand age was positive. In both ecoregions the total causal effects were fairly similar. Although
+the total causal effects on canopy closure was stronger for extremes than median burn severity in
+the east, under both measures of severity it had the strongest relationship with severity. Similarly
+in the west, biomass had the strongest total causal effect, but the relationship was negative for
+median burn severity whereas it was positive for burn severity extremes.
 
 Our multigroup analysis revealed that there is a difference from east to west for the indirect
 pathway between biomass and extreme burn severity (*p* (x^2~L\\ML~^) = 2.2e-11) and the indirect
@@ -474,6 +507,13 @@ severity (*p* \<0.001), with an increase in topography leading to a 26% decrease
 in burn severity (*p* =0.003), with an increase in stand age causing a 26% change in heterogeneity
 (Table \@ref(tab:s7))
 
+The indirect relationship between forest structure and heterogeneity were marginal (Figure
+\@ref(fig:4), with increases in heterogeneity ranging from 1 to 3 %. Stand age had a negative
+relationship, decreasing heterogeneity by 3%, whereas canopy closure and biomass were both positive,
+increasing heterogeneity by 2% and 1% respectively. Unlike forest structure, the indirect
+relationship between drought and burn severity heterogeneity was strong, increasing heterogeneity by
+22%.
+
 *Discussion*
 
 Our results suggest that snow cover dynamics have a direct relationship with burn severity in
@@ -512,6 +552,15 @@ Indirect effects and multigroup analysis
 
 -   reveals difference in stand composition from east to west
 
+Explain the relationship between snow free duration and drought. As we saw in our study, snow free
+duration increased as drought code increases. This is because the the later in the season fires
+burn, the greater the influence of drought. Explain this relationship, in situations where snow free
+duration is longer,
+
+Why does drought code increase snow free duration.
+
+-   provide references that support the relationship between drought influencing snow cover
+
 **caveats**
 
 -   scale of analysis
@@ -539,43 +588,64 @@ why do we study the scale we do, caveats?
 
 ```
 
-```{r fig3, echo = FALSE, results = 'asis'}
+```{r fig1b}
 
+```
+
+```{r fig3, echo = FALSE, results = 'asis'}
+#structural equation of multigroup
+```
+
+```{r 4, echo = FALSE, results = 'asis'}
+# figure for heterogeniety indirect effects
 ```
 
 # Tables
 
 ```{r s1, echo = FALSE, results = 'asis'}
-modsum
+source("manuscript/executable-scripts/sem-all-fires.R")
+source("scripts/pub-table-function.R")
+pub.table(sem_ext, response = "extreme", region = "NA")
 ```
 
 ```{r s2, echo = FALSE, results = 'asis'}
 #burn severity med
-modsum_med_all
-
+source("manuscript/executable-scripts/sem-all-fires.R")
+source("scripts/pub-table-function.R")
+pub.table(sem_med, response = "median", region = "NA")
 ```
 
 ```{r S3, echo = FALSE, results = 'asis'}
 #burn severity west/ext
-modsum_west_ext
+source("manuscript/executable-scripts/sem-east-west.R")
+source("scripts/pub-table-function.R")
+pub.table(west_sem_ext, response = "extreme", region = "west")
 ```
 
 ```{r S4, echo = FALSE, results = 'asis'}
 #burn severity east/ext}
-modsum_ee
+source("manuscript/executable-scripts/sem-east-west.R")
+source("scripts/pub-table-function.R")
+pub.table(east_sem_ext, response = "extreme", region = "east")
 ```
 
 ```{r S5, echo = FALSE, results = 'asis'}
 #burn severity west/med}
-modsum_west_med
+source("manuscript/executable-scripts/sem-east-west.R")
+source("scripts/pub-table-function.R")
+pub.table(west_sem_med, response = "median", region = "west")
 ```
 
 ```{r S6, echo = FALSE, results = 'asis'}
 #burn severity east/med}
-modsum_em
+source("manuscript/executable-scripts/sem-east-west.R")
+source("scripts/pub-table-function.R")
+pub.table(east_sem_med, response = "median", region = "east")
 ```
 
 ```{r s7, echo = FALSE, results = 'asis'}
 #heterogeneity full
-modsum_cv
+source("manuscript/executable-scripts/sem-heterogeneity.R")
+ 
+sem_table_cv(sem_cv)
 ```

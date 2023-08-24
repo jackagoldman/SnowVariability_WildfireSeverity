@@ -39,6 +39,9 @@ source("scripts/total-effects-function.R")
 #vif function (call vif.lme)
 source("scripts/vif-nlme-function.R")
 
+#
+source("scripts/sem-table-function.R")
+
 ```
 
 
@@ -153,7 +156,6 @@ plot(lme(sdd ~  avgBio + age + cc + tri, random = ~1 | Fire_Year/size_class, na.
 ### Extreme
 
 ```{r, Extreme all of Ontario}
-new_data <- rename(new_data, rbr_qs = "Severity")
 sem_ext <- psem(
   lme(sdd ~  avgBio + age + cc + tri, 
       random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"),
@@ -212,9 +214,10 @@ modsum %>%
       booktabs = T) %>% 
   kable_classic(full_width = F, html_font = "Cambria")
 
+modsum <- sem_results(sem_ext)
 modsum <- sem_table(sem_ext)
 modsum
-write.csv(modsum, "results/results-summary-tables/Table-1-sem-ext-ont.csv")
+saveRDS(sem_ext, "results/results-summary-tables/Table-1-sem-ext-ont.rds")
 ```
 
 calculate indirect effects 
@@ -290,7 +293,7 @@ modsum_med_all %>%
 
 modsum_med_all <- sem_table(sem_med)
 modsum_med_all
-write.csv(modsum_med_all, "results/results-summary-tables/Table-2-sem-med-ont.csv")
+saveRDS(sem_med, "results/results-summary-tables/Table-2-sem-med-ont.rds")
 ```
 
 total indirect effects

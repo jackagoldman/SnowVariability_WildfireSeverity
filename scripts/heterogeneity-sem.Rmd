@@ -82,6 +82,9 @@ source("scripts/sem-table-function.R")
 modsum_cv <- sem_table_cv(sem_cv)
 
 modsum_cv
+
+saveRDS(sem_cv, "results/results-summary-tables/Table-7-sem-cv.rds")
+
 ```
 
 dsep claim for snow free duration and average bio. This dsep pvalue is marginal.
@@ -128,5 +131,23 @@ ggplot(data = new_data_cv, aes(x = tri, y = sdd)) +
 
 plot(lm(sdd ~tri, data = new_data_cv))
 summary(lme(sdd ~ avgBio, random = ~1 | Fire_Year, data = new_data_cv))
+```
+
+Indirect and total effects effects
+```{r}
+source("scripts/indirect-effects-function.R")
+source("scripts/total-effects-function.R")
+source("scripts/pathway-plot-function.R")
+
+#indirect effects
+cv_ind_eff <- ind.eff(sem_cv, response = "heterogeneity")
+cv_ind_eff
+#total causal effects
+cv_tot_eff <- tot.eff(sem_cv, response = "heterogeneity")
+cv_tot_eff
+
+#plot effects
+cv_eff_plot <- pathway.plot(cv_ind_eff, cv_tot_eff, response = "heterogeneity")
+cv_eff_plot
 ```
 

@@ -208,9 +208,102 @@ lapply(east_sem_med, function(i) hist(resid(i))) # looks generally normal
 #tidy table
 modsum_em <- sem_table(east_sem_med, region = "e")
 
+modsum <- summary(east_sem_med)$coefficients
+modsum$Estimate <- round(modsum$Estimate, 3)
+modsum$Std.Error <- round(modsum$Std.Error, 3)
+modsum$Crit.Value <- round(modsum$Crit.Value, 3)
+modsum$P.Value <- round(modsum$P.Value, 3)
+modsum$P.Value <- ifelse(modsum$P.Value<0.001, "<0.001", modsum$P.Value)
+modsum$Std.Estimate <- round(modsum$Std.Estimate, 3)
+modsum$Response <- gsub("_", " ", modsum$Response)
+modsum$Predictor <- gsub("_", " ", modsum$Predictor)
+colnames(modsum)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+modsum <- data.frame(modsum)
 
 
 modsum_em
 write.csv(modsum_em, "results/results-summary-tables/Table-6-sem-med-east.csv")
 
+```
+
+# indirect effects
+
+```{r}
+source("indirect-effects-function.R")
+source("total-effects-function.R")
+source("pathway-plot-function.R")
+```
+
+# east sem ext
+```{r}
+
+#indirect
+east_ext_ont_ind_effects <- ind.eff(east_sem_ext, response = "extreme")
+east_ext_ont_ind_effects 
+#specific
+east_ext_ont_spec_ind_eff <- spec.ind.eff(east_sem_ext, response = "extreme")
+east_ext_ont_spec_ind_eff
+#total
+east_ext_ont_tot_effects <- tot.eff(east_sem_ext, response = "extreme")
+east_ext_ont_tot_effects
+
+#pathway plot
+east_ext_pathway <- pathway.plot(east_ext_ont_ind_effects, east_ext_ont_tot_effects, response = "extreme", region = "east")
+
+east_ext_pathway
+```
+
+
+# east sem med
+```{r}
+#
+east_med_ont_ind_effects <- ind.eff(east_sem_med, response = "median")
+east_med_ont_ind_effects 
+#specific
+east_med_ont_spec_ind_eff <- spec.ind.eff(east_sem_med, response = "median")
+east_med_ont_spec_ind_eff
+#total
+east_med_ont_tot_effects <- tot.eff(east_sem_med, response = "median")
+east_med_ont_tot_effects
+
+#pathway plot
+east_med_pathway <- pathway.plot(east_med_ont_ind_effects, east_med_ont_tot_effects, response = "median", region = "east")
+
+east_med_pathway
+
+```
+
+# west sem ext
+
+```{r}
+#indirect
+west_ext_ont_ind_effects <- ind.eff(west_sem_ext, response = "extreme")
+west_ext_ont_ind_effects 
+#specific
+west_ext_ont_spec_ind_eff <- spec.ind.eff(west_sem_ext, response = "extreme")
+west_ext_ont_spec_ind_eff
+#total
+west_ext_ont_tot_effects <- tot.eff(west_sem_ext, response = "extreme")
+west_ext_ont_tot_effects
+
+#pathway plot
+west_ext_pathway <- pathway.plot(west_ext_ont_ind_effects, west_ext_ont_tot_effects, response = "extreme", region = "west")
+west_ext_pathway
+```
+
+# west sem med
+```{r}
+west_med_ont_ind_effects <- ind.eff(west_sem_med, response = "median")
+west_med_ont_ind_effects 
+#specific
+west_med_ont_spec_ind_eff <- spec.ind.eff(west_sem_med, response = "median")
+west_med_ont_spec_ind_eff
+#total
+west_med_ont_tot_effects <- tot.eff(west_sem_med, response = "median")
+west_med_ont_tot_effects
+
+#pathway plot
+west_med_pathway <- pathway.plot(west_med_ont_ind_effects, west_med_ont_tot_effects, response = "median", region = "west")
+
+west_med_pathway
 ```

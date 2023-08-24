@@ -23,6 +23,19 @@
 #function
 
 ind.eff <- function(df, response){
+  
+  df <- summary(df)$coefficients
+  df$Estimate <- round(df$Estimate, 3)
+  df$Std.Error <- round(df$Std.Error, 3)
+  df$Crit.Value <- round(df$Crit.Value, 3)
+  df$P.Value <- round(df$P.Value, 3)
+  df$P.Value <- ifelse(df$P.Value<0.001, "<0.001", modsum$P.Value)
+  df$Std.Estimate <- round(df$Std.Estimate, 3)
+  df$Response <- gsub("_", " ", df$Response)
+  df$Predictor <- gsub("_", " ", df$Predictor)
+  colnames(df)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+  df <- data.frame(df)
+  
   if(response == "extreme"){
     x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
     y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
@@ -94,6 +107,41 @@ ind.eff <- function(df, response){
     table2$`Indirect Effect` = as.numeric(table2$`Indirect Effect`)
     return(table2)
   }
+  if(response == "heterogeneity"){
+    x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
+    y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
+    z = df[df$Predictor == "tssm" & df$Response == "rbr cv",8]  
+    age = (x * y *z) # age pathway
+    x1 = df[df$Predictor == "avgBio" & df$Response == "sdd",8] 
+    y1 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z1 = df[df$Predictor == "tssm" & df$Response == "rbr cv", 8]
+    abio = (x1 * y1 *z1) # avgbio pathway
+    x2 = df[df$Predictor == "cc" & df$Response == "sdd",8] 
+    y2 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z2 = df[df$Predictor == "tssm" & df$Response == "rbr cv", 8]
+    cc = (x2 *y2  * z2) #cc pathway
+    x3 = df[df$Predictor == "dc" & df$Response == "tssm", 8]
+    y3 = df[df$Predictor == "tssm" & df$Response == "rbr cv", 8]
+    dc = (x3 * y3)
+    x4 = df[df$Predictor == "tri" & df$Response == "sdd", 8]
+    y4 = df[df$Predictor == "sdd" & df$Response =="tssm", 8]
+    z4 = df[df$Predictor == "tssm" & df$Response == "rbr cv", 8]
+    tri = (x4 * y4 *z4 )
+    cols = c("Pathway", "Indirect Effect")
+    matrix2 = matrix(c("Stand age", "Average Biomass", "Canopy Closure", "Drought", "Topography" ,
+                       age, abio, cc, dc, tri), ncol =2)
+    table2 = as.table(matrix2)
+    colnames(table2) = cols
+    table2 = as.data.frame.matrix(table2)
+    rownames(table2) = NULL
+    table2<- tidyr::as_tibble(table2)
+    
+    table2 <- dplyr::mutate(table2, Response = rep("Burn Severity Heterogeneity"))
+    
+    table2 <- dplyr::relocate(table2, Response, .before = "Indirect Effect")
+    table2$`Indirect Effect` = as.numeric(table2$`Indirect Effect`)
+    return(table2)
+  }
 }
 
 # Specific indirect effects
@@ -101,6 +149,18 @@ ind.eff <- function(df, response){
 # the effect of age, cc, bio on bs through sfd
 
 spec.ind.eff <- function(df, response){
+  df <- summary(df)$coefficients
+  df$Estimate <- round(df$Estimate, 3)
+  df$Std.Error <- round(df$Std.Error, 3)
+  df$Crit.Value <- round(df$Crit.Value, 3)
+  df$P.Value <- round(df$P.Value, 3)
+  df$P.Value <- ifelse(df$P.Value<0.001, "<0.001", modsum$P.Value)
+  df$Std.Estimate <- round(df$Std.Estimate, 3)
+  df$Response <- gsub("_", " ", df$Response)
+  df$Predictor <- gsub("_", " ", df$Predictor)
+  colnames(df)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
+  df <- data.frame(df)
+  
   if(response == "extreme"){
     x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
     y = df[df$Predictor == "sdd" & df$Response == "rbr qs", 8]  
