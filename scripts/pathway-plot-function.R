@@ -44,7 +44,7 @@ if (response == "median"){
       theme(legend.position ="bottom") + xlab("Standardized Effects")+
       scale_colour_viridis_d("Effect Type", option = "viridis") +
       labs(title = "Median Burn Severity - West") + 
-      scale_y_discrete(position = "right") #y to the right to make proper pannel of plots
+      scale_y_discrete(position = "left") #y to the right to make proper pannel of plots
   }else if(region == "NA"){
     #plot
     plt <- ggplot()+
@@ -91,7 +91,7 @@ if (response == "median"){
       theme(legend.position ="bottom") + xlab("Standardized Effects")+
       scale_colour_viridis_d("Effect Type", option = "viridis") +
       labs(title = "Extreme Burn Severity - West") + 
-      scale_y_discrete(position = "right") #y to the right to make proper pannel of plots
+      scale_y_discrete(position = "left") #y to the right to make proper pannel of plots
     
     
     
@@ -124,7 +124,7 @@ if (response == "median"){
     theme(legend.position ="bottom") + xlab("Standardized Effects")+
     scale_colour_viridis_d("Effect Type", option = "viridis") +
     labs(title = "Burn Severity Heterogeneity") + 
-    scale_y_discrete(position = "right") #y to the right to make proper pannel of plots
+    scale_y_discrete(position = "left") #y to the right to make proper pannel of plots
   
   
   
@@ -137,7 +137,26 @@ if (response == "median"){
 
 
 
-
+grouped_path <- function(df1, df2, df3, df4){
+  require(patchwork)
+  #remove legends 
+  df1 <- df1 + theme(legend.position = "none")
+  df2 <- df2 + theme(legend.position = "none")
+  df3 <- df3 +theme(legend.position = "none")
+  
+  #change title
+  df1 <- df1 + labs(title = "West", subtitle = "Extreme") +   theme(plot.subtitle=element_text(hjust=0.5))
+  df2 <- df2 + labs(title = "East", subtitle = "Extreme") +   theme(plot.subtitle=element_text(hjust=0.5)) + theme(axis.title.y = element_blank())
+  df3 <-df3 + labs(title = "West", subtitle = "Median") +   theme(plot.subtitle=element_text(hjust=0.5))
+  df4 <- df4 + labs(title = "East", subtitle = "Median") +   theme(plot.subtitle=element_text(hjust=0.5))+ theme(axis.title.y = element_blank())
+  
+  #make plot
+  plot <- df1 + df2 + df3 + df4 + plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+  
+  return(plot)
+  
+  
+}
 
 
 

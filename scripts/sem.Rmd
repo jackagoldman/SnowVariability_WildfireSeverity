@@ -223,7 +223,7 @@ saveRDS(sem_ext, "results/results-summary-tables/Table-1-sem-ext-ont.rds")
 calculate indirect effects 
 
 ```{r}
-ext_ont_ind_effects <- ind.eff(modsum, response = "extreme")
+ext_ont_ind_effects <- ind.eff(sem_ext, response = "extreme")
 
 ext_ont_ind_effects
 ```
@@ -231,7 +231,7 @@ ext_ont_ind_effects
 
 Calculate total effects
 ```{r}
-ext_ont_tot_effects <- tot.eff(modsum, response = "extreme")
+ext_ont_tot_effects <- tot.eff(sem_ext, response = "extreme")
 
 ext_ont_tot_effects
 ```
@@ -299,7 +299,7 @@ saveRDS(sem_med, "results/results-summary-tables/Table-2-sem-med-ont.rds")
 total indirect effects
 ```{r}
 
-med_ont_ind_effects <- ind.eff(modsum_med_all, response = "median")
+med_ont_ind_effects <- ind.eff(sem_med, response = "median")
 
 med_ont_ind_effects 
 
@@ -308,14 +308,14 @@ med_ont_ind_effects
 specific indirect effects
 
 ```{r}
-med_ont_spec_ind_eff <- spec.ind.eff(modsum_med_all, response = "median")
+med_ont_spec_ind_eff <- spec.ind.eff(sem_med, response = "median")
 
 med_ont_spec_ind_eff
 ```
 
 total direct effects
 ```{r}
-med_ont_tot_effects <- tot.eff(modsum_med_all, response = "median")
+med_ont_tot_effects <- tot.eff(sem_med, response = "median")
 
 med_ont_tot_effects
 ```
@@ -345,14 +345,17 @@ theme_bw()+
         panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + 
   theme(legend.position ="bottom") + xlab("Standardized Effects")+
   scale_colour_viridis_d("Effect Type", option = "viridis") +
-  labs(title = "Median Burn Severity - All Fires") + 
+  labs(title = "Median Burn Severity") + 
   scale_y_discrete(position = "right") #y to the right to make proper pannel of plots
 
 
 
 
 # calculating confidence intervals for the random variables (path coefficients?)
-med.p.all
+med.p.all 
+
+med.p.all <-  med.p.all + theme(legend.position = "none",
+                                axis.title.y = element_blank())
 
 
 ```
@@ -378,13 +381,16 @@ theme_bw()+
         panel.border = element_rect(colour = "black", fill=NA, linewidth=1)) + 
   theme(legend.position ="bottom") + xlab("Standardized Effects")+
   scale_colour_viridis_d("Effect Type") +
-  labs(title = "Burn Severity Extremes - All Fires") #scale_y_discrete(position = "right") #y to the right to make proper pannel of plots
+  labs(title = "Burn Severity Extremes ") #scale_y_discrete(position = "right") #y to the right to make proper pannel of plots
 
 ext.p.all
 
 ```
 
 ```{r}
-ta
+library(patchwork)
+
+ext.p.all + med.p.all + plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+ggsave("~/Desktop/OneDrive - University of Toronto/Projects/forest-snow-fire-interactions/figures-tables/figures/FigureS1-all-ind-effects.png", width = 20, height = 20, units = "cm")
 ```
 

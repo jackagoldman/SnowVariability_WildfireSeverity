@@ -29,14 +29,14 @@ ind.eff <- function(df, response){
   df$Std.Error <- round(df$Std.Error, 3)
   df$Crit.Value <- round(df$Crit.Value, 3)
   df$P.Value <- round(df$P.Value, 3)
-  df$P.Value <- ifelse(df$P.Value<0.001, "<0.001", modsum$P.Value)
+  df$P.Value <- ifelse(df$P.Value<0.001, "<0.001", df$P.Value)
   df$Std.Estimate <- round(df$Std.Estimate, 3)
   df$Response <- gsub("_", " ", df$Response)
   df$Predictor <- gsub("_", " ", df$Predictor)
   colnames(df)[4:8] <- c("SE", "DF", "t-Value", "P-Value", "Std. Estimate")
   df <- data.frame(df)
   
-  if(response == "extreme"){
+  if (response =="extreme"){
     x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
     y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
     z = df[df$Predictor == "tssm" & df$Response == "rbr qs", 8]  
@@ -67,12 +67,9 @@ ind.eff <- function(df, response){
     
     table1 <- dplyr::mutate(table1, Response = rep("Extreme Burn Severity"))
     
-    table1 <- dplyr::relocate(table1, Response, .before = "Indirect Effect")
-    table1$`Indirect Effect` = as.numeric(table1$`Indirect Effect`)
-    
-    return(table1)
-  }
-  if(response == "median"){
+    table2 <- dplyr::relocate(table1, Response, .before = "Indirect Effect")
+    table2$`Indirect Effect` = as.numeric(table2$`Indirect Effect`)
+  }else if(response == "median"){
     x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
     y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
     z = df[df$Predictor == "tssm" & df$Response == "RBR median",8]  
@@ -105,9 +102,7 @@ ind.eff <- function(df, response){
     
     table2 <- dplyr::relocate(table2, Response, .before = "Indirect Effect")
     table2$`Indirect Effect` = as.numeric(table2$`Indirect Effect`)
-    return(table2)
-  }
-  if(response == "heterogeneity"){
+  }else if(response == "heterogeneity"){
     x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
     y = df[df$Predictor == "sdd" & df$Response == "tssm", 8]
     z = df[df$Predictor == "tssm" & df$Response == "rbr cv",8]  
@@ -140,8 +135,9 @@ ind.eff <- function(df, response){
     
     table2 <- dplyr::relocate(table2, Response, .before = "Indirect Effect")
     table2$`Indirect Effect` = as.numeric(table2$`Indirect Effect`)
-    return(table2)
+    
   }
+  return(table2)
 }
 
 # Specific indirect effects
@@ -154,7 +150,7 @@ spec.ind.eff <- function(df, response){
   df$Std.Error <- round(df$Std.Error, 3)
   df$Crit.Value <- round(df$Crit.Value, 3)
   df$P.Value <- round(df$P.Value, 3)
-  df$P.Value <- ifelse(df$P.Value<0.001, "<0.001", modsum$P.Value)
+  df$P.Value <- ifelse(df$P.Value<0.001, "<0.001", df$P.Value)
   df$Std.Estimate <- round(df$Std.Estimate, 3)
   df$Response <- gsub("_", " ", df$Response)
   df$Predictor <- gsub("_", " ", df$Predictor)
@@ -183,12 +179,10 @@ spec.ind.eff <- function(df, response){
     
     table1 <- dplyr::mutate(table1, Response = rep("Extreme Burn Severity"))
     
-    table1 <- dplyr::relocate(table1, Response, .before = "Specific Indirect Effect")
-    table1$`Specific Indirect Effect` = as.numeric(table1$`Specific Indirect Effect`)
+    table2 <- dplyr::relocate(table1, Response, .before = "Specific Indirect Effect")
+    table2$`Specific Indirect Effect` = as.numeric(table2$`Specific Indirect Effect`)
     
-    return(table1)
-  }
-  if(response == "median"){
+  }else if(response == "median"){
     x = df[df$Predictor =="age" & df$Response == "sdd",8] # 
     y = df[df$Predictor == "sdd" & df$Response == "RBR median", 8]  
     age = (x*y) # age pathway
@@ -212,6 +206,7 @@ spec.ind.eff <- function(df, response){
     
     table2 <- dplyr::relocate(table2, Response, .before = "Specific Indirect Effect")
     table2$`Specific Indirect Effect` = as.numeric(table2$`Specific Indirect Effect`)
-    return(table2)
+    
   }
+  return(table2)
 }

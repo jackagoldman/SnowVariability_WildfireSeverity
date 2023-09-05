@@ -129,6 +129,7 @@ lapply(west_sem_med, function(i) hist(resid(i))) # looks generally normal
 #
 #tidy table
 
+ 
 modsum_west_med <- sem_table(west_sem_med, region = "w")
 
 
@@ -229,9 +230,9 @@ write.csv(modsum_em, "results/results-summary-tables/Table-6-sem-med-east.csv")
 # indirect effects
 
 ```{r}
-source("indirect-effects-function.R")
-source("total-effects-function.R")
-source("pathway-plot-function.R")
+source("./scripts//indirect-effects-function.R")
+source("./scripts/total-effects-function.R")
+source("./scripts/pathway-plot-function.R")
 ```
 
 # east sem ext
@@ -305,5 +306,13 @@ west_med_ont_tot_effects
 #pathway plot
 west_med_pathway <- pathway.plot(west_med_ont_ind_effects, west_med_ont_tot_effects, response = "median", region = "west")
 
-west_med_pathway
+west_med_pathway 
 ```
+```{r}
+library(patchwork)
+
+grouped_path(west_ext_pathway, east_ext_pathway,  west_med_pathway , east_med_pathway) 
+
+ggsave("~/Desktop/OneDrive - University of Toronto/Projects/forest-snow-fire-interactions/figures-tables/figures/FigureS2-east-west-ind-effects.png", width = 20, height = 20, units = "cm")
+```
+

@@ -464,6 +464,8 @@ theme_bw()+
 ```{r}
 library(patchwork)
 
-emult_eff + mmult_eff + plot_layout(guides = "collect")
+emult_eff + mmult_eff + plot_layout(guides = "collect") 
+
+ggsave("~/Desktop/OneDrive - University of Toronto/Projects/forest-snow-fire-interactions/figures-tables/figures/FigureS3-multigroup-ind-effects.png", width = 20, height = 10, units = "cm")
 ```
 

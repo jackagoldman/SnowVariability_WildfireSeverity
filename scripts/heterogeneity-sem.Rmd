@@ -149,5 +149,8 @@ cv_tot_eff
 #plot effects
 cv_eff_plot <- pathway.plot(cv_ind_eff, cv_tot_eff, response = "heterogeneity")
 cv_eff_plot
+
+ggsave("~/Desktop/OneDrive - University of Toronto/Projects/forest-snow-fire-interactions/figures-tables/figures/FigureS4-hetero-ind-effects.png", width = 15, height = 10, units = "cm")
+
 ```
 
