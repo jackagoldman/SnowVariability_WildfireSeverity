@@ -241,7 +241,7 @@ source("./scripts/pathway-plot-function.R")
 #indirect
 east_ext_ont_ind_effects <- ind.eff(east_sem_ext, response = "extreme")
 east_ext_ont_ind_effects 
-#specific
+<- #specific
 east_ext_ont_spec_ind_eff <- spec.ind.eff(east_sem_ext, response = "extreme")
 east_ext_ont_spec_ind_eff
 #total

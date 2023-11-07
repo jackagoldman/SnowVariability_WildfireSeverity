@@ -292,7 +292,7 @@ modsum_med_all %>%
   kable_classic(full_width = F, html_font = "Cambria")
 
 modsum_med_all <- sem_table(sem_med)
-modsum_med_all
+modsum_med_all <- sem_results(sem_med)
 saveRDS(sem_med, "results/results-summary-tables/Table-2-sem-med-ont.rds")
 ```
 
@@ -391,6 +391,6 @@ ext.p.all
 library(patchwork)
 
 ext.p.all + med.p.all + plot_layout(guides = "collect") & theme(legend.position = 'bottom')
-ggsave("~/Desktop/OneDrive - University of Toronto/Projects/forest-snow-fire-interactions/figures-tables/figures/FigureS1-all-ind-effects.png", width = 20, height = 20, units = "cm")
+ggsave("~/Desktop/OneDrive - University of Toronto/Projects/forest-snow-fire-interactions/figures-tables/figures/FigureS1-all-ind-effects.png", width = 20, height = 10, units = "cm")
 ```
 
