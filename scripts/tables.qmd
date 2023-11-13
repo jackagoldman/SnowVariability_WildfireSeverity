@@ -1,0 +1,299 @@
+---
+title: "results-summary-table"
+format: html
+editor: visual
+---
+
+```{r}
+pkgs <- c("flextable", "broom", "report", "effectsize")
+install.packages(pkgs)
+```
+
+
+```{r}
+
+medall2 <- modsum_med_all |> 
+    select(c(P.Value, Std..Estimate))
+medall2<-  insertRow2(medall2, newrow2, r2)
+
+medall2[8,1:2] <- " "
+
+modsum <- modsum |> select(c(Response, Predictor, P.Value, Std..Estimate))
+
+modsum <- insertRow2(modsum, newrow2, r2)
+modsum[8,1] <- "SFDr"
+modsum[8,2] <- "Biomass"
+modsum[8,3:4] <- " "
+#
+r <- 7
+newrow <- seq(7)
+insertRow <- function(existingDF, newrow, r) {
+  existingDF[seq(r+1,nrow(existingDF)+1),] <- existingDF[seq(r,nrow(existingDF)),]
+  existingDF[r,] <- newrow
+  existingDF
+}
+r2 <- 8
+newrow2 <- seq(8)
+insertRow2 <- function(existingDF, newrow2, r2) {
+  existingDF[seq(r2+1,nrow(existingDF)+1),] <- existingDF[seq(r2,nrow(existingDF)),]
+  existingDF[r2,] <- newrow2
+  existingDF
+}
+
+# west ext
+res_west_ext <- west_sem_ext |> sem_results() |> 
+  select(c(P.Value, Std..Estimate)) 
+res_west_ext <-  insertRow(res_west_ext, newrow, r)
+res_west_ext <-  insertRow(res_west_ext, newrow, r)
+
+res_west_ext[7,1:2] <- " "
+res_west_ext[8,1:2] <- " "
+
+  # west med
+res_west_med <- west_sem_med |> sem_results() |> 
+  select(c(P.Value, Std..Estimate))
+
+res_west_med <-  insertRow(res_west_med, newrow, r)
+res_west_med <-  insertRow(res_west_med, newrow, r)
+
+res_west_med[7,1:2] <- " "
+res_west_med[8,1:2] <- " "
+
+# east med
+res_east_med <- east_sem_med |> sem_results() |> 
+  select(c(P.Value, Std..Estimate))
+
+res_east_med <-  insertRow(res_east_med, newrow, r)
+res_east_med <-  insertRow(res_east_med, newrow, r)
+
+res_east_med[7,1:2] <- " "
+res_east_med[8,1:2] <- " "
+
+#east ext
+res_east_ext <- east_sem_ext |> sem_results() |> 
+  select(c(P.Value, Std..Estimate))
+
+res_east_ext <-  insertRow(res_east_ext, newrow, r)
+res_east_ext <-  insertRow(res_east_ext, newrow, r)
+
+res_east_ext[7,1:2] <- " "
+res_east_ext[8,1:2] <- " "
+#
+modsum_tbl <- modsum |> 
+  select(c(Response, Predictor, P.Value, Std..Estimate)) |> 
+  cbind(medall2, modsum_cv, res_west_ext, res_east_ext, res_west_med, res_east_med) |> 
+  transform(P.Value = gsub('<', '&lt;', P.Value)) |> 
+  transform(P.Value.1 = gsub('<', '&lt;', P.Value.1)) |> 
+  transform(P.Value.2 = gsub('<', '&lt;', P.Value.2)) |> 
+  transform(P.Value.3 = gsub('<', '&lt;', P.Value.3)) |> 
+  transform(P.Value.4 = gsub('<', '&lt;', P.Value.4)) |> 
+  transform(P.Value.5 = gsub('<', '&lt;', P.Value.5)) |> 
+  transform(P.Value.6 = gsub('<', '&lt;', P.Value.6)) |> 
+  kbl(caption = "<b>Table 2.</b> Comparison of the results from piecwiseSEM for both extreme and median burn severity for the entire boreal shield, western boreal shield and eastern boreal shield. Table compares the significance of each pathway and the standard estimate of each pathway. In instances where no values are shown, that specific pathway was not modeled in the sem.",
+      col.names = c( "Response", "Predictor", "<i>Pvalue<i>", "<i>Std. Estimate<i>", "<i>Pvalue<i>", "<i>Std. Estimate<i>", "<i>Pvalue<i>", "<i>Std. Estimate<i>", "<i>Pvalue<i>", "<i>Std. Estimate<i>", "<i>Pvalue<i>", "<i>Std. Estimate<i>", "<i>Pvalue<i>", "<i>Std. Estimate<i>", "<i>Pvalue<i>", "<i>Std. Estimate<i>"), escape = F,
+      booktabs = T, 
+      linesep = "") |> 
+  kable_classic(full_width = T, html_font = "Cambria") |> 
+  add_header_above(c(" " = 1, " " = 1,  "Extreme" = 2, "Median" = 2, "Heterogeneity" = 2, "Extreme" = 4, "Median" = 4)) |> 
+    add_header_above(c(" " = 1, " " = 1,"Entire Boreal Shield" = 6, "West vs. East" = 4, "West vs. East" = 4)) |> 
+  column_spec(2, border_right=T) |> 
+    column_spec(8, border_right=T) |> 
+    column_spec(12, border_right=T) |> 
+    column_spec(16, border_right=T) |> 
+     kable_styling(latex_options =c("hold_position"))
+
+
+
+
+
+
+modsum_tbl
+
+#save it
+# save_kable(modsum_tbl, "results/table2-comparsion-sem-res-style1.html")
+#webshot::webshot("results/table2-comparsion-sem-res-style1.html", "results/table2-comparsion-sem-res-style1.pdf")
+
+
+#just all ontario
+
+#modsum2 <- modsum |> 
+#  select(c(Response, Predictor, P.Value, Std..Estimate)) |> 
+##  cbind(medall2) |> 
+#  kbl(caption = "piecewiseSEM results for Ontario Boreal Shield",
+#      booktabs = T) |> 
+#  kable_classic(full_width = F, html_font = "Cambria") |> 
+#  add_header_above(c(" " = 1, " " = 1,  "Extreme" = 2, "Median" = 2)) 
+
+
+# modsum2
+
+modsum_cv <- modsum_cv |> 
+  select(c(Response, Predictor, P.Value, Std..Estimate)) |> 
+  mutate(Response = case_when(Response == "Heterogeneity" ~ "Severity",
+                              TRUE ~ Response)) |> select(c(P.Value, Std..Estimate))
+
+
+```
+
+
+
+
+#model fit tables
+
+```{r}
+# all of ontario
+fire_level <- c("Extreme", "Median", "Heterogeneity")
+c <- c(14.177, 14.177, 6.069)
+df <- c(8,8,6)
+p <- c(0.077, 0.077, 0.415)
+r2_sfd<- c(0.67, 0.67, 0.77)
+r2_sfdr <- c(0.84, 0.84, 0.90)
+r2_sev <- c(0.20, 0.12, 0.29)
+names <- c("c", "df", 'p', "r2 sfd", "r2 sfdr", "r2 sev")
+
+
+table1 <- as.data.frame(rbind(c, df, p, r2_sfd, r2_sfdr, r2_sev))
+colnames(table1) <- fire_level
+table1 <- cbind(names, table1)
+table1$Heterogeneity <- as.numeric(table1$Heterogeneity)
+rownames(table1) <- NULL
+
+
+table1<- table1 |> pivot_longer(!names, names_to = "col", values_to = "val") |> 
+  pivot_wider(id_cols = col, values_from = "val", names_from = "names") 
+
+table1$df <- round(test$df, 0)
+
+colnames(table1)[1] <- "Response"
+
+table1 <- table1 |> 
+  kbl(booktabs = T,
+      linesep = "",
+      caption = "<b>Table 1.</b> Summary of model fit of structual equation models for the entire boreal shield. <i>R$^2$</i> values correspond to the proportion of variance that our model explains for the following variables: sfd = snow free date; sfdr = snow free duration; sev = severity (measured as Extreme, Median or Heterogeneity as denoted in the response column) ",
+      col.names = c( "Response", "<i>C<i>", "<i>df<i>", '<i>Pvalue<i>', "<i>R$^2$ sfd", "<i>R$^2$ sfdr", "<i>R$^2$ sev"), escape = FALSE) |> 
+  kable_styling(latex_options = c("HOLD_position", "scale_down")) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") 
+
+table1
+
+save_kable(table1, "results/table1-model-fit-entire.html")
+webshot::webshot("results/table3-comparsion-sem-res-style1.html", "results/table3-comparsion-sem-res-style1.pdf")
+
+```
+
+```{r}
+fire_level <- c("Extreme", "Median", "Heterogeneity", "Extreme", "Median", "Extreme" ,"Median")
+c <- c(14.177, 14.177, 6.069, 9.864, 9.864,  15.483, 15.483)
+df <- c(8,8,6, 10,10,10,10)
+p <- c(0.077, 0.077, 0.415, 0.453,  0.453, 0.115, 0.115)
+r2_sfd<- c(0.67, 0.67, 0.77, 0.63, 0.63, 0.78,  0.78)
+r2_sfdr <- c(0.84, 0.84, 0.90, 0.83,0.83, 0.87,  0.87)
+r2_sev <- c(0.20, 0.12, 0.29, 0.20,0.13, 0.28,  0.18 )
+names <- list( "Response", "c", "df", "Pvalue", "r2 sfd", "r2 sfdr", "r2 sev")
+
+table1 <- cbind(fire_level, c, df, p, r2_sfd, r2_sfdr, r2_sev) |> 
+  as.data.frame()
+
+colnames(table1) <- names
+
+
+
+table1a <- table1 |> 
+  kbl(booktabs = T,
+      linesep = "",
+      caption = "<b>Table 1.</b> Summary of model fit of structural equation models. <i>C</i> values correspond to the Fisher's C-statisic. <i>R<sup>2</sup></i> values correspond to the proportion of variance that our model explains for the following variables: sfd = snow free date; sfdr = snow free duration; sev = severity (measured as Extreme or Median as denoted in the response column) ",
+      col.names = c("Response", "<i>C<i>", "<i>df<i>", '<i>Pvalue<i>', "<i>R<sup>2</sup>sfd</i>", "<i>R<sup>2</sup>sfdr</i>", "<i>R<sup>2</sup>sev</i>"), escape = F) |> 
+  kable_styling(latex_options = c("HOLD_position", "scale_down")) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") |> 
+  pack_rows("Entire Boreal Shield", 1,3) |> 
+  pack_rows("Boreal Shield West", 4,5) |> 
+  pack_rows("Boreal Shield East", 6, 7)
+
+table1a
+
+
+save_kable(table1a, "results/table1-model-fit-entire.html")
+webshot::webshot("results/table1-model-fit-entire.html", "results/table1-model-fit-entire.pdf")
+
+
+```
+
+
+```{r}
+# East vs West
+Location <- c("West", "East", "West", "East")
+fire_level <- c("Extreme", "Extreme", "Median" ,"Median")
+c <- c(9.864, 15.483, 9.864, 15.483)
+df <- c(10,10,10,10)
+p <- c(0.0453, 0.115, 0.453, 0.115)
+r2_sfd<- c(0.63,0.78, 0.63, 0.78)
+r2_sfdr <- c(0.83, 0.87, 0.83, 0.87)
+r2_sev <- c(0.20, 0.28, 0.13, 0.18 )
+names <- list("Location", "Response", "c", "df", "Pvalue", "r2 sfd", "r2 sfdr", "r2 sev")
+
+table2 <- cbind(Location, fire_level, c, df, p, r2_sfd, r2_sfdr, r2_sev) |> 
+  as.data.frame()
+
+colnames(table2) <- names
+
+
+
+table2 <- table2 |> 
+  kbl(booktabs = T,
+      linesep = "",
+      caption = "<b>Table 2.</b> Summary of model fit of structural equation models for east and west boreal shield. <i>R$^2$</i> values correspond to the proportion of variance that our model explains for the following variables: sfd = snow free date; sfdr = snow free duration; sev = severity (measured as Extreme or Median as denoted in the response column) ",
+      col.names = c("Location", "Response", "<i>C<i>", "<i>df<i>", '<i>Pvalue<i>', "<i>R$^2$ sfd ", "<i>R$^2$ sfdr", "<i>R$^2$ sev"), escape = FALSE) |> 
+  kable_styling(latex_options = c("HOLD_position", "scale_down")) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") 
+
+table2
+
+
+```
+
+```{r}
+modsum_tbl <- modsum |> 
+  select(c(Response, Predictor, P.Value, Std..Estimate)) |> 
+  cbind(res_west_ext, res_east_ext, res_west_med, res_east_med, medall2, modsum_cv) |> 
+  transform(P.Value = gsub('<', '&lt;', P.Value)) |> 
+  transform(P.Value.1 = gsub('<', '&lt;', P.Value.1)) |> 
+  transform(P.Value.2 = gsub('<', '&lt;', P.Value.2)) |> 
+  transform(P.Value.3 = gsub('<', '&lt;', P.Value.3)) |> 
+  transform(P.Value.4 = gsub('<', '&lt;', P.Value.4)) |> 
+  transform(P.Value.5 = gsub('<', '&lt;', P.Value.5)) |> 
+  transform(P.Value.6 = gsub('<', '&lt;', P.Value.6)) |> 
+  kbl(caption = "<b>Table 2.</b> Comparison of the results from piecwiseSEM for both extreme and median burn severity for the entire boreal shield, western boreal shield and eastern boreal shield. Table compares the significance of each pathway and the standard estimate of each pathway. In instances where no values are shown, that specific pathway was not modeled in the sem.",
+      col.names = c( "<b>Response<b>", "<b>Predictor<b>", "<b><i>Pvalue<i><b>", "<b><i>Std. Estimate<i><b>", "<b><i>Pvalue<i><b>", "<b><i>Std. Estimate<i><b>", "<b><i>Pvalue<i><b>", "<b><i>Std. Estimate<i><b>", "<b><i>Pvalue<i><b>", "<b><i>Std. Estimate<i><b>", "<b><i>Pvalue<i><b>", "<b><i>Std. Estimate<i><b>", "<b><i>Pvalue<i><b>", "<b><i>Std. Estimate<i><b>", "<b><i>Pvalue<i><b>", "<b><i>Std. Estimate<i><b>"), escape = F,
+      booktabs = T, 
+      linesep = "") |> 
+  kable_classic(full_width = T, html_font = "Cambria") |> 
+  add_header_above(c(" " = 1, " " = 1,  "Entire Boreal Shield" = 2, "Western Boreal Shield Ecoregion" = 2, "Eastern Boreal Shield Ecoregion" = 2, "Entire Boreal Shield" = 2, "Western Boreal Shield Ecoregion" = 2, "Eastern Boreal Shield Ecoregion" = 2, "Entire Boreal Shield" = 2), bold = T) |> 
+    add_header_above(c(" " = 1, " " = 1,"Burn Severity Extremes" = 6, "Median Burn Severity" = 6, "Variation in Burn Severity" = 2), bold = T) |> 
+  column_spec(2, border_right=T) |> 
+    column_spec(8, border_right=T) |> 
+    column_spec(14, border_right=T) |> 
+    column_spec(16, border_right=T) |> 
+    column_spec(3, width = "30em", background = "lightgrey") |> 
+    column_spec(4, width = "30em", background = "lightgrey") |> 
+    column_spec(7, width = "30em", background = "lightgrey") |> 
+    column_spec(8, width = "30em", background = "lightgrey") |> 
+    column_spec(11, width = "30em", background = "lightgrey") |> 
+    column_spec(12, width = "30em", background = "lightgrey") |> 
+    column_spec(15, width = "30em", background = "lightgrey") |> 
+    column_spec(16, width = "30em", background = "lightgrey") |> 
+    column_spec(1, bold = T) |> 
+    column_spec(2, bold = T) |> 
+     kable_styling(latex_options =c("hold_position"))
+
+
+
+
+
+
+modsum_tbl
+#save it
+ save_kable(modsum_tbl, "results/table2-comparsion-sem-res-style2.html")
+webshot::webshot("results/table2-comparsion-sem-res-style2.html", "results/table2-comparsion-sem-res-style2.pdf")
+
+```
+
