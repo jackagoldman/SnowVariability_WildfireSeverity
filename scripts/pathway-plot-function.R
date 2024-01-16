@@ -1,5 +1,18 @@
-# indirect plot function
-
+#' Effects plots for SEM
+#' 
+#' This functions creates plots that compare the indirect, direct and total causal effects of between two variables
+#' from and piecewiseSEM.
+#' @param df1 dataframe consisting of indirect effects and direct effects. 
+#'            The dataframe should have a column each for the pathway and response variable as well as...
+#' @param df2 Optional. data frame consisting of total causal effects structured in same way as df1
+#' @param response one of median, extreme or heterogeneity
+#' @param region  one of east or west, or null for entire boreal shield
+#'
+#' @return returns a effects plot
+#' 
+#'
+#' @examples pathway.plot(cv_ind_eff, cv_tot_eff, response = "heterogeneity")
+#' 
 pathway.plot <- function(df1, df2, response, region){
   
   
@@ -18,6 +31,7 @@ if (response == "median"){
     plt <- ggplot()+
       geom_point(data = df_long, aes(x = effect, y = Pathway, colour = type), size = 5)+
       theme_bw()+
+      geom_vline(xintercept = 0, linetype = 2)+
       theme(axis.title = element_text(size = 14, family = "Helvetica"), 
             axis.text = element_text(size = 10, family = "Helvetica"),
             plot.title = element_text(hjust = 0.5),
@@ -36,6 +50,7 @@ if (response == "median"){
     plt <- ggplot()+
       geom_point(data = df_long, aes(x = effect, y = Pathway, colour = type), size = 5)+
       theme_bw()+
+      geom_vline(xintercept = 0, linetype = 2)+
       theme(axis.title = element_text(size = 14, family = "Helvetica"), 
             axis.text = element_text(size = 10, family = "Helvetica"),
             plot.title = element_text(hjust = 0.5),
@@ -50,6 +65,7 @@ if (response == "median"){
     plt <- ggplot()+
       geom_point(data = df_long, aes(x = effect, y = Pathway, colour = type), size = 5)+
       theme_bw()+
+      geom_vline(xintercept = 0), linetype = 2+
       theme(axis.title = element_text(size = 14, family = "Helvetica"), 
             axis.text = element_text(size = 10, family = "Helvetica"),
             plot.title = element_text(hjust = 0.5),
@@ -68,6 +84,7 @@ if (response == "median"){
     plt <- ggplot()+
       geom_point(data = df_long, aes(x = effect, y = Pathway, colour = type), size = 5)+
       theme_bw()+
+      geom_vline(xintercept = 0, linetype = 2)+
       theme(axis.title = element_text(size = 14, family = "Helvetica"), 
             axis.text = element_text(size = 10, family = "Helvetica"),
             plot.title = element_text(hjust = 0.5),
@@ -83,6 +100,7 @@ if (response == "median"){
     plt <- ggplot()+
       geom_point(data = df_long, aes(x = effect, y = Pathway, colour = type), size = 5)+
       theme_bw()+
+      geom_vline(xintercept = 0, linetype = 2)+
       theme(axis.title = element_text(size = 14, family = "Helvetica"), 
             axis.text = element_text(size = 10, family = "Helvetica"),
             plot.title = element_text(hjust = 0.5),
@@ -101,6 +119,7 @@ if (response == "median"){
     plt <- ggplot()+
       geom_point(data = df_long, aes(x = effect, y = Pathway, colour = type), size = 5)+
       theme_bw()+
+      geom_vline(xintercept = 0, linetype = 2)+
       theme(axis.title = element_text(size = 14, family = "Helvetica"), 
             axis.text = element_text(size = 10, family = "Helvetica"),
             plot.title = element_text(hjust = 0.5),
@@ -116,6 +135,7 @@ if (response == "median"){
   plt <- ggplot()+
     geom_point(data = df_long, aes(x = effect, y = Pathway, colour = type), size = 5)+
     theme_bw()+
+    geom_vline(xintercept = 0, linetype = 2)+
     theme(axis.title = element_text(size = 14, family = "Helvetica"), 
           axis.text = element_text(size = 10, family = "Helvetica"),
           plot.title = element_text(hjust = 0.5),
