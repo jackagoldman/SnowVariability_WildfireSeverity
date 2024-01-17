@@ -1,20 +1,25 @@
-### total effect function
-
-# Author: Jack A. Goldman
-
-# Date: 2023-04-25
-
-# This function calculates the total effects of forest structure on 
-# wildfire burn severity when given the following table structure:
+#' SEM total causal and direct effects
+#' @author Jack A. Goldman
+#' 
+#'This function calculates the total effects of forest structure on 
+#'wildfire burn severity when given the following table structure:
 # Predictor, Response, SE, DF, t-Value, P-Value, Std. Estimate
-# when subsetting each row in the function (x, x1, y, y1) the row x responds to 
-# path of indirect effect of interest into mediator and y responds to path from mediator
-# to response. These needs to be adjusted according to variables of interest
-# names of columns also need to be adjusted
-
-#function
-
-tot.eff <- function(df, response){
+#'when subsetting each row in the function (x, x1, y, y1) the row x responds to 
+#'path of indirect effect of interest into mediator and y responds to path from mediator
+#'to response. These needs to be adjusted according to variables of interest
+#'names of columns also need to be adjusted
+#'
+#' @param df data frame consisting of results from a SEM
+#' @param response one of median, extreme or heterogeneity
+#' @param total if total = True returns direct and total causal effects, if total = False it does not return total causal effects
+#'
+#' @return table of direct and total causal effects for each predictor x response pathway
+#' @export
+#'
+#' @examples
+#' 
+#' 
+tot.eff <- function(df, response, total = TRUE){
   
   df <- summary(df)$coefficients
   df$Estimate <- round(df$Estimate, 3)
@@ -299,7 +304,13 @@ tot.eff <- function(df, response){
     
     
   }
-  return(table2)
+  if(total == TRUE){
+    return(table2)
+  }else if(total == FALSE){
+    table2_nototal <-  table2 |> select(-c(`Total Causal Effect`))
+    return(table2_nototal)
+  }
+  
   
 }
 

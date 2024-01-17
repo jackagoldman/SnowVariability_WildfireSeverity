@@ -3,20 +3,26 @@
 #' This functions creates plots that compare the indirect, direct and total causal effects of between two variables
 #' from and piecewiseSEM.
 #' 
-#' @param df1 dataframe consisting of indirect effects and direct effects. 
+#' @param df1 dataframe consisting of indirect effects and direct effects. @seealso indirect-effects-function.R
 #'            The dataframe should have a column each for the pathway and response variable as well as...
-#' @param df2 Optional. data frame consisting of total causal effects structured in same way as df1
+#' @param df2 Optional. data frame consisting of total causal effects structured in same way as df1. @seealso total-effects-function.R
 #' @param response one of median, extreme or heterogeneity
-#' @param region  one of east or west, or null for entire boreal shield
+#' @param region  one of east or west. If no region is specified then it computes for entire boreal shield
 #'
 #' @return returns a effects plot
+#' 
 #' 
 #'
 #' @examples pathway.plot(cv_ind_eff, cv_tot_eff, response = "heterogeneity")
 #' 
 pathway.plot <- function(df1, df2, response, region){
-  if (missing(df2)){
-    df_long <- df1 |> 
+  if ("`Total Causal Effects`" %in% colnames(df2)){
+    df <-  df1 %>% 
+      left_join(df2, by = c("Pathway", "Response")) 
+    df$`Indirect Effect` <- round(df$`Indirect Effect`, digits = 3)
+    df$`Total Causal Effect` <- round(df$`Total Causal Effect`, digits = 3)
+    
+    df_long <- df |> 
       select(-c(Response)) |> 
       pivot_longer(!Pathway, names_to = "type", values_to = "effect")
   }else{
@@ -24,7 +30,7 @@ pathway.plot <- function(df1, df2, response, region){
   df <-  df1 %>% 
     left_join(df2, by = c("Pathway", "Response")) 
   df$`Indirect Effect` <- round(df$`Indirect Effect`, digits = 3)
-  df$`Total Causal Effect` <- round(df$`Total Causal Effect`, digits = 3)
+  
   
 df_long <- df %>% select(-c(Response)) %>% 
     pivot_longer(!Pathway, names_to = "type", values_to = "effect")
