@@ -2,174 +2,230 @@
 
 library(ggplot2)
 library(nlme)
-library(effects)
+library(marginaleffects)
+library(patchwork)
 
 
 
-# 
-summary(lme(rbr_qs ~ dc + tssm + sdd +tri +age + cc + avgBio, 
-    random = ~1 | Fire_Year/size_class, na.action = na.omit, data = new_data, method = "ML"))
-summary(sem_ext)
-coef_table = sem_ext |> 
-  piecewiseSEM::coefs(intercepts = TRUE) |> 
-  as.data.frame() |> 
-  select(c(Response:Std.Estimate)) |> 
-  mutate(region = rep("ecozone", 17))
-  
-coef_table_dc = coef_table[coef_table$Response == 'rbr_qs' & (coef_table$Predictor == "tssm" | coef_table$Predictor =="(Intercept)"),]
+#### return marginal effects
+#get marginal effects for sem_med
+estim_med <-marginaleffects::slopes(sem_med[[3]])
+estim_tssm_sem_med <- estim[estim$term == "tssm",]
+#add model ID column
+estim_tssm_sem_med$region <- c("Ecozone")
+#get marginal effects for west_sem_med
+estim_west_med <-marginaleffects::slopes(west_sem_med[[3]])
+estim_tssm_west_med <- estim_west_med[estim_west_med$term == "tssm",]
+estim_tssm_west_med$region <- c("Boreal Shield West")
+#get marginal effects for east_sem_med
+estim_east_med <-marginaleffects::slopes(east_sem_med[[3]])
+estim_tssm_east_med <- estim_east_med[estim_east_med$term == "tssm",]
+estim_tssm_east_med$region <- c("Boreal Shield East")
+
+#rbind the data
+med_results <- rbind(estim_tssm_sem_med, estim_tssm_east_med, estim_tssm_west_med)
 
 
-  
+#make plot
+p_med <- ggplot(data = med_results, aes(x = tssm, y = predicted,  fill = region)) + 
+  geom_smooth(data = med_results, aes(group = region) , colour = "grey" , se = TRUE, stat = "smooth", method = "lm") +
+  viridis::scale_fill_viridis(name = "Region", discrete = TRUE) + theme_bw() + 
+  labs(y = "Median Burn Severity", x = "Snow-free duration") + ylim(100, 550)
+p_med
+layer_scales(p_med)$y$range$range
 
 
+p_med_a = p_med + theme(legend.position="none")
+#### return marginal effects
+#get marginal effects for sem_ext
+estim_ext <-marginaleffects::slopes(sem_ext[[3]])
+estim_tssm_sem_ext <- estim_ext[estim_ext$term == "tssm",] 
+estim_tssm_sem_ext <-  estim_tssm_sem_ext |> 
+  select(-c(rbr_qs))
+#add model ID column
+estim_tssm_sem_ext$region <- c("Ecozone")
+#get marginal effects for west_sem_ext
+estim_west_ext <-marginaleffects::slopes(west_sem_ext[[3]])
+estim_tssm_west_ext <- estim_west_ext[estim_west_ext$term == "tssm",]
+estim_tssm_west_ext$region <- c("Boreal Shield West")
+#get marginal effects for east_sem_ext
+estim_east_ext <-marginaleffects::slopes(east_sem_ext[[3]])
+estim_tssm_east_ext <- estim_east_ext[estim_east_ext$term == "tssm",]
+estim_tssm_east_ext$region <- c("Boreal Shield East")
+view(estim_east_ext)
+#rbind the data
+ext_results <- rbind(estim_tssm_sem_ext, estim_tssm_east_ext, estim_tssm_west_ext)
 
-coef_table2 <- west_sem_ext |> 
-  piecewiseSEM::coefs(intercepts = TRUE) |> 
-  as.data.frame() |>
-  select(c(Response:Std.Estimate)) |> 
-  mutate(region = rep("west", 16))
-
-coef_table2 <- coef_table2[coef_table2$Response == 'rbr_qs' & (coef_table2$Predictor == "tssm" | coef_table2$Predictor =="(Intercept)"),]
-  
-
-
-coef_table3 <- east_sem_ext |> 
-  piecewiseSEM::coefs(intercepts = TRUE) |> 
-  as.data.frame() |>
-  select(c(Response:Std.Estimate)) |> 
-  mutate(region = rep("east", 16))
-
-coef_table3 <- coef_table3[coef_table3$Response == 'rbr_qs' & (coef_table3$Predictor == "tssm" | coef_table3$Predictor =="(Intercept)"),]
-
-
-binded <- rbind(coef_table_dc, coef_table2, coef_table3)
-
-dc_plot <- ggplot() + geom_point(data=new_data, aes(x = tssm, y= rbr_qs)) + 
-                    geom_abline(slope = coef_table_dc$Estimate[[2]], intercept = coef_table_dc$Estimate[[1]], colour = "red")+
-                    geom_abline(slope = coef_table2$Estimate[[2]], intercept = coef_table2$Estimate[[1]],  colour = "blue")+
-                    geom_abline(slope = coef_table3$Estimate[[2]],intercept = coef_table3$Estimate[[1]], colour = "green")+
-                      labs(x="Snow-free date", y="Severity")
-
-dc_plot
-################
-
-coef_table_med = sem_med |> 
-  piecewiseSEM::coefs(intercepts = TRUE) |> 
-  as.data.frame() |> 
-  select(c(Response:Std.Estimate)) |> 
-  mutate(region = rep("ecozone", 17))
-
-coef_table_med = coef_table_med[coef_table_med$Response == 'RBR_median' & (coef_table_med$Predictor == "tssm" | coef_table_med$Predictor =="(Intercept)"),]
-
-coef_table_med <- coef_table_med |> 
-  mutate(ci_lwr = (Estimate - 1.96 * Std.Error), 
-         ci_upr = (Estimate + 1.96 *Std.Error))
+#back transform predicted values
+ext_results <- ext_results |> 
+  mutate(predicted_bt = ((max_q+1) - predicted^2))
 
 
-new_data_all <-  new_data |> 
-  select(c(tssm , rbr_qs)) |>
-  mutate(ci_upr = rep(coef_table_med$ci_upr[[2]], 284),
-        ci_lwr = rep(coef_table_med$ci_lwr[[2]], 284), 
-        slope = rep(coef_table_med$Estimate[[2]], 284),
-        intercept = rep(coef_table_med$Estimate[[1]], 284))
+#make plot
+p_ext <- ggplot(data = ext_results, aes(x = tssm, y = predicted, fill = region)) + 
+  geom_smooth(data = ext_results, aes(group = region) , colour = "grey" , se = TRUE, stat = "smooth", method = "lm") +
+  viridis::scale_fill_viridis(name = "Region", discrete = TRUE) + theme_bw() +
+  labs( x = "Snow-free duration", y = "sqrt(Burn Severity Extremes)") 
+p_ext
 
-plot <-ggplot(data = new_data_all, aes(x = tssm , y = rbr_qs))+
-  geom_point()+
-  geom_ribbon(data = new_data_all, aes(ymin = ci_lwr, ymax = ci_upr, color = NULL), alpha = .15) +
-  geom_line(data = new_data_all, aes(y = slope), size = 1)
+p_ext_b = p_ext + theme(legend.position="none")
 
-
-coef_tablem2 <- west_sem_med |> 
-  piecewiseSEM::coefs(intercepts = TRUE) |> 
-  as.data.frame() |>
-  select(c(Response:Std.Estimate)) |> 
-  mutate(region = rep("west", 16)) |> 
-mutate(ci_lwr = (Estimate - 1.96 * Std.Error), 
-       ci_upr = (Estimate + 1.96 *Std.Error))
-
-coef_tablem2 <- coef_tablem2[coef_tablem2$Response == 'RBR_median' & (coef_tablem2$Predictor == "tssm" | coef_tablem2$Predictor =="(Intercept)"),]
+#get ylims
+layer_scales(p_ext)$y$range$range
 
 
 
-coef_tablem3 <- east_sem_med |> 
-  piecewiseSEM::coefs(intercepts = TRUE) |> 
-  as.data.frame() |>
-  select(c(Response:Std.Estimate)) |> 
-  mutate(region = rep("east", 16)) |>  
-  mutate(ci_lwr = (Estimate - 1.96 * Std.Error), 
-         ci_upr = (Estimate + 1.96 * Std.Error))
+#drought code med
+estim_dc_med <- estim_med[estim_med$term == "dc",] 
+estim_dc_med$region <- c("Ecozone")
+#get marginal effects for west_sem_med
+estim_dc_west_med <- estim_west_med[estim_west_med$term == "dc",]
+estim_dc_west_med$region <- c("Boreal Shield West")
+#get marginal effects for east_sem_med
+estim_dc_east_med <- estim_east_med[estim_east_med$term == "dc",]
+estim_dc_east_med$region <- c("Boreal Shield East")
 
-coef_tablem3 <- coef_tablem3[coef_tablem3$Response == 'RBR_median' & (coef_tablem3$Predictor == "tssm" | coef_tablem3$Predictor =="(Intercept)"),]
-
-
-binded_m <- rbind(coef_table_med, coef_tablem2, coef_tablem3)
-
-
-
-### good plot
-#need to figure out how to colour in the plots 
-p <- ggplot() + geom_point(data = new_data, aes(x = tssm, y= RBR_median), alpha = 0.3) + 
-  scale_color_manual(values = c("entire" = "red"))+
-  geom_abline(slope = coef_table_med$Estimate[[2]], intercept = coef_table_med$Estimate[[1]], color = "entire")+
-  geom_abline(slope = coef_table_med$ci_lwr[[2]], intercept = coef_table_med$Estimate[[1]], color = "entire", linetype ="dashed") +
-  geom_abline(slope = coef_table_med$ci_upr[[2]], intercept = coef_table_med$Estimate[[1]], color = "entire",  linetype ="dashed") 
- 
-
-p <- p + geom_abline(slope = coef_tablem2$Estimate[[2]], intercept = coef_tablem2$Estimate[[1]], colour = "green")+
-    geom_abline(slope = coef_tablem2$ci_lwr[[2]], intercept = coef_tablem2$Estimate[[1]], colour = "green", linetype ="dashed") +
-    geom_abline(slope = coef_tablem2$ci_upr[[2]], intercept = coef_tablem2$Estimate[[1]], colour = "green", , linetype ="dashed") 
-  
+#rbind the data
+med_dc_results <- rbind(estim_dc_med, estim_dc_east_med, estim_dc_west_med)
 
 
-p <- p + geom_abline(slope = coef_tablem3$Estimate[[2]], intercept = coef_tablem3$Estimate[[1]], colour = "blue")+
-    geom_abline(slope = coef_tablem3$ci_lwr[[2]], intercept = coef_tablem3$Estimate[[1]], colour = "blue", linetype ="dashed") +
-    geom_abline(slope = coef_tablem3$ci_upr[[2]], intercept = coef_tablem3$Estimate[[1]], colour = "blue", , linetype ="dashed") 
+#make plot
+p_dc_med <- ggplot(data = med_dc_results, aes(x = dc, y = predicted,  fill = region)) + 
+  geom_smooth(data = med_results, aes(group = region) , colour = "grey" , se = TRUE, stat = "smooth", method = "lm") +
+  viridis::scale_fill_viridis(name = "Region", discrete = TRUE) + theme_bw() + 
+  labs(y = "Median Burn Severity", x = "Drought") + ylim(100, 550)
+p_dc_med
 
-p + theme_classic()
-  
-  
-  summary(sem_med[[3]])
-new_pred = new_data |> 
-  select(c(rbr_qs, tssm))
-test <- predict(sem_med[[3]], new_pred, level = 0)
-  
-  summary(sem_ext)
+p_dc_med_c = p_dc_med + theme(legend.position="none")
 
 
+#### return marginal effects
+#get marginal effects for sem_ext
+estim_dc_ext <- estim_ext[estim_ext$term == "dc",] 
+estim_dc_ext <-  estim_dc_ext |> 
+  select(-c(rbr_qs))
+#add model ID column
+estim_dc_ext$region <- c("Ecozone")
+#get marginal effects for west_sem_ext
+estim_dc_west_ext <- estim_west_ext[estim_west_ext$term == "dc",]
+estim_dc_west_ext$region <- c("Boreal Shield West")
+#get marginal effects for east_sem_ext
+estim_dc_east_ext <- estim_east_ext[estim_east_ext$term == "dc",]
+estim_dc_east_ext$region <- c("Boreal Shield East")
+view(estim_east_ext)
+#rbind the data
+ext_dc_results <- rbind(estim_dc_ext, estim_dc_east_ext, estim_dc_west_ext)
 
-  estim <- modelbased::estimate_prediction(sem_med[[3]], at = "tssm", ci = c(0.50, 0.69, 0.89, 0.97))
-  
-estim <-marginaleffects::slopes(sem_med[[3]])
+#back transform predicted values
+# calculate predicted back transform
+# get max value for all of the region
+max_q = max(new_data$RBR_quant)
+ext_dc_results <- ext_dc_results |> 
+  mutate(predicted_bt = ((max_q+1) - predicted^2))
 
-estim_tssm <- estim[estim$term == "tssm",]
 
-dc_plot2
-  
-  geom_abline(slope = seq(coef_table_med$ci_upr[[2]], coef_table_med$Estimate[[2]], 
-                          coef_table_med$ci_lwr[[2]]), color = "grey60", 
-              intercept = coef_table_med$Estimate[[1]])
+
+#make plot
+p_dc_ext <- ggplot(data = ext_dc_results, aes(x = dc, y = predicted, fill = region)) + 
+  geom_smooth(data = ext_dc_results, aes(group = region) , colour = "grey" , se = TRUE, stat = "smooth", method = "lm") +
+  viridis::scale_fill_viridis(name = "Region", discrete = TRUE) + theme_bw() + 
+  labs( x = "Drought", y = "sqrt(Burn Severity Extremes)")
+p_dc_ext
+
+p_dc_ext_d = p_dc_ext
+
+g <- ggplot_build(p_dc_ext)
+unique(g$data[[1]]["fill"])
+fill
+1   #440154FF
+81  #21908CFF
+161 #FDE725FF
+
+## arrange plots
+
+p_med_a + p_dc_med_c + p_ext_b + p_dc_ext_d + plot_layout(guides = "collect") & theme(legend.position = 'bottom')
 
 
 
 
 
+# get marginal effects for cv
+#get marginal effects for sem_ext
+estim_cv <-marginaleffects::slopes(sem_cv[[3]])
+estim_tri_cv <- estim_cv[estim_cv$term == "tri",] 
 
-  geom_abline(slope = coef_tablem2$Estimate[[2]], intercept = coef_tablem2$Estimate[[1]],  colour = "blue")+
-  geom_abline(slope = coef_tablem3$Estimate[[2]],intercept = coef_tablem3$Estimate[[1]], colour = "green")+
-  labs(x="Snow-free date", y="Median BurnSeverity") + theme_bw() 
+#add model ID column
+estim_tri_cv$region <- c("Ecozone")
 
-dc_plot2
+#back transform log10
+estim_tri_cv <- estim_tri_cv |> 
+  mutate(predicted_bt = (10^predicted))
 
-pre.x <- rnorm(70, mean = 24, sd = 4)
-post.x <- rnorm(70, mean = 12, sd = 4)
-clinical.data <- data.frame(pre.x, post.x)
-error.measurement <- 3.2
+#make plot
+cv_tri <- ggplot(data = estim_tri_cv, aes(x = tri, y = predicted_bt)) + 
+  geom_smooth(data = estim_tri_cv, colour = "grey" , se = TRUE, stat = "smooth", method = "lm") +
+  viridis::scale_fill_viridis(name = "Region", discrete = TRUE) + theme_bw() +
+  scale_y_continuous(labels = scales::percent)+
+  labs( x = "Topographic Ruggedness Index", y = "Variability in Burn Severity (%)") 
 
-ribbondata<- data.frame(x=c(-50, pre.x, 50),
-                        ymin=c(  -50 - error.measurement,
-                                 pre.x - error.measurement,
-                                 50 - error.measurement),
-                        ymax=c(  -50 + error.measurement,
-                                 pre.x + error.measurement,
-                                 50 + error.measurement)
-)
+cv_tri
+
+#tssm
+estim_cv <-marginaleffects::slopes(sem_cv[[3]])
+estim_tssm_cv <- estim_cv[estim_cv$term == "tri",] 
+
+#add model ID column
+estim_tssm_cv$region <- c("Ecozone")
+
+#back transform log10
+estim_tssm_cv <- estim_tssm_cv |> 
+  mutate(predicted_bt = (10^predicted))
+
+#make plot
+tri_cv <- ggplot(data = estim_tssm_cv, aes(x = tri, y = predicted_bt)) + 
+  geom_smooth(data = estim_tssm_cv, colour = "grey" , se = TRUE, stat = "smooth", method = "lm") +
+  viridis::scale_fill_viridis(name = "Region", discrete = TRUE) + theme_bw() +
+  scale_y_continuous(labels = scales::percent)+
+  labs( x = "Topography", y = "Variability in Burn Severity (%)") 
+
+tri_cv
+
+#
+estim_cv <-marginaleffects::slopes(sem_cv[[3]])
+estim_tssm_cv <- estim_cv[estim_cv$term == "tssm",] 
+
+#add model ID column
+estim_tssm_cv$region <- c("Ecozone")
+
+#back transform log10
+estim_tssm_cv <- estim_tssm_cv |> 
+  mutate(predicted_bt = (10^predicted))
+
+#make plot
+tssm_cv <- ggplot(data = estim_tssm_cv, aes(x = tssm, y = predicted_bt)) + 
+  geom_smooth(data = estim_tssm_cv, colour = "grey" , fill = "#21908CFF" ,se = TRUE, stat = "smooth", method = "lm")  + theme_bw() +
+  scale_y_continuous(labels = scales::percent)+
+  labs( x = "Snow-free duration", y = "Variability in Burn Severity (%)") 
+
+tssm_cv
+
+
+###age
+estim_cv <-marginaleffects::slopes(sem_cv[[3]])
+estim_age_cv <- estim_cv[estim_cv$term == "age",] 
+
+#add model ID column
+estim_age_cv$region <- c("Ecozone")
+
+#back transform log10
+estim_age_cv <- estim_age_cv |> 
+  mutate(predicted_bt = (10^predicted))
+
+#make plot
+age_cv <- ggplot(data = estim_age_cv, aes(x = age, y = predicted_bt)) + 
+  geom_smooth(data = estim_age_cv , "grey", fill = "#21908CFF",  se = TRUE, stat = "smooth", method = "lm") +
+  viridis::scale_colour_viridis() + theme_bw() +
+  scale_y_continuous(labels = scales::percent)+
+  labs( x = "Stand Age", y = "Variability in Burn Severity (%)") 
+
+age_cv
