@@ -69,6 +69,8 @@ RBR quant is negatively skewed. Fix this using square root
 transformation for negatively skewed data
 
 ```{r}
+
+
 #sqrt transform rbr quant
 new_data <- new_data %>% mutate(rbr_qs = sqrt((max(RBR_quant+1)-RBR_quant)))
 hist(new_data$rbr_qs)
@@ -231,7 +233,7 @@ ext_ont_ind_effects
 
 Calculate total effects
 ```{r}
-ext_ont_tot_effects <- tot.eff(sem_ext, response = "extreme")
+ext_ont_tot_effects <- tot.eff(sem_ext, response = "extreme", total = FALSE)
 
 ext_ont_tot_effects
 ```
@@ -315,7 +317,7 @@ med_ont_spec_ind_eff
 
 total direct effects
 ```{r}
-med_ont_tot_effects <- tot.eff(sem_med, response = "median")
+med_ont_tot_effects <- tot.eff(sem_med, response = "median", total = FALSE)
 
 med_ont_tot_effects
 ```
@@ -337,7 +339,7 @@ med_ont_eff_long <- med_ont_eff %>% select(-c(Response)) %>%
 #plot
 med.p.all <- ggplot()+
   geom_point(data = med_ont_eff_long, aes(x = effect, y = Pathway, colour = type), size = 5)+
-theme_bw()+
+theme_bw()+geom_vline(xintercept = 0, linetype = 2)+
   theme(axis.title = element_text(size = 14, family = "Helvetica"), 
         axis.text = element_text(size = 10, family = "Helvetica"),
         plot.title = element_text(hjust = 0.5),
@@ -373,7 +375,7 @@ ext_ont_eff_long <- ext_ont_eff %>% select(-c(Response)) %>%
 #plot
 ext.p.all <- ggplot()+
   geom_point(data = ext_ont_eff_long, aes(x = effect, y = Pathway, colour = type), size = 5)+
-theme_bw()+
+theme_bw()+ geom_vline(xintercept = 0, linetype = 2)+
   theme(axis.title = element_text(size = 14, family = "Helvetica"), 
         axis.text = element_text(size = 10, family = "Helvetica"),
         plot.title = element_text(hjust = 0.5),

@@ -241,11 +241,11 @@ source("./scripts/pathway-plot-function.R")
 #indirect
 east_ext_ont_ind_effects <- ind.eff(east_sem_ext, response = "extreme")
 east_ext_ont_ind_effects 
-<- #specific
+#specific
 east_ext_ont_spec_ind_eff <- spec.ind.eff(east_sem_ext, response = "extreme")
 east_ext_ont_spec_ind_eff
 #total
-east_ext_ont_tot_effects <- tot.eff(east_sem_ext, response = "extreme")
+east_ext_ont_tot_effects <- tot.eff(east_sem_ext, response = "extreme", total = FALSE)
 east_ext_ont_tot_effects
 
 #pathway plot
@@ -264,7 +264,7 @@ east_med_ont_ind_effects
 east_med_ont_spec_ind_eff <- spec.ind.eff(east_sem_med, response = "median")
 east_med_ont_spec_ind_eff
 #total
-east_med_ont_tot_effects <- tot.eff(east_sem_med, response = "median")
+east_med_ont_tot_effects <- tot.eff(east_sem_med, response = "median", total = FALSE)
 east_med_ont_tot_effects
 
 #pathway plot
@@ -284,7 +284,7 @@ west_ext_ont_ind_effects
 west_ext_ont_spec_ind_eff <- spec.ind.eff(west_sem_ext, response = "extreme")
 west_ext_ont_spec_ind_eff
 #total
-west_ext_ont_tot_effects <- tot.eff(west_sem_ext, response = "extreme")
+west_ext_ont_tot_effects <- tot.eff(west_sem_ext, response = "extreme", total = FALSE)
 west_ext_ont_tot_effects
 
 #pathway plot
@@ -300,7 +300,7 @@ west_med_ont_ind_effects
 west_med_ont_spec_ind_eff <- spec.ind.eff(west_sem_med, response = "median")
 west_med_ont_spec_ind_eff
 #total
-west_med_ont_tot_effects <- tot.eff(west_sem_med, response = "median")
+west_med_ont_tot_effects <- tot.eff(west_sem_med, response = "median", total = FALSE)
 west_med_ont_tot_effects
 
 #pathway plot

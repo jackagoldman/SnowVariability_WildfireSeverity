@@ -79,7 +79,7 @@ sem_cv <- psem(
 summary(sem_cv)
 
 source("scripts/sem-table-function.R")
-modsum_cv <- sem_table_cv(sem_cv)
+modsum_cv <- sem_results_cv(sem_cv)
 
 modsum_cv
 
@@ -143,11 +143,11 @@ source("scripts/pathway-plot-function.R")
 cv_ind_eff <- ind.eff(sem_cv, response = "heterogeneity")
 cv_ind_eff
 #total causal effects
-cv_tot_eff <- tot.eff(sem_cv, response = "heterogeneity")
+cv_tot_eff <- tot.eff(sem_cv, response = "heterogeneity", total = FALSE)
 cv_tot_eff
 
 #plot effects
-cv_eff_plot <- pathway.plot(cv_ind_eff, cv_tot_eff, response = "heterogeneity")
+cv_eff_plot <- pathway.plot(cv_ind_eff, cv_tot_eff,  response = "heterogeneity")
 cv_eff_plot
 
 ggsave("~/Desktop/OneDrive - University of Toronto/Projects/forest-snow-fire-interactions/figures-tables/figures/FigureS4-hetero-ind-effects.png", width = 15, height = 10, units = "cm")

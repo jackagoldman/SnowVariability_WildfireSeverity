@@ -22,6 +22,17 @@
 
 #function
 
+#' Title
+#'
+#' @param df 
+#' @param response 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
+
 ind.eff <- function(df, response){
   
   df <- summary(df)$coefficients
@@ -144,6 +155,15 @@ ind.eff <- function(df, response){
 
 # the effect of age, cc, bio on bs through sfd
 
+#' Title
+#'
+#' @param df 
+#' @param response 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 spec.ind.eff <- function(df, response){
   df <- summary(df)$coefficients
   df$Estimate <- round(df$Estimate, 3)
