@@ -1,0 +1,24 @@
+// entire dag
+digraph "updated-entire-dag" {
+	B [label=Biomass shape=rect]
+	C [label="Canopy Closure" shape=rect]
+	S [label="Stand Age" shape=rect]
+	A [label="Snow-free date" shape=rect]
+	R [label="Snow-free duration" shape=rect]
+	V [label="Burn Severity" color=red shape=ellipse]
+	T [label=Topography shape=rect]
+	D [label=Drought shape=rect]
+	B -> A
+	C -> A
+	S -> A
+	A -> R
+	B -> V
+	C -> V
+	S -> V
+	R -> V
+	D -> V
+	T -> V
+	T -> A
+	D -> R
+	B -> R [style=dashed]
+}
